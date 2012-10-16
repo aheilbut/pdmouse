@@ -16,7 +16,7 @@ loadCELs <- function() {
   return(pd.eset)
 }
 
-#  pd.eset <- loadCELs()
+pd.eset <- loadCELs()
 
 
 loadData <- function() { 
@@ -62,18 +62,30 @@ dat.medians$ttest <- apply(exprs(pd.eset), 1,
 
 data <- exprs(pd.eset[,c(ascorbate$filenames, ohda$filenames)])
 y <- c(rep(1,10), rep(2,7))
-samfit <- SAM(data, y, resp.type="Two class unpaired", nperms=2000)
-
+samfit <- SAM(data, y, resp.type="Two class unpaired", geneid=row.names(data), nperms=50)
 
 # 6-OHDA/saline vs 6-OHDA/chronic low levodopa vs. chronic high levodopa
-a <- subset(pd.covar, MouseType=="CP101" & DrugTreat=="Chronic saline" & LesionType=="6-OHDA")
-b <- subset(pd.covar, MouseType=="CP101" & DrugTreat=="Chronic low levodopa" & LesionType=="6-OHDA")
-c <- subset(pd.covar, MouseType=="CP101" & DrugTreat=="Chronic high levodopa" & LesionType=="6-OHDA")
+d_a <- subset(pd.covar, MouseType=="CP73" & DrugTreat=="Chronic saline" & LesionType=="6-OHDA")
+d_b <- subset(pd.covar, MouseType=="CP73" & DrugTreat=="Chronic low levodopa" & LesionType=="6-OHDA")
+d_c <- subset(pd.covar, MouseType=="CP73" & DrugTreat=="Chronic high levodopa" & LesionType=="6-OHDA")
 
-data <- exprs(pd.eset[,c(a$filenames, c$filenames)])
-y <- c(rep(0, dim(a)[1]), c$Day8AIM)
-samfit.2 <- SAM(data, y, resp.type="Quantitative", nperms=200)
+for (i in 1:8) { 
+  par(new=T); 
+  plot( x = c(1,3,4,5,8), 
+        y = d_c[i, c("Day1AIM","Day3AIM", "Day4AIM", "Day5AIM", "Day8AIM")], 
+        type="o", 
+        col="red", 
+        ylim=c(0, 40)) 
+}
 
+data <- exprs(pd.eset[,c(d_b$filenames, d_c$filenames)])
+# y <- c(rep(0, dim(a)[1]), d_c$totalAIM)
+y <- c(d_b$totalAIM, d_c$totalAIM)
+
+data <- exprs(pd.eset[,d_b$filenames])
+y <- c(d_b$totalAIM)
+
+samfit.2 <- SAM(data, y, resp.type="Quantitative", geneid=row.names(data))
 
 up <- as.data.frame(samfit.2$siggenes.table$genes.up)
 up$probe_id <- rownames(exprs(pd.eset))[as.integer(as.matrix(up$"Gene Name"))]
@@ -81,7 +93,24 @@ up$probe_id <- rownames(exprs(pd.eset))[as.integer(as.matrix(up$"Gene Name"))]
 down <- as.data.frame(samfit$siggenes.table$genes.lo)
 down$probe_id <- rownames(exprs(pd.eset))[down$"Gene Name"]
 
-merge(up, mo430genenames, by.x="probe_id", by.y="probe_id", sort=FALSE)[1:50,]
-merge(dat.medians[order(dat.medians$ttest, decreasing=FALSE),][1:30,], mo430genenames, by.x=0, by.y="probe_id", sort=FALSE)
+merge(up, mo430genenames, by.x="Gene Name", by.y="probe_id", sort=FALSE)[1:50,]
+merge(dat.medians[order(dat.medians$ttest, decreasing=FALSE),][1:30,], mo430genenames, by.x=0, by.y="probe_id", sort=FALSE
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
 
 #mo430genenames[mo430genenames$probe_id %in% rownames(exprs(pd.eset))[as.integer(samfit$siggenes.table$genes.up[,"Gene Name"])]

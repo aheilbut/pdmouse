@@ -40,6 +40,8 @@ loadData <- function() {
 }
 
 pd.covar <- loadData()
+pd.covar$totalAIM <- apply(pd.covar[c("Day1AIM","Day3AIM","Day4AIM","Day5AIM","Day8AIM")], 1, sum)
+
 
 ascorbate <- subset(pd.covar, MouseType=="CP101" & DrugTreat=="Chronic saline" & LesionType=="Ascorbate")
 ohda <- subset(pd.covar, MouseType=="CP101" & DrugTreat=="Chronic saline" & LesionType=="6-OHDA")
@@ -65,9 +67,12 @@ y <- c(rep(1,10), rep(2,7))
 samfit <- SAM(data, y, resp.type="Two class unpaired", geneid=row.names(data), nperms=50)
 
 # 6-OHDA/saline vs 6-OHDA/chronic low levodopa vs. chronic high levodopa
-d_a <- subset(pd.covar, MouseType=="CP73" & DrugTreat=="Chronic saline" & LesionType=="6-OHDA")
-d_b <- subset(pd.covar, MouseType=="CP73" & DrugTreat=="Chronic low levodopa" & LesionType=="6-OHDA")
-d_c <- subset(pd.covar, MouseType=="CP73" & DrugTreat=="Chronic high levodopa" & LesionType=="6-OHDA")
+d_chronic_saline <- subset(pd.covar, MouseType=="CP73" & DrugTreat=="Chronic saline" & LesionType=="6-OHDA")
+d_chronic_low_levo <- subset(pd.covar, MouseType=="CP73" & DrugTreat=="Chronic low levodopa" & LesionType=="6-OHDA")
+d_chronic_high_levo <- subset(pd.covar, MouseType=="CP73" & DrugTreat=="Chronic high levodopa" & LesionType=="6-OHDA")
+d_acute_high_levo <- subset(pd.covar, MouseType=="CP73" & DrugTreat=="Acute high levodopa" & LesionType=="6-OHDA")
+d_acute_saline <- subset(pd.covar, MouseType=="CP73" & DrugTreat=="Acute saline" & LesionType=="6-OHDA")
+
 
 for (i in 1:8) { 
   par(new=T); 
@@ -78,14 +83,30 @@ for (i in 1:8) {
         ylim=c(0, 40)) 
 }
 
+
+function doSAM(data, response, comparison) { 
+
 data <- exprs(pd.eset[,c(d_b$filenames, d_c$filenames)])
 # y <- c(rep(0, dim(a)[1]), d_c$totalAIM)
 y <- c(d_b$totalAIM, d_c$totalAIM)
 
-data <- exprs(pd.eset[,d_b$filenames])
-y <- c(d_b$totalAIM)
+data <- exprs(pd.eset[,d_chronic_high_levo$filenames])
+y <- c(d_chronic_high_levo$totalAIM)
 
-samfit.2 <- SAM(data, y, resp.type="Quantitative", geneid=row.names(data))
+SAM.chronic_high_vs_AIM <- SAM(exprs(pd.eset[,d_chronic_high_levo$filenames]),
+                d_chronic_high_levo$totalAIM,
+                resp.type="Quantitative", 
+                geneid=row.names(data))
+
+
+all_levo_files <- c(d_chronic_low_levo$filenames, d_chronic_high_levo$filenames)
+data.all_levo <- exprs(pd.eset[,all_levo_files])
+responses.all_levo <- c(d_chronic_low_levo$totalAIM, d_chronic_high_levo$totalAIM)
+SAM.allLevo_vs_AIM <- SAM( data.all_levo,
+                           responses.all_levo,
+                           resp.type="Quantitative",
+                           geneid=row.names(data.all_levo)
+                           )
 
 up <- as.data.frame(samfit.2$siggenes.table$genes.up)
 up$probe_id <- rownames(exprs(pd.eset))[as.integer(as.matrix(up$"Gene Name"))]

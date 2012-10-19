@@ -109,76 +109,64 @@ fdr_cutoff = 0.2
 SAM.cp73.chronic_high_vs_AIM <- SAM(exprs(pd.eset[,d_cp73_chronic_high_levo$filenames]),
                 d_cp73_chronic_high_levo$totalAIM,
                 resp.type="Quantitative", 
-                geneid=row.names(data),  
+                geneid=row.names(exprs(pd.eset)),  
                 fdr.output=fdr_cutoff)
 
 SAM.cp73.all_levo_vs_AIM <- SAM(exprs(pd.eset[,d_cp73_all_levo$filenames]),
                                  d_cp73_all_levo$totalAIM,
                                  resp.type="Quantitative", 
-                                 geneid=row.names(data),
+                                 geneid=row.names(exprs(pd.eset)),
                                 fdr.output=fdr_cutoff)
 
 SAM.cp101.chronic_high_vs_AIM <- SAM(exprs(pd.eset[,d_cp101_chronic_high_levo$filenames]),
                                      d_cp101_chronic_high_levo$totalAIM,
                                      resp.type="Quantitative", 
-                                     geneid=row.names(data),
+                                     geneid=row.names(exprs(pd.eset)),
                                      fdr.output=fdr_cutoff)
-
-
-SAM.cp101.chronic_high_vs_AIMDay8 <- SAM(exprs(pd.eset[,d_cp101_chronic_high_levo$filenames]),
-                                     d_cp101_chronic_high_levo$Day8AIM,
-                                     resp.type="Quantitative", 
-                                     geneid=row.names(data),
-                                     fdr.output=fdr_cutoff)
-
-
 
 SAM.cp101.chronic_low_vs_AIM <- SAM(exprs(pd.eset[,d_cp101_chronic_low_levo$filenames]),
                                      d_cp101_chronic_low_levo$totalAIM,
                                      resp.type="Quantitative", 
-                                     geneid=row.names(data),
+                                     geneid=row.names(exprs(pd.eset)),
                                      fdr.output=fdr_cutoff)
 
 SAM.cp73.chronic_low_vs_AIM <- SAM(exprs(pd.eset[,d_cp73_chronic_low_levo$filenames]),
                                      d_cp73_chronic_low_levo$totalAIM,
                                      resp.type="Quantitative", 
-                                     geneid=row.names(data),
+                                     geneid=row.names(exprs(pd.eset)),
                                      fdr.output=fdr_cutoff)
 
 
 SAM.cp101.all_levo_vs_AIM <- SAM(exprs(pd.eset[,d_cp101_all_levo$filenames]),
                                  d_cp101_all_levo$totalAIM,
                                  resp.type="Quantitative", 
-                                 geneid=row.names(data),
+                                 geneid=row.names(exprs(pd.eset)),
                                  fdr.output=fdr_cutoff)
 
 
 SAM.cp101.all_levo_vs_saline <- SAM(exprs(pd.eset[,c(d_cp101_all_levo$filenames,d_cp101_all_saline$filenames)]),
                                  c( rep(2, dim(d_cp101_all_levo)[1]), rep(1, dim(d_cp101_all_saline)[1])),
                                  resp.type="Two class unpaired", 
-                                 geneid=row.names(data),
+                                 geneid=row.names(exprs(pd.eset)),
                                  fdr.output=fdr_cutoff)
 
 SAM.cp73.all_levo_vs_saline <- SAM(exprs(pd.eset[,c(d_cp73_all_levo$filenames,d_cp73_all_saline$filenames)]),
                                     c( rep(2, dim(d_cp73_all_levo)[1]), rep(1, dim(d_cp73_all_saline)[1])),
                                     resp.type="Two class unpaired", 
-                                    geneid=row.names(data),
+                                    geneid=row.names(exprs(pd.eset)),
                                     fdr.output=fdr_cutoff)
-
-
-
 
 SAM.cp101.chronic_high_vs_saline <- SAM(exprs(pd.eset[,c(d_cp101_chronic_high_levo$filenames, d_cp101_chronic_saline$filenames)]),
                                         c(rep(2, dim(d_cp101_chronic_high_levo)[1]), rep(1, dim(d_cp101_chronic_saline)[1])),
                                         resp.type="Two class unpaired", 
-                                        geneid=row.names(data),
-                                        fdr.output=0.20)  
+                                        geneid=row.names(exprs(pd.eset)),
+                                        fdr.output=0.20, nperm=100)  
 
 SAM.cp73.chronic_high_vs_saline <- SAM(exprs(pd.eset[,c(d_cp73_chronic_high_levo$filenames, d_cp73_chronic_saline$filenames)]),
                                         c(rep(2, dim(d_cp73_chronic_high_levo)[1]), rep(1, dim(d_cp73_chronic_saline)[1])),
                                         resp.type="Two class unpaired", 
-                                        geneid=row.names(data),
-                                        fdr.output=0.20)
+                                        geneid=row.names(exprs(pd.eset)),
+                                        fdr.output=0.20, nperm=100)
 
 
 SAM.cp101.chronhighup_chronhighlevo_vs_AIM <- SAM(exprs(pd.eset[SAM.cp101.chronic_high_vs_saline$siggenes.table$genes.up[,"Gene Name"],
@@ -239,7 +227,15 @@ SAM.cp73.all_levo_up_and_all_levo_AIM <- SAM(exprs(pd.eset[responsive_set,d_cp73
                                             d_cp73_all_levo$totalAIM,
                                              resp.type="Quantitative", 
                                              geneid=responsive_set,
-                                            fdr.output=0.05)
+                                            fdr.output=0.05, nperm=1000)
+
+
+responsive_set <- SAM.cp73.all_levo_vs_saline$siggenes.table$genes.lo[as.numeric(as.data.frame(SAM.cp73.all_levo_vs_saline$siggenes.table$genes.lo, stringsAsFactors=FALSE )$'q-value(%)') < 10, "Gene Name"  ]
+SAM.cp73.all_levo_down_and_all_levo_AIM <- SAM(exprs(pd.eset[responsive_set,d_cp73_all_levo$filenames]),
+                                            d_cp73_all_levo$totalAIM,
+                                             resp.type="Quantitative", 
+                                             geneid=responsive_set,
+                                            fdr.output=0.05, nperm=1000)
 
 
 responsive_set <- SAM.cp101.all_levo_vs_saline$siggenes.table$genes.up[as.numeric(as.data.frame(SAM.cp101.all_levo_vs_saline$siggenes.table$genes.up, stringsAsFactors=FALSE )$'q-value(%)') < 10, "Gene Name"  ]
@@ -247,7 +243,14 @@ SAM.cp101.all_levo_up_and_all_levo_AIM <- SAM(exprs(pd.eset[responsive_set,d_cp1
                                              d_cp101_all_levo$totalAIM,
                                              resp.type="Quantitative", 
                                              geneid=responsive_set,
-                                             fdr.output=0.05)
+                                             fdr.output=0.05, nperm=1000)
+
+responsive_set <- SAM.cp101.all_levo_vs_saline$siggenes.table$genes.lo[as.numeric(as.data.frame(SAM.cp101.all_levo_vs_saline$siggenes.table$genes.lo, stringsAsFactors=FALSE )$'q-value(%)') < 10, "Gene Name"  ]
+SAM.cp101.all_levo_down_and_all_levo_AIM <- SAM(exprs(pd.eset[responsive_set,d_cp101_all_levo$filenames]),
+                                            d_cp101_all_levo$totalAIM,
+                                             resp.type="Quantitative", 
+                                             geneid=responsive_set,
+                                            fdr.output=0.05, nperm=1000)
 
 
 
@@ -277,7 +280,7 @@ annotate_samtable <- function(sam_result) {
                mo430genenames, 
                by.x="Gene Name", 
                by.y="probe_id", 
-               sort=FALSE), mo430symbol, by.x="Gene Name", by.y="probe_id", sort=FALSE)[1:min(100, dim(sam_result)[1]),] )
+               sort=FALSE), mo430symbol, by.x="Gene Name", by.y="probe_id", sort=FALSE)[1:min(10000, dim(sam_result)[1]),] )
   
 }
       
@@ -311,7 +314,7 @@ plot_ExprAIM <- function(probe_id, mouse_type) {
        y=pd_set$totalAIM, 
        color=pd_set$DrugTreat, 
        shape=pd_set$LesionType, 
-       size=I(2), 
+       size=I(3), 
        xlab="log2 expression", 
         ylab="integral of AIM score",
        main=title, 
@@ -325,7 +328,7 @@ plot_ExprAIM <- function(probe_id, mouse_type) {
 #for 
       
 printGraphs <- function(samset, filename, description, maxgraphs) {       
-  pdf(file=paste("~/Dropbox/", filename))
+  pdf(file=paste("~/Dropbox/", filename, sep=""))
   current <- samset
   #grid.table(annotate_samtable(current$siggenes.table$genes.up), gp=gpar(fontsize=6))      
   current.up <- as.data.frame(samset$siggenes.table$genes.up, stringsAsFactors=FALSE)
@@ -334,6 +337,7 @@ printGraphs <- function(samset, filename, description, maxgraphs) {
   if (!is.null(current$siggenes.table$genes.up)) {
   for (g in rownames(current.up[1:min(maxgraphs, dim(current.up)[1]),])) { 
     probe <- current.up[g, "Gene Name"]
+    print(probe)
     #do.call(arrange_ggplot2, list(do.call(plot_ExprAIM, list(probe, "CP73")), do.call(plot_ExprAIM, list(probe, "CP101")), ncol=1))
     arrange_ggplot2( plot_ExprAIM(probe, "CP73"),  plot_ExprAIM(probe, "CP101"), ncol=1)
   }
@@ -342,6 +346,7 @@ printGraphs <- function(samset, filename, description, maxgraphs) {
   if (!is.null(current$siggenes.table$genes.lo)) {
   for (g in rownames(current.lo[1:min(maxgraphs, dim(current.lo)[1]),])) { 
     probe <- current.lo[g, "Gene Name"]
+    print(probe)
 #    do.call( arrange_ggplot2, list( do.call(plot_ExprAIM, list(probe, "CP73")), do.call(plot_ExprAIM, list(probe, "CP101")), ncol=1))
     arrange_ggplot2( plot_ExprAIM(probe, "CP73"),  plot_ExprAIM(probe, "CP101"), ncol=1)
     
@@ -360,8 +365,30 @@ printGraphs(SAM.cp73.chronhighup_chronhighlevo_vs_AIM, "sam_cp73_chron_high_levo
 
 printGraphs(SAM.cp73.chronhighup_chronhighlevo_vs_AIM, "sam_cp73_chron_high_levo_vs_saline_VS_AIM.pdf", "Filter genes up vs saline, then scored by regression to AIM", 10)
       
-printGraphs(SAM.cp73.all_levo_up_and_all_levo_AIM, "SAM.cp73.all_levo_up_and_all_levo_AIM.pdf", "Filter genes up vs saline, then scored by regression to AIM", 10)
-printGraphs(SAM.cp101.all_levo_up_and_all_levo_AIM, "SAM.cp101.all_levo_up_and_all_levo_AIM.pdf", "Filter genes up vs saline, then scored by regression to AIM", 10)
+printGraphs(SAM.cp73.all_levo_up_and_all_levo_AIM, "SAM.cp73.all_levo_up_and_all_levo_AIM.pdf", "Filter genes up vs saline, then scored by regression to AIM", 100)
+printGraphs(SAM.cp101.all_levo_up_and_all_levo_AIM, "SAM.cp101.all_levo_up_and_all_levo_AIM.pdf", "Filter genes up vs saline, then scored by regression to AIM", 100)
+ 
+printGraphs(SAM.cp73.all_levo_down_and_all_levo_AIM, "SAM.cp73.all_levo_down_and_all_levo_AIM.pdf", "Filter genes up vs saline, then scored by regression to AIM", 100)
+printGraphs(SAM.cp101.all_levo_down_and_all_levo_AIM, "SAM.cp101.all_levo_down_and_all_levo_AIM.pdf", "Filter genes up vs saline, then scored by regression to AIM", 100)
+      
+annotate_samtable(SAM.cp73.all_levo_up_and_all_levo_AIM$siggenes.table$genes.up)      
+
+write.table(annotate_samtable(SAM.cp73.all_levo_up_and_all_levo_AIM$siggenes.table$genes.up),
+            file="~/Dropbox/CP73_up_allLevo_AIM.xls", quote=FALSE, sep="\t")
+write.table(annotate_samtable(SAM.cp101.all_levo_up_and_all_levo_AIM$siggenes.table$genes.up),
+            file="~/Dropbox/CP101_up_allLevo_AIM.xls", quote=FALSE, sep="\t")
+write.table(annotate_samtable(SAM.cp73.all_levo_down_and_all_levo_AIM$siggenes.table$genes.lo),
+            file="~/Dropbox/CP73_down_allLevo_AIM.xls", quote=FALSE, sep="\t")
+write.table(annotate_samtable(SAM.cp101.all_levo_down_and_all_levo_AIM$siggenes.table$genes.lo),
+            file="~/Dropbox/CP101_down_allLevo_AIM.xls", quote=FALSE, sep="\t")
+
+write.table(annotate_samtable(SAM.cp73.all_levo_vs_saline$siggenes.table$genes.up),
+            file="~/Dropbox/CP73_all_levo_up.xls", quote=FALSE, sep="\t")      
+
+write.table(annotate_samtable(SAM.cp101.all_levo_vs_saline$siggenes.table$genes.up),
+            file="~/Dropbox/CP101_all_levo_up.xls", quote=FALSE, sep="\t")      
+
+      
       
 pdf("~/Dropbox/test.pdf")
   for (i in c("1422507_at", "1452731_x_at")) {

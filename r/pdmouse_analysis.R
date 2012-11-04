@@ -18,6 +18,31 @@ loadCELs <- function() {
 
 pd.eset <- loadCELs()
 
+# make a simple linear model
+aimcorr_cp73_chron_high_f <- lapply(1:length(rownames(exprs(pd.eset))), 
+  function(i) {
+    return( lm(aim ~ expression, 
+              data.frame(expression = exprs(pd.eset)[i,d_cp73_chronic_high_levo$filenames], 
+                         aim = d_cp73_chronic_high_levo$totalAIM)) )
+  })
+
+aimcorr_cp73_chron_low_f <- lapply(1:length(rownames(exprs(pd.eset))), 
+  function(i) {
+    return( lm(aim ~ expression, 
+               data.frame(expression=exprs(pd.eset)[i,d_cp73_chronic_low_levo$filenames], 
+                          aim=d_cp73_chronic_low_levo$totalAIM)) )    
+  })
+
+aimcorr_cp73_chron_high_f_pval <- sapply( aimcorr_cp73_chron_high_f, lmp)
+aimcorr_cp73_chron_low_f_pval <- sapply( aimcorr_cp73_chron_low_f, lmp)
+
+mo430genenames[ rownames(exprs(pd.eset))[ which( aimcorr_cp73_chron_high_f_pval < 0.001 ) ], ]
+
+plotcorr <- function(x) {
+  plot( aimcorr_cp73_chron_high_f[[x]]$model$expression, aimcorr_cp73_chron_high_f[[x]]$model$aim)
+  lines( aimcorr_cp73_chron_high_f[[x]]$model$expression, aimcorr_cp73_chron_high_f[[x]]$fitted.values, lty=8, col="red")
+}
+
 
 loadData <- function() { 
   

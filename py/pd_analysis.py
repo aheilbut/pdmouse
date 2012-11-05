@@ -14,14 +14,17 @@ import time, datetime
 import scipy.stats as st
 import statsmodels.sandbox.stats.multicomp
 
-def fitAIM(probeset, dataset):
+def fitAIM(probeset, covar_subset, dataset):
     model = "AIM ~ expression"
-    cur_gene = pandas.DataFrame( { "expression" : pd_all.ix[probeset,dataset.filenames], "AIM" : list(dataset.totalAIM) } )
+    cur_gene = pandas.DataFrame( { "expression" : dataset.ix[probeset,covar_subset.filenames], 
+                                  "AIM" : list(covar_subset.totalAIM) } )
     test_model = ols(model, cur_gene).fit()
     return test_model
 
-def fitModels(probeset, dataset):
-    fits = pandas.DataFrame( index=probeset, data=[fitAIM(p, dataset) for p in probeset], columns=["model"])
+def fitModels(probeset, covar_subset, dataset):
+    fits = pandas.DataFrame( index = probeset, 
+                            data = [fitAIM(p, covar_subset, dataset) for p in probeset], 
+                            columns=["model"])
     fits["pval"] = fits["model"].map( lambda x: x.pvalues["expression"] )
     fits["expr_coef"] = fits["model"].map( lambda x: x.params["expression"] )
     fits["bh"] = statsmodels.sandbox.stats.multicomp.multipletests(fits.pval, method="fdr_bh")[1]
@@ -31,7 +34,7 @@ def fitModels(probeset, dataset):
     
     return fits
 
-def fitModels():
+def dofitModels():
     aim_models_cp73_chronicHigh = fitModels(pd_all.index, ss_cp73_chronicHigh)
     aim_models_cp73_chronicLow = fitModels(pd_all.index, ss_cp73_chronicLow)
     

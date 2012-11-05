@@ -17,7 +17,7 @@ pd_covar = pandas.read_table("/data/adrian/Dropbox/Projects/Broad/PD_mouse/resul
 mo430symbol = pandas.read_table("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/Oct29/mo4302symbols.tab")
 mo430symbol.index = mo430symbol.probe_id
 
-mo430names =pandas.read_table("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/Oct29/mo4302genenames.tab")
+mo430names = pandas.read_table("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/Oct29/mo4302genenames.tab")
 mo430names.index =  mo430names.probe_id
 
 mo430info = mo430symbol.merge(mo430names)
@@ -41,6 +41,20 @@ ss_cp101_chronicLow = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == 
                                                 and pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" 
                                                 and pd_covar.ix[x, "MouseID"] != 1343)) 
 
+ss_cp101_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
+                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" 
+                                                     or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")
+                                                and pd_covar.ix[x, "MouseID"] != 1343)) 
+
+ss_cp73_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
+                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" \
+                                                     or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")
+                                                and pd_covar.ix[x, "MouseID"] != 1343)) 
+
+
+aim_models_cp101_allchronic = pda.fitModels(ss_cp101_allchronic, pd_all)
 
 cp73_chronic_saline = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP73" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")
 cp101_chronic_saline = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP101" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")

@@ -17,7 +17,7 @@ def start(config=None):
     conf = {
         '/' : {
         'request.dispatch' : setup_routes(),
-        'tools.staticdir.root' : "/home/adrian/code/projects/broad/pdmouse/cf"
+        'tools.staticdir.root' : "/data/adrian/code/projects/broad/pdmouse/cf"
         },
         
         '/static' : { 'tools.staticdir.on' : True, 'tools.staticdir.dir' : 'static' }

@@ -5,27 +5,25 @@
 
 <div id="body">
 
-<a href="https://github.com/square"><img src="logotype.png" width="122" height="31"></a>
-
-<h1>Crossfilter</h1>
-
-<h2>Fast Multidimensional Filtering for Coordinated Views</h2>
-
-<p><b>Crossfilter</b> is a <a href="https://github.com/square/crossfilter">JavaScript library</a> for exploring large multivariate datasets in the browser. Crossfilter supports extremely fast (&lt;30ms) interaction with coordinated views, even with datasets containing a million or more records; we built it to power analytics for <a href="https://squareup.com/register">Square Register</a>, allowing merchants to slice and dice their payment history fluidly.
-
-<p>Since most interactions only involve a single dimension, and then only small adjustments are made to the filter values, incremental filtering and reducing is significantly faster than starting from scratch. Crossfilter uses sorted indexes (and a few bit-twiddling hacks) to make this possible, dramatically increasing the perfor&shy;mance of live histograms and top-<i>K</i> lists. For more details on how Crossfilter works, see the <a href="https://github.com/square/crossfilter/wiki/API-Reference">API reference</a>.
+<h3>parkinsons mouse data</h3>
 
 
 <div id="charts">
   <div id="cp101__chronicHigh_vs_saline__fc-chart" class="chart">
     <div class="title">CP101 Chronic High L-DOPA foldchange vs saline</div>
   </div>
+
+  <div id="cp101__chronicHigh_vs_saline__bhpval-chart" class="chart">
+    <div class="title">CP101 Chronic High L-DOPA vs saline bh pval</div>
+  </div>
+
+
 </div>
 
 <aside id="totals"><span id="active">-</span> of <span id="total">-</span> flights selected.</aside>
 
 <div id="lists">
-  <div id="gene-list" class="list"></div>
+  <div id="flight-list" class="list"></div>
 </div>
 
 <footer>
@@ -37,13 +35,24 @@
 <script src="d3.v2.min.js"></script>
 <script>
 
-
 d3.csv("pd_genes.json", function(pdgenes) {
+  // Various formatters.
+  var formatNumber = d3.format(",d"),
+      formatChange = d3.format("+,d"),
+      formatDate = d3.time.format("%B %d, %Y"),
+      formatTime = d3.time.format("%I:%M %p");
+
+
   pdgenes.forEach(function(d, i) {
     d.index = i;
 
     d.cp101__chronicHigh_vs_saline__fc = +d.cp101__chronicHigh_vs_saline__fc;
+    
+    d.cp101__chronicHigh_vs_saline__ttest__bh_pval = Math.log(+d.bh);
+
+    /*
     d.cp101__chronicHigh_vs_saline__ttest__bh_pval = Math.log(+d.cp101__chronicHigh_vs_saline__ttest__bh_pval);
+
     d.cp101__chronicHigh_vs_sumAIM__pval = Math.log(+d.cp101__chronicHigh_vs_AIM__pval);
     d.cp101__chronicHigh_vs_sumAIM__expr_cv = Math.log(+d.cp101__chronicHigh_vs_sumAIM__expr_cv);
 
@@ -64,14 +73,19 @@ d3.csv("pd_genes.json", function(pdgenes) {
     d.cp73__chronicLow_vs_saline__ttest__bh_pval = Math.log(+d.cp73__chronicLow_vs_saline__ttest__bh_pval);
     d.cp73__chronicLow_vs_sumAIM__pval = Math.log(+d.cp73__chronicLow_vs_sumAIM__pval);
     d.cp73__chronicLow_vs_sumAIM__expr_cv = +d.cp73__chronicLow_vs_sumAIM__expr_cv;
-
+   */
 
   });
 
 
   var gene = crossfilter(pdgenes),
-    dim_cp101__chronicHigh_vs_saline__fc = pd.genes.dimension( function(d) { return d.cp101__chronicHigh_vs_saline__fc; } ),
-    grp_cp101__chronicHigh_vs_saline__fc = dim_cp101__chronicHigh_vs_saline__fc.group(function(d) { return Math.floor(d / 50) * 50; } );
+    all = gene.groupAll(),
+    dim_cp101__chronicHigh_vs_saline__fc = gene.dimension( function(d) { return d.cp101__chronicHigh_vs_saline__fc; } ),
+    grp_cp101__chronicHigh_vs_saline__fc = dim_cp101__chronicHigh_vs_saline__fc.group(function(d) { return (Math.floor(d * 200) / 200); } ),
+
+    dim_cp101__chronicHigh_vs_saline__ttest__bh_pval = gene.dimension( function(d) { return d.cp101__chronicHigh_vs_saline__ttest__bh_pval} ),
+    grp_cp101__chronicHigh_vs_saline__ttest__bh_pval = dim_cp101__chronicHigh_vs_saline__ttest__bh_pval.group(function(d) { return (Math.floor(d * 200) / 200); } )
+    ;
 
 
   var charts = [
@@ -81,6 +95,14 @@ d3.csv("pd_genes.json", function(pdgenes) {
       .x(d3.scale.linear()
         .domain([-3, 3])
         .rangeRound([0, 10 * 24])),
+
+    barChart()
+        .dimension(dim_cp101__chronicHigh_vs_saline__ttest__bh_pval)
+        .group(grp_cp101__chronicHigh_vs_saline__ttest__bh_pval)
+      .x(d3.scale.linear()
+        .domain([-6, 6])
+        .rangeRound([0, 10 * 24])),
+
 
   ];
 
@@ -93,11 +115,11 @@ d3.csv("pd_genes.json", function(pdgenes) {
 
   // Render the initial lists.
   var list = d3.selectAll(".list")
-      .data([flightList]);
+      .data([geneList]);
 
   // Render the total.
   d3.selectAll("#total")
-      .text(formatNumber(flight.size()));
+      .text(formatNumber(gene.size()));
 
   renderAll();
 
@@ -132,51 +154,28 @@ d3.csv("pd_genes.json", function(pdgenes) {
     renderAll();
   };
 
-  function flightList(div) {
-    var flightsByDate = nestByDate.entries(date.top(40));
+  function geneList(div) {
+    var probelist = dim_cp101__chronicHigh_vs_saline__fc.top(50);
 
     div.each(function() {
-      var date = d3.select(this).selectAll(".date")
-          .data(flightsByDate, function(d) { return d.key; });
+      var probeset = d3.select(this).selectAll(".flight")
+          .data(probelist, function(d) { return d.probeset; });
 
-      date.enter().append("div")
-          .attr("class", "date")
-        .append("div")
-          .attr("class", "day")
-          .text(function(d) { return formatDate(d.values[0].date); });
+      var probesetEnter = probeset.enter().append("div")
+        .attr("class", "flight");
 
-      date.exit().remove();
+      probesetEnter.append("div")
+          .attr("class", "probesetid")
+          .text(function(d) { return d.probeset; });
+          
+      probesetEnter.append("div")
+          .attr("class", "cp101__chronicHigh_vs_saline__fc")
+          .text(function(d) { return d.cp101__chronicHigh_vs_saline__fc; });          
 
-      var flight = date.order().selectAll(".flight")
-          .data(function(d) { return d.values; }, function(d) { return d.index; });
+      probeset.exit().remove();
+      
+      probeset.order();
 
-      var flightEnter = flight.enter().append("div")
-          .attr("class", "flight");
-
-      flightEnter.append("div")
-          .attr("class", "time")
-          .text(function(d) { return formatTime(d.date); });
-
-      flightEnter.append("div")
-          .attr("class", "origin")
-          .text(function(d) { return d.origin; });
-
-      flightEnter.append("div")
-          .attr("class", "destination")
-          .text(function(d) { return d.destination; });
-
-      flightEnter.append("div")
-          .attr("class", "distance")
-          .text(function(d) { return formatNumber(d.distance) + " mi."; });
-
-      flightEnter.append("div")
-          .attr("class", "delay")
-          .classed("early", function(d) { return d.delay < 0; })
-          .text(function(d) { return formatChange(d.delay) + " min."; });
-
-      flight.exit().remove();
-
-      flight.order();
     });
   }
 
@@ -185,6 +184,7 @@ d3.csv("pd_genes.json", function(pdgenes) {
 
     var margin = {top: 10, right: 10, bottom: 20, left: 10},
         x,
+//        y = d3.scale.log().clamp(true).domain([0.1, 40])..nice(),
         y = d3.scale.linear().range([100, 0]),
         id = barChart.id++,
         axis = d3.svg.axis().orient("bottom"),
@@ -375,3 +375,4 @@ d3.csv("pd_genes.json", function(pdgenes) {
 
 });
 
+</script>

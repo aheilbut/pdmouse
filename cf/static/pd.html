@@ -93,14 +93,14 @@ d3.csv("pd_genes.json", function(pdgenes) {
         .dimension(dim_cp101__chronicHigh_vs_saline__fc)
         .group(grp_cp101__chronicHigh_vs_saline__fc)
       .x(d3.scale.linear()
-        .domain([-3, 3])
+        .domain([-4, 4])
         .rangeRound([0, 10 * 24])),
 
     barChart()
         .dimension(dim_cp101__chronicHigh_vs_saline__ttest__bh_pval)
         .group(grp_cp101__chronicHigh_vs_saline__ttest__bh_pval)
       .x(d3.scale.linear()
-        .domain([-6, 6])
+        .domain([-7, 7])
         .rangeRound([0, 10 * 24])),
 
 
@@ -170,7 +170,12 @@ d3.csv("pd_genes.json", function(pdgenes) {
           
       probesetEnter.append("div")
           .attr("class", "cp101__chronicHigh_vs_saline__fc")
-          .text(function(d) { return d.cp101__chronicHigh_vs_saline__fc; });          
+          .text(function(d) { return d3.round(d.cp101__chronicHigh_vs_saline__fc,3) ; });          
+
+      probesetEnter.append("div")
+          .attr("class", "dim_cp101__chronicHigh_vs_saline__ttest__bh_pval")
+          .text(function(d) { return d3.round(d.cp101__chronicHigh_vs_saline__ttest__bh_pval, 3); });          
+
 
       probeset.exit().remove();
       

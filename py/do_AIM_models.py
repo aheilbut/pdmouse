@@ -47,6 +47,9 @@ ss_cp101_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == 
                                                      or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")
                                                 and pd_covar.ix[x, "MouseID"] != 1343)) 
 
+ss_cp101_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa") and pd_covar.ix[x, "MouseID"] != 1343)) 
+
+
 ss_cp73_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
                                                 and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
                                                 and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" \
@@ -54,7 +57,6 @@ ss_cp73_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "
                                                 and pd_covar.ix[x, "MouseID"] != 1343)) 
 
 
-aim_models_cp101_allchronic = pda.fitModels(ss_cp101_allchronic, pd_all)
 
 cp73_chronic_saline = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP73" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")
 cp101_chronic_saline = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP101" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")
@@ -65,6 +67,10 @@ aim_model_set = ['aim_models_cp73_chronicHigh', 'aim_models_cp73_chronicLow',
 print "save pickle models"
 #for m in aim_model_set:
 #    cPickle.dump(eval(m), open("/data/adrian/data/temp/%s.pickle" % m,"w"), protocol=-1)
+
+aim_models_cp101_allchronic = pda.fitModels(pd_all.index, ss_cp101_allchronic, pd_all)
+aim_models_cp73_allchronic = pda.fitModels(pd_all.index, ss_cp73_allchronic, pd_all)
+
 
 print "load pickled models"
 for m in aim_model_set:
@@ -122,3 +128,26 @@ cp73_Low_AIMcorr = pda.changeFilter(aim_models_cp73_chronicLow, cp73_lowVsSaline
 makePlots(pd_all, pd_covar, cp73_High_AIMcorr, "/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/cp73_High_AIMcorr.pdf")
 
 pda.makePlots(pd_all, pd_covar, cp101_High_2xFC_AIMcorr, "/data/adrian/test.pdf")
+
+"""
+
+@dview.parallel
+    def gomodel(x):
+        return pda.fitAIM(x, ss_cp101_allchronic, pd_all)
+       
+start = time.time()
+%px y = pda.fitModels(a, ss_cp101_allchronic, pd_all)
+end = time.time()
+print end-start     
+
+start = time.time()
+z = gomodel(list(pd_all.index))
+end = time.time()
+print end-start     
+
+
+start = time.time()
+y = pda.fitModels(a, ss_cp101_allchronic, pd_all)
+end = time.time()
+print end-start
+"""

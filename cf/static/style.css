@@ -1,8 +1,10 @@
+@import url(http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:400,700);
 
 
 body {
-  font-family: "Helvetica Neue";
-  margin: 40px auto;
+  font-family: "Helvetica";
+  font-size: 8pt;
+  margin: 40px;
   width: 960px;
   min-height: 2000px;
 }
@@ -44,12 +46,14 @@ h1, h2 {
 
 #charts {
   padding: 10px 0;
+  float: left;
 }
 
 .chart {
   display: inline-block;
   height: 151px;
   margin-bottom: 20px;
+  border: 1px solid gray;
 }
 
 .reset {
@@ -103,7 +107,6 @@ h1, h2 {
 }
 
 #flight-list {
-  min-height: 1024px;
 }
 
 #flight-list .date,
@@ -114,7 +117,7 @@ h1, h2 {
 #flight-list .flight {
   line-height: 1.5em;
   background: #eee;
-  width: 640px;
+  width: 1024px;
   margin-bottom: 1px;
 }
 
@@ -134,13 +137,16 @@ h1, h2 {
   text-align: right;
 }
 
-#flight-list .early {
-  color: green;
+#flight-list div.genename {
+  width: 400px;
+  padding-right: 10px;
+  text-align: left;
+}
+
+#flight-list .symbol {
+  font-weight: bold;
 }
 
 aside {
-  position: absolute;
-  left: 740px;
-  font-size: smaller;
-  width: 220px;
+
 }

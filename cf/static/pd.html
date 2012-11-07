@@ -1,26 +1,95 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<title>Crossfilter</title>
+<title>pd Crossfilter</title>
 <link rel="stylesheet"  type="text/css" href="style.css"></link>
 
 <div id="body">
 
 <h3>parkinsons mouse data</h3>
 
-
+<table>
+<tr>
+<td width=400px style="vertical-align: top">
 <div id="charts">
-  <div id="cp101__chronicHigh_vs_saline__fc-chart" class="chart">
-    <div class="title">CP101 Chronic High L-DOPA foldchange vs saline</div>
+
+  <div id="dim_fc_exp_cp73_t_hi-chart" class="chart">
+    <div class="title"><b>CP73 Chronic High L-DOPA </b> <br> log2 foldchange vs saline</div>
   </div>
 
-  <div id="cp101__chronicHigh_vs_saline__bhpval-chart" class="chart">
-    <div class="title">CP101 Chronic High L-DOPA vs saline bh pval</div>
+  <div id="cv_cp73_t_hi-chart" class="chart">
+    <div class="title"><br>CP73 Chronic High L-DOPA vs saline</b> <br> CV </div>
+  </div>
+
+  <div id="bh_cp73_t_hi-chart" class="chart">
+    <div class="title"><b>CP73 Chronic High L-DOPA vs saline </b> <br> bh ttest pval</div>
+  </div>
+
+  <div id="bh_cp73_aim_hi-chart" class="chart">
+    <div class="title"><b>CP73 Chronic High L-DOPA vs. AIMs </b> <br> unc pval</div>
+  </div>
+
+
+  <div id="dim_fc_exp_cp73_t_lo-chart" class="chart">
+    <div class="title">CP73 Chronic Low L-DOPA <br> log2 foldchange vs saline</div>
+  </div>
+
+  <div id="cv_cp73_t_hi-chart" class="chart">
+    <div class="title"><br>CP73 Chronic Low L-DOPA vs saline</b> <br> CV </div>
+  </div>
+
+  <div id="bh_cp73_t_lo-chart" class="chart">
+    <div class="title">CP73 Chronic Low L-DOPA vs saline <br> bh ttest pval</div>
+  </div>
+
+  <div id="bh_cp73_aim_lo-chart" class="chart">
+    <div class="title"><b>CP73 Chronic Low L-DOPA vs. AIMs </b> <br> unc pval</div>
+  </div>
+
+<!-- cp101 -->
+
+  <div id="dim_fc_exp_cp101_t_hi-chart" class="chart">
+    <div class="title"><b>CP101 Chronic High L-DOPA </b> <br> log2 foldchange vs saline</div>
+  </div>
+
+  <div id="cv_cp101_t_hi-chart" class="chart">
+    <div class="title"><br>CP101 Chronic High L-DOPA vs saline</b> <br> CV </div>
+  </div>
+
+  <div id="bh_cp101_t_hi-chart" class="chart">
+    <div class="title"><b>CP101 Chronic High L-DOPA vs saline </b> <br> bh ttest pval</div>
+  </div>
+
+  <div id="bh_cp101_aim_hi-chart" class="chart">
+    <div class="title"><b>CP101 Chronic High L-DOPA vs. AIMs </b> <br> unc pval</div>
+  </div>
+
+<!--
+  <div id="dim_fc_exp_cp101_t_lo-chart" class="chart">
+    <div class="title">CP101 Chronic Low L-DOPA <br> log2 foldchange vs saline</div>
+  </div>
+-->
+
+  <div id="cv_cp101_t_hi-chart" class="chart">
+    <div class="title"><br>CP101 Chronic Low L-DOPA vs saline</b> <br> CV </div>
+  </div>
+
+  <div id="bh_cp101_t_lo-chart" class="chart">
+    <div class="title">CP101 Chronic Low L-DOPA vs saline <br> bh ttest pval</div>
+  </div>
+
+  <div id="bh_cp101_aim_lo-chart" class="chart">
+    <div class="title"><b>CP101 Chronic Low L-DOPA vs. AIMs </b> <br> unc pval</div>
   </div>
 
 
 </div>
+</td>
 
-<aside id="totals"><span id="active">-</span> of <span id="total">-</span> flights selected.</aside>
+
+<td style="vertical-align: top">
+<div>
+<aside id="totals"><span id="active">-</span> of <span id="total">-</span> probesets selected.</aside>
+</div>
 
 <div id="lists">
   <div id="flight-list" class="list"></div>
@@ -30,6 +99,10 @@
 </footer>
 
 </div>
+</td>
+</tr>
+</table>
+
 
 <script src="crossfilter.v1.min.js"></script>
 <script src="d3.v2.min.js"></script>
@@ -46,9 +119,34 @@ d3.csv("pd_genes.json", function(pdgenes) {
   pdgenes.forEach(function(d, i) {
     d.index = i;
 
-    d.cp101__chronicHigh_vs_saline__fc = +d.cp101__chronicHigh_vs_saline__fc;
-    
-    d.cp101__chronicHigh_vs_saline__ttest__bh_pval = Math.log(+d.bh);
+    d.fc_exp_cp73_t_hi = +d.fc_exp_cp73_t_hi;
+    d.cv_exp_cp73_t_hi = Math.log(+d.cv_exp_cp73_t_hi);
+    d.bh_cp73_t_hi = Math.log(+d.bh_cp73_t_hi);
+
+    d.fc_exp_cp73_t_lo = +d.fc_exp_cp73_t_lo;
+    d.cv_exp_cp73_t_lo = Math.log(+d.cv_exp_cp73_t_lo);
+    d.bh_cp73_t_lo = Math.log(+d.bh_cp73_t_lo);
+ 
+    d.aim_rsq_cp73_hi = +d.aim_rsq_cp73_hi;
+    d.aim_pval_cp73_hi = Math.log(+d.aim_pval_cp73_hi);
+
+    d.aim_rsq_cp73_lo = +d.aim_rsq_cp73_lo;
+    d.aim_pval_cp73_lo = Math.log(+d.aim_pval_cp73_lo);
+
+    d.fc_exp_cp101_t_hi = +d.fc_exp_cp101_t_hi;
+    d.cv_exp_cp101_t_hi = Math.log(+d.cv_exp_cp101_t_hi);
+    d.bh_cp101_t_hi = Math.log(+d.bh_cp101_t_hi);
+
+    d.fc_exp_cp101_t_lo = +d.fc_exp_cp101_t_lo;
+    d.cv_exp_cp101_t_lo = Math.log(+d.cv_exp_cp101_t_lo);
+    d.bh_cp101_t_lo = Math.log(+d.bh_cp101_t_lo);
+
+    d.aim_rsq_cp101_hi = +d.aim_rsq_cp101_hi;
+    d.aim_pval_cp101_hi = Math.log(+d.aim_pval_cp101_hi);
+
+    d.aim_rsq_cp101_lo = +d.aim_rsq_cp101_lo;
+    d.aim_pval_cp101_lo = Math.log(+d.aim_pval_cp101_lo);
+   
 
     /*
     d.cp101__chronicHigh_vs_saline__ttest__bh_pval = Math.log(+d.cp101__chronicHigh_vs_saline__ttest__bh_pval);
@@ -80,28 +178,216 @@ d3.csv("pd_genes.json", function(pdgenes) {
 
   var gene = crossfilter(pdgenes),
     all = gene.groupAll(),
-    dim_cp101__chronicHigh_vs_saline__fc = gene.dimension( function(d) { return d.cp101__chronicHigh_vs_saline__fc; } ),
-    grp_cp101__chronicHigh_vs_saline__fc = dim_cp101__chronicHigh_vs_saline__fc.group(function(d) { return (Math.floor(d * 200) / 200); } ),
 
-    dim_cp101__chronicHigh_vs_saline__ttest__bh_pval = gene.dimension( function(d) { return d.cp101__chronicHigh_vs_saline__ttest__bh_pval} ),
-    grp_cp101__chronicHigh_vs_saline__ttest__bh_pval = dim_cp101__chronicHigh_vs_saline__ttest__bh_pval.group(function(d) { return (Math.floor(d * 200) / 200); } )
-    ;
+
+    dim_fc_exp_cp73_t_hi = gene.dimension( function(d) { return d.fc_exp_cp73_t_hi; }),
+    grp_fc_exp_cp73_t_hi = dim_fc_exp_cp73_t_hi.group( function(d) { return (Math.floor(d * 100) / 100); }),
+
+    dim_cv_exp_cp73_t_hi = gene.dimension( function(d) { return d.cv_exp_cp73_t_hi; }),
+    grp_cv_exp_cp73_t_hi = dim_cv_exp_cp73_t_hi.group( function(d) { return (Math.floor(d * 100) / 100); }),
+
+    dim_bh_cp73_t_hi = gene.dimension( function(d) { return d.bh_cp73_t_hi; } ),
+    grp_bh_cp73_t_hi = dim_bh_cp73_t_hi.group( function(d) { return (Math.floor(d * 100) / 100); }),
+
+    dim_fc_exp_cp73_t_lo = gene.dimension( function(d) { return d.fc_exp_cp73_t_lo; }),
+    grp_fc_exp_cp73_t_lo = dim_fc_exp_cp73_t_lo.group( function(d) { return (Math.floor(d * 100) / 100); }),
+
+    dim_cv_exp_cp73_t_lo = gene.dimension( function(d) { return d.cv_exp_cp73_t_lo; }),
+    grp_cv_exp_cp73_t_lo = dim_cv_exp_cp73_t_lo.group( function(d) { return (Math.floor(d * 100) / 100); }),
+
+    dim_bh_cp73_t_lo = gene.dimension( function(d) { return d.bh_cp73_t_lo; } ),
+    grp_bh_cp73_t_lo = dim_bh_cp73_t_lo.group( function(d) { return (Math.floor(d * 100) / 100); }),
+
+    dim_aim_rsq_cp73_hi = gene.dimension( function(d) { return d.aim_rsq_cp73_hi; }),
+    grp_aim_rsq_cp73_hi = dim_aim_rsq_cp73_hi.group( function(d) { return (Math.floor(d * 100) / 100); }),
+
+    dim_aim_pval_cp73_hi = gene.dimension( function(d) { return d.aim_pval_cp73_hi; }),
+    grp_aim_pval_cp73_hi = dim_aim_pval_cp73_hi.group( function(d) { return (Math.floor(d * 100) / 100); }),
+
+    dim_aim_rsq_cp73_lo = gene.dimension( function(d) { return d.aim_rsq_cp73_lo; }),
+    grp_aim_rsq_cp73_lo = dim_aim_rsq_cp73_lo.group( function(d) { return (Math.floor(d * 100) / 100); }),
+
+    dim_aim_pval_cp73_lo = gene.dimension( function(d) { return d.aim_pval_cp73_lo; }),
+    grp_aim_pval_cp73_lo = dim_aim_pval_cp73_lo.group( function(d) { return (Math.floor(d * 100) / 100); }),
+
+// cp101
+
+    dim_fc_exp_cp101_t_hi = gene.dimension( function(d) { return d.fc_exp_cp101_t_hi; }),
+    grp_fc_exp_cp101_t_hi = dim_fc_exp_cp101_t_hi.group( function(d) { return (Math.floor(d * 100) / 100); }),
+
+    dim_cv_exp_cp101_t_hi = gene.dimension( function(d) { return d.cv_exp_cp101_t_hi; }),
+    grp_cv_exp_cp101_t_hi = dim_cv_exp_cp101_t_hi.group( function(d) { return (Math.floor(d * 100) / 100); }),
+
+    dim_bh_cp101_t_hi = gene.dimension( function(d) { return d.bh_cp101_t_hi; } ),
+    grp_bh_cp101_t_hi = dim_bh_cp101_t_hi.group( function(d) { return (Math.floor(d * 100) / 100); }),
+
+//    dim_fc_exp_cp101_t_lo = gene.dimension( function(d) { return d.fc_exp_cp_101_t_lo; }),
+//    grp_fc_exp_cp101_t_lo = dim_fc_exp_cp101_t_lo.group( function(d) { return (Math.floor(d * 100) / 100); }),
+
+    dim_cv_exp_cp101_t_lo = gene.dimension( function(d) { return d.cv_exp_cp101_t_lo; }),
+    grp_cv_exp_cp101_t_lo = dim_cv_exp_cp101_t_lo.group( function(d) { return (Math.floor(d * 100) / 100); }),
+
+
+    dim_bh_cp101_t_lo = gene.dimension( function(d) { return d.bh_cp101_t_lo; } ),
+    grp_bh_cp101_t_lo = dim_bh_cp101_t_lo.group( function(d) { return (Math.floor(d * 100) / 100); }),
+
+    dim_aim_rsq_cp101_hi = gene.dimension( function(d) { return d.aim_rsq_cp101_hi; }),
+    grp_aim_rsq_cp101_hi = dim_aim_rsq_cp101_hi.group( function(d) { return (Math.floor(d * 100) / 100); }),
+
+    dim_aim_pval_cp101_hi = gene.dimension( function(d) { return d.aim_pval_cp101_hi; }),
+    grp_aim_pval_cp101_hi = dim_aim_pval_cp101_hi.group( function(d) { return (Math.floor(d * 100) / 100); }),
+
+    dim_aim_rsq_cp101_lo = gene.dimension( function(d) { return d.aim_rsq_cp101_lo; }),
+    grp_aim_rsq_cp101_lo = dim_aim_rsq_cp101_lo.group( function(d) { return (Math.floor(d * 100) / 100); }),
+
+    dim_aim_pval_cp101_lo = gene.dimension( function(d) { return d.aim_pval_cp101_lo; }),
+    grp_aim_pval_cp101_lo = dim_aim_pval_cp101_lo.group( function(d) { return (Math.floor(d * 100) / 100); });
+
+  
+/*
+ 
+    d.aim_rsq_cp73_hi = +d.aim_rsq_cp73_hi;
+    d.aim_pval_cp73_hi = Math.log(+d.aim_pval_cp73_hi);
+
+    d.aim_rsq_cp73_lo = +d.aim_rsq_cp73_lo;
+    d.aim_pval_cp73_lo = Math.log(+d.aim_pval_cp73_lo);
+
+    d.fc_exp_cp101_t_hi = +d.fc_exp_cp101_t_hi;
+    d.cv_exp_cp101_t_hi = Math.log(+d.cv_exp_cp101_t_hi);
+    d.bh_cp101_t_hi = Math.log(+d.bh_cp101_t_hi);
+
+    d.fc_exp_cp101_t_lo = +d.fc_exp_cp101_t_lo;
+    d.cv_exp_cp101_t_lo = Math.log(+d.cv_exp_cp101_t_lo);
+    d.bh_cp101_t_lo = Math.log(+d.bh_cp101_t_lo);
+
+    d.aim_rsq_cp101_hi = +d.aim_rsq_cp101_hi;
+    d.aim_pval_cp101_hi = Math.log(+d.aim_pval_cp101_hi);
+
+    d.aim_rsq_cp101_lo = +d.aim_rsq_cp101_lo;
+    d.aim_pval_cp101_lo = Math.log(+d.aim_pval_cp101_lo);
+*/
 
 
   var charts = [
     barChart()
-        .dimension(dim_cp101__chronicHigh_vs_saline__fc)
-        .group(grp_cp101__chronicHigh_vs_saline__fc)
+        .dimension(dim_fc_exp_cp73_t_hi)
+        .group(grp_fc_exp_cp73_t_hi)
       .x(d3.scale.linear()
-        .domain([-4, 4])
-        .rangeRound([0, 10 * 24])),
+        .domain([-10, 10])
+        .rangeRound([0, 20 * 24])),
 
     barChart()
-        .dimension(dim_cp101__chronicHigh_vs_saline__ttest__bh_pval)
-        .group(grp_cp101__chronicHigh_vs_saline__ttest__bh_pval)
+        .dimension(dim_cv_exp_cp73_t_hi)
+        .group(grp_cv_exp_cp73_t_hi)
       .x(d3.scale.linear()
-        .domain([-7, 7])
-        .rangeRound([0, 10 * 24])),
+        .domain([-10, 10])
+        .rangeRound([0, 20 * 24])),
+
+    barChart()
+        .dimension(dim_bh_cp73_t_hi)
+        .group(grp_bh_cp73_t_hi)
+      .x(d3.scale.linear()
+        .domain([-40, 10])
+        .rangeRound([0, 20 * 24])),
+
+
+    barChart()
+        .dimension(dim_aim_pval_cp73_hi)
+        .group(grp_aim_pval_cp73_hi)
+      .x(d3.scale.linear()
+        .domain([-10, 0])
+        .rangeRound([0, 20 * 24])),
+
+
+    barChart()
+        .dimension(dim_fc_exp_cp73_t_lo)
+        .group(grp_fc_exp_cp73_t_lo)
+      .x(d3.scale.linear()
+        .domain([-10, 10])
+        .rangeRound([0, 20 * 24])),
+   
+    barChart()
+        .dimension(dim_cv_exp_cp73_t_lo)
+        .group(grp_cv_exp_cp73_t_lo)
+      .x(d3.scale.linear()
+        .domain([-10, 10])
+        .rangeRound([0, 20 * 24])),
+
+    barChart()
+        .dimension(dim_bh_cp73_t_lo)
+        .group(grp_bh_cp73_t_lo)
+      .x(d3.scale.linear()
+        .domain([-40, 10])
+        .rangeRound([0, 20 * 24])),
+
+    barChart()
+        .dimension(dim_aim_pval_cp73_lo)
+        .group(grp_aim_pval_cp73_lo)
+      .x(d3.scale.linear()
+        .domain([-10, 0])
+        .rangeRound([0, 20 * 24])),
+
+// CP101
+
+
+    barChart()
+        .dimension(dim_fc_exp_cp101_t_hi)
+        .group(grp_fc_exp_cp101_t_hi)
+      .x(d3.scale.linear()
+        .domain([-10, 10])
+        .rangeRound([0, 20 * 24])),
+
+    barChart()
+        .dimension(dim_cv_exp_cp101_t_hi)
+        .group(grp_cv_exp_cp101_t_hi)
+      .x(d3.scale.linear()
+        .domain([-10, 10])
+        .rangeRound([0, 20 * 24])),
+
+    barChart()
+        .dimension(dim_bh_cp101_t_hi)
+        .group(grp_bh_cp101_t_hi)
+      .x(d3.scale.linear()
+        .domain([-40, 10])
+        .rangeRound([0, 20 * 24])),
+
+
+    barChart()
+        .dimension(dim_aim_pval_cp101_hi)
+        .group(grp_aim_pval_cp101_hi)
+      .x(d3.scale.linear()
+        .domain([-10, 0])
+        .rangeRound([0, 20 * 24])),
+
+
+//    barChart()
+//        .dimension(dim_fc_exp_cp101_t_lo)
+//        .group(grp_fc_exp_cp101_t_lo)
+//      .x(d3.scale.linear()
+//        .domain([-10, 10])
+//        .rangeRound([0, 20 * 24])),
+   
+    barChart()
+        .dimension(dim_cv_exp_cp101_t_lo)
+        .group(grp_cv_exp_cp101_t_lo)
+      .x(d3.scale.linear()
+        .domain([-10, 10])
+        .rangeRound([0, 20 * 24])),
+
+    barChart()
+        .dimension(dim_bh_cp101_t_lo)
+        .group(grp_bh_cp101_t_lo)
+      .x(d3.scale.linear()
+        .domain([-40, 10])
+        .rangeRound([0, 20 * 24])),
+
+    barChart()
+        .dimension(dim_aim_pval_cp101_lo)
+        .group(grp_aim_pval_cp101_lo)
+      .x(d3.scale.linear()
+        .domain([-10, 0])
+        .rangeRound([0, 20 * 24])),
+
 
 
   ];
@@ -155,7 +441,7 @@ d3.csv("pd_genes.json", function(pdgenes) {
   };
 
   function geneList(div) {
-    var probelist = dim_cp101__chronicHigh_vs_saline__fc.top(50);
+    var probelist = dim_fc_exp_cp73_t_hi.top(500);
 
     div.each(function() {
       var probeset = d3.select(this).selectAll(".flight")
@@ -166,15 +452,23 @@ d3.csv("pd_genes.json", function(pdgenes) {
 
       probesetEnter.append("div")
           .attr("class", "probesetid")
-          .text(function(d) { return d.probeset; });
-          
-      probesetEnter.append("div")
-          .attr("class", "cp101__chronicHigh_vs_saline__fc")
-          .text(function(d) { return d3.round(d.cp101__chronicHigh_vs_saline__fc,3) ; });          
+          .text(function(d) { return d.probe; });
 
       probesetEnter.append("div")
-          .attr("class", "dim_cp101__chronicHigh_vs_saline__ttest__bh_pval")
-          .text(function(d) { return d3.round(d.cp101__chronicHigh_vs_saline__ttest__bh_pval, 3); });          
+          .attr("class", "symbol")
+          .text(function(d) { return d.symbol; });
+          
+      probesetEnter.append("div")
+          .attr("class", "fc_exp_cp73_t_hi")
+          .text(function(d) { return d3.round(d.fc_exp_cp73_t_hi,3) ; });          
+
+      probesetEnter.append("div")
+          .attr("class", "bh_cp73_t_hi")
+          .text(function(d) { return d3.round(d.bh_cp73_t_hi, 3); });          
+
+      probesetEnter.append("div")
+          .attr("class", "genename")
+          .text(function(d) { return d.gene_name; });
 
 
       probeset.exit().remove();

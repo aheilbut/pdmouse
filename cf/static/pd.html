@@ -9,77 +9,122 @@
 
 <table>
 <tr>
-<td width=400px style="vertical-align: top">
+<td width=600px style="vertical-align: top">
 <div id="charts">
 
+<table>
+<tr>
+ <td>
   <div id="dim_fc_exp_cp73_t_hi-chart" class="chart">
     <div class="title"><b>CP73 Chronic High L-DOPA </b> <br> log2 foldchange vs saline</div>
   </div>
+ </td>
 
+ <td>
   <div id="cv_cp73_t_hi-chart" class="chart">
-    <div class="title"><br><b>CP73 Chronic High L-DOPA vs saline</b> <br> CV </div>
+    <div class="title"><b>CP73 Chronic High L-DOPA vs saline</b> <br> CV </div>
   </div>
 
+ </td>
+</tr>
+
+<tr>
+<td>
   <div id="bh_cp73_t_hi-chart" class="chart">
     <div class="title"><b>CP73 Chronic High L-DOPA vs saline </b> <br> bh ttest pval</div>
   </div>
+</td>
 
+<td>
   <div id="bh_cp73_aim_hi-chart" class="chart">
     <div class="title"><b>CP73 Chronic High L-DOPA vs. AIMs </b> <br> unc pval</div>
   </div>
+</td>
+</tr>
 
-
+<tr>
+<td>
   <div id="dim_fc_exp_cp73_t_lo-chart" class="chart">
     <div class="title">CP73 Chronic Low L-DOPA <br> log2 foldchange vs saline</div>
   </div>
-
+</td>
+<td>
   <div id="cv_cp73_t_hi-chart" class="chart">
-    <div class="title"><br>CP73 Chronic Low L-DOPA vs saline</b> <br> CV </div>
+    <div class="title"><b>CP73 Chronic Low L-DOPA vs saline</b> <br> CV </div>
   </div>
+</td>
+</tr>
 
+<tr>
+<td>
   <div id="bh_cp73_t_lo-chart" class="chart">
-    <div class="title">CP73 Chronic Low L-DOPA vs saline <br> bh ttest pval</div>
+    <div class="title"><b>CP73 Chronic Low L-DOPA vs saline</b> <br> bh ttest pval</div>
   </div>
-
+</td>
+<td>
   <div id="bh_cp73_aim_lo-chart" class="chart">
     <div class="title"><b>CP73 Chronic Low L-DOPA vs. AIMs </b> <br> unc pval</div>
   </div>
-
+</td>
+</tr>
 <!-- cp101 -->
 
+<tr>
+<td>
   <div id="dim_fc_exp_cp101_t_hi-chart" class="chart">
     <div class="title"><b>CP101 Chronic High L-DOPA </b> <br> log2 foldchange vs saline</div>
   </div>
+</td>
 
+<td>
   <div id="cv_cp101_t_hi-chart" class="chart">
-    <div class="title"><br>CP101 Chronic High L-DOPA vs saline</b> <br> CV </div>
+    <div class="title"><b>CP101 Chronic High L-DOPA vs saline</b> <br> CV </div>
   </div>
+</td>
+</tr>
 
+<tr>
+<td>
   <div id="bh_cp101_t_hi-chart" class="chart">
     <div class="title"><b>CP101 Chronic High L-DOPA vs saline </b> <br> bh ttest pval</div>
   </div>
-
+</td>
+<td>
   <div id="bh_cp101_aim_hi-chart" class="chart">
     <div class="title"><b>CP101 Chronic High L-DOPA vs. AIMs </b> <br> unc pval</div>
   </div>
+</td>
+</tr>
 
+<tr>
+<td>
 <!--
   <div id="dim_fc_exp_cp101_t_lo-chart" class="chart">
     <div class="title">CP101 Chronic Low L-DOPA <br> log2 foldchange vs saline</div>
   </div>
 -->
+</td>
 
+<td>
   <div id="cv_cp101_t_hi-chart" class="chart">
-    <div class="title"><br>CP101 Chronic Low L-DOPA vs saline</b> <br> CV </div>
+    <div class="title"><b>CP101 Chronic Low L-DOPA vs saline</b> <br> CV </div>
   </div>
+</td>
+</tr>
 
+<tr>
+<td>
   <div id="bh_cp101_t_lo-chart" class="chart">
     <div class="title">CP101 Chronic Low L-DOPA vs saline <br> bh ttest pval</div>
   </div>
-
+</td>
+<td>
   <div id="bh_cp101_aim_lo-chart" class="chart">
     <div class="title"><b>CP101 Chronic Low L-DOPA vs. AIMs </b> <br> unc pval</div>
   </div>
+</td>
+</tr>
+</table>
 </div>
 
 </td>
@@ -90,7 +135,24 @@
 <aside id="totals"><span id="active">-</span> of <span id="total">-</span> probesets selected (max of 1000 shown).</aside>
 </div>
 
+
 <div id="lists">
+  <div id="probelist-label">
+   <div class="label">probe</div>
+   <div class="label">symbol</div>
+   <div class="valuelabel">cp73 hi FC</div>
+   <div class="valuelabel">cp73 hi CV</div>
+   <div class="valuelabel">cp73 hi bh pval</div>
+   <div class="valuelabel">cp73 hi AIM pval</div>
+
+   <div class="valuelabel">cp73 lo FC</div>
+   <div class="valuelabel">cp73 lo CV</div>
+   <div class="valuelabel">cp73 lo bh pval</div>
+   <div class="valuelabel">cp73 lo AIM pval</div>
+
+
+  </div>
+
   <div id="flight-list" class="list"></div>
 </div>
 
@@ -107,6 +169,8 @@
 <script src="d3.v2.min.js"></script>
 <script>
 
+log2 = function(x)  {  return Math.log(x) / Math.log(2); }
+
 d3.csv("pd_genes.json", function(pdgenes) {
   // Various formatters.
   var formatNumber = d3.format(",d"),
@@ -119,32 +183,32 @@ d3.csv("pd_genes.json", function(pdgenes) {
     d.index = i;
 
     d.fc_exp_cp73_t_hi = +d.fc_exp_cp73_t_hi;
-    d.cv_exp_cp73_t_hi = Math.log(+d.cv_exp_cp73_t_hi);
-    d.bh_cp73_t_hi = Math.log(+d.bh_cp73_t_hi);
+    d.cv_exp_cp73_t_hi = log2(+d.cv_exp_cp73_t_hi);
+    d.bh_cp73_t_hi = log2(+d.bh_cp73_t_hi);
 
     d.fc_exp_cp73_t_lo = +d.fc_exp_cp73_t_lo;
-    d.cv_exp_cp73_t_lo = Math.log(+d.cv_exp_cp73_t_lo);
-    d.bh_cp73_t_lo = Math.log(+d.bh_cp73_t_lo);
+    d.cv_exp_cp73_t_lo = log2(+d.cv_exp_cp73_t_lo);
+    d.bh_cp73_t_lo = log2(+d.bh_cp73_t_lo);
  
     d.aim_rsq_cp73_hi = +d.aim_rsq_cp73_hi;
-    d.aim_pval_cp73_hi = Math.log(+d.aim_pval_cp73_hi);
+    d.aim_pval_cp73_hi = log2(+d.aim_pval_cp73_hi);
 
     d.aim_rsq_cp73_lo = +d.aim_rsq_cp73_lo;
-    d.aim_pval_cp73_lo = Math.log(+d.aim_pval_cp73_lo);
+    d.aim_pval_cp73_lo = log2(+d.aim_pval_cp73_lo);
 
     d.fc_exp_cp101_t_hi = +d.fc_exp_cp101_t_hi;
-    d.cv_exp_cp101_t_hi = Math.log(+d.cv_exp_cp101_t_hi);
-    d.bh_cp101_t_hi = Math.log(+d.bh_cp101_t_hi);
+    d.cv_exp_cp101_t_hi = log2(+d.cv_exp_cp101_t_hi);
+    d.bh_cp101_t_hi = log2(+d.bh_cp101_t_hi);
 
     d.fc_exp_cp101_t_lo = +d.fc_exp_cp101_t_lo;
-    d.cv_exp_cp101_t_lo = Math.log(+d.cv_exp_cp101_t_lo);
-    d.bh_cp101_t_lo = Math.log(+d.bh_cp101_t_lo);
+    d.cv_exp_cp101_t_lo = log2(+d.cv_exp_cp101_t_lo);
+    d.bh_cp101_t_lo = log2(+d.bh_cp101_t_lo);
 
     d.aim_rsq_cp101_hi = +d.aim_rsq_cp101_hi;
-    d.aim_pval_cp101_hi = Math.log(+d.aim_pval_cp101_hi);
+    d.aim_pval_cp101_hi = log2(+d.aim_pval_cp101_hi);
 
     d.aim_rsq_cp101_lo = +d.aim_rsq_cp101_lo;
-    d.aim_pval_cp101_lo = Math.log(+d.aim_pval_cp101_lo);
+    d.aim_pval_cp101_lo = log2(+d.aim_pval_cp101_lo);
    
 
     /*
@@ -266,28 +330,28 @@ d3.csv("pd_genes.json", function(pdgenes) {
     d.aim_pval_cp101_lo = Math.log(+d.aim_pval_cp101_lo);
 */
 
-  chartWidth = 15;
+  chartWidth = 10;
 
   var charts = [
     barChart()
         .dimension(dim_fc_exp_cp73_t_hi)
         .group(grp_fc_exp_cp73_t_hi)
       .x(d3.scale.linear()
-        .domain([-10, 10])
+        .domain([-8, 8])
         .rangeRound([0, chartWidth * 24])),
 
     barChart()
         .dimension(dim_cv_exp_cp73_t_hi)
         .group(grp_cv_exp_cp73_t_hi)
       .x(d3.scale.linear()
-        .domain([-10, 10])
+        .domain([-12, 12])
         .rangeRound([0, chartWidth * 24])),
 
     barChart()
         .dimension(dim_bh_cp73_t_hi)
         .group(grp_bh_cp73_t_hi)
       .x(d3.scale.linear()
-        .domain([-40, 10])
+        .domain([-60, 5])
         .rangeRound([0, chartWidth * 24])),
 
 
@@ -295,7 +359,7 @@ d3.csv("pd_genes.json", function(pdgenes) {
         .dimension(dim_aim_pval_cp73_hi)
         .group(grp_aim_pval_cp73_hi)
       .x(d3.scale.linear()
-        .domain([-10, 0])
+        .domain([-12, 0])
         .rangeRound([0, chartWidth * 24])),
 
 
@@ -310,21 +374,21 @@ d3.csv("pd_genes.json", function(pdgenes) {
         .dimension(dim_cv_exp_cp73_t_lo)
         .group(grp_cv_exp_cp73_t_lo)
       .x(d3.scale.linear()
-        .domain([-10, 10])
+        .domain([-10, 2])
         .rangeRound([0, chartWidth * 24])),
 
     barChart()
         .dimension(dim_bh_cp73_t_lo)
         .group(grp_bh_cp73_t_lo)
       .x(d3.scale.linear()
-        .domain([-40, 10])
+        .domain([-50, 5])
         .rangeRound([0, chartWidth * 24])),
 
     barChart()
         .dimension(dim_aim_pval_cp73_lo)
         .group(grp_aim_pval_cp73_lo)
       .x(d3.scale.linear()
-        .domain([-10, 0])
+        .domain([-12, 0])
         .rangeRound([0, chartWidth * 24])),
 
 // CP101
@@ -440,8 +504,22 @@ d3.csv("pd_genes.json", function(pdgenes) {
     renderAll();
   };
 
+  window.dofilter = function(i, r) {
+   charts[i].filter(r);
+   renderAll();
+  }
+
+  window.getcharts = function() {
+  return charts;
+ }
+
+ window.getCF = function() {
+  return gene;
+ }
+
+
   function geneList(div) {
-    var probelist = dim_fc_exp_cp73_t_hi.top(1000);
+    var probelist = dim_fc_exp_cp73_t_hi.top(500);
 
     div.each(function() {
       var probeset = d3.select(this).selectAll(".flight")
@@ -459,12 +537,38 @@ d3.csv("pd_genes.json", function(pdgenes) {
           .text(function(d) { return d.symbol; });
           
       probesetEnter.append("div")
-          .attr("class", "fc_exp_cp73_t_hi")
+          .attr("class", "value")
           .text(function(d) { return d3.round(d.fc_exp_cp73_t_hi,3) ; });          
 
       probesetEnter.append("div")
-          .attr("class", "bh_cp73_t_hi")
+          .attr("class", "value")
+          .text(function(d) { return d3.round(d.cv_exp_cp73_t_hi, 3); });          
+
+      probesetEnter.append("div")
+          .attr("class", "value")
           .text(function(d) { return d3.round(d.bh_cp73_t_hi, 3); });          
+
+      probesetEnter.append("div")
+          .attr("class", "value")
+          .text(function(d) { return d3.round(d.aim_pval_cp73_hi, 3); });          
+
+      probesetEnter.append("div")
+          .attr("class", "value")
+          .text(function(d) { return d3.round(d.fc_exp_cp73_t_lo,3) ; });          
+
+      probesetEnter.append("div")
+          .attr("class", "value")
+          .text(function(d) { return d3.round(d.cv_exp_cp73_t_lo, 3); });          
+
+      probesetEnter.append("div")
+          .attr("class", "value")
+          .text(function(d) { return d3.round(d.bh_cp73_t_lo, 3); });          
+
+      probesetEnter.append("div")
+          .attr("class", "value")
+          .text(function(d) { return d3.round(d.aim_pval_cp73_lo, 3); });          
+
+
 
       probesetEnter.append("div")
           .attr("class", "genename")

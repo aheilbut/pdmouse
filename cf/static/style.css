@@ -45,7 +45,7 @@ h1, h2 {
 }
 
 #charts {
-  width: 400px;
+  width: 600px;
   padding: 10px 0;
   float: left;
 }
@@ -116,12 +116,31 @@ h1, h2 {
   margin-bottom: .4em;
 }
 
+
 #flight-list .flight {
   line-height: 1.5em;
   background: #eee;
-  width: 1024px;
+  width: 1524px;
   margin-bottom: 1px;
 }
+
+#probelist-label .flight {
+  line-height: 1.5em;
+  background: #eee;
+  width: 1524px;
+  margin-bottom: 1px;
+}
+
+#probelist-label div.label {
+  display: inline-block;
+  width: 90px;
+}
+
+#probelist-label div.valuelabel {
+  display: inline-block;
+  max-width: 60px;
+}
+
 
 #flight-list .time {
   color: #999;
@@ -129,7 +148,7 @@ h1, h2 {
 
 #flight-list .flight div {
   display: inline-block;
-  width: 100px;
+  width: 90px;
 }
 
 #flight-list div.distance,
@@ -143,6 +162,12 @@ h1, h2 {
   width: 400px;
   padding-right: 10px;
   text-align: left;
+}
+
+
+#flight-list div.value  {
+  display: inline-block;
+  width: 60px;
 }
 
 #flight-list .symbol {

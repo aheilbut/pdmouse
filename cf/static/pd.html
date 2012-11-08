@@ -17,7 +17,7 @@
   </div>
 
   <div id="cv_cp73_t_hi-chart" class="chart">
-    <div class="title"><br>CP73 Chronic High L-DOPA vs saline</b> <br> CV </div>
+    <div class="title"><br><b>CP73 Chronic High L-DOPA vs saline</b> <br> CV </div>
   </div>
 
   <div id="bh_cp73_t_hi-chart" class="chart">
@@ -80,15 +80,14 @@
   <div id="bh_cp101_aim_lo-chart" class="chart">
     <div class="title"><b>CP101 Chronic Low L-DOPA vs. AIMs </b> <br> unc pval</div>
   </div>
-
-
 </div>
+
 </td>
 
 
 <td style="vertical-align: top">
 <div>
-<aside id="totals"><span id="active">-</span> of <span id="total">-</span> probesets selected.</aside>
+<aside id="totals"><span id="active">-</span> of <span id="total">-</span> probesets selected (max of 1000 shown).</aside>
 </div>
 
 <div id="lists">
@@ -267,6 +266,7 @@ d3.csv("pd_genes.json", function(pdgenes) {
     d.aim_pval_cp101_lo = Math.log(+d.aim_pval_cp101_lo);
 */
 
+  chartWidth = 15;
 
   var charts = [
     barChart()
@@ -274,21 +274,21 @@ d3.csv("pd_genes.json", function(pdgenes) {
         .group(grp_fc_exp_cp73_t_hi)
       .x(d3.scale.linear()
         .domain([-10, 10])
-        .rangeRound([0, 20 * 24])),
+        .rangeRound([0, chartWidth * 24])),
 
     barChart()
         .dimension(dim_cv_exp_cp73_t_hi)
         .group(grp_cv_exp_cp73_t_hi)
       .x(d3.scale.linear()
         .domain([-10, 10])
-        .rangeRound([0, 20 * 24])),
+        .rangeRound([0, chartWidth * 24])),
 
     barChart()
         .dimension(dim_bh_cp73_t_hi)
         .group(grp_bh_cp73_t_hi)
       .x(d3.scale.linear()
         .domain([-40, 10])
-        .rangeRound([0, 20 * 24])),
+        .rangeRound([0, chartWidth * 24])),
 
 
     barChart()
@@ -296,7 +296,7 @@ d3.csv("pd_genes.json", function(pdgenes) {
         .group(grp_aim_pval_cp73_hi)
       .x(d3.scale.linear()
         .domain([-10, 0])
-        .rangeRound([0, 20 * 24])),
+        .rangeRound([0, chartWidth * 24])),
 
 
     barChart()
@@ -304,28 +304,28 @@ d3.csv("pd_genes.json", function(pdgenes) {
         .group(grp_fc_exp_cp73_t_lo)
       .x(d3.scale.linear()
         .domain([-10, 10])
-        .rangeRound([0, 20 * 24])),
+        .rangeRound([0, chartWidth * 24])),
    
     barChart()
         .dimension(dim_cv_exp_cp73_t_lo)
         .group(grp_cv_exp_cp73_t_lo)
       .x(d3.scale.linear()
         .domain([-10, 10])
-        .rangeRound([0, 20 * 24])),
+        .rangeRound([0, chartWidth * 24])),
 
     barChart()
         .dimension(dim_bh_cp73_t_lo)
         .group(grp_bh_cp73_t_lo)
       .x(d3.scale.linear()
         .domain([-40, 10])
-        .rangeRound([0, 20 * 24])),
+        .rangeRound([0, chartWidth * 24])),
 
     barChart()
         .dimension(dim_aim_pval_cp73_lo)
         .group(grp_aim_pval_cp73_lo)
       .x(d3.scale.linear()
         .domain([-10, 0])
-        .rangeRound([0, 20 * 24])),
+        .rangeRound([0, chartWidth * 24])),
 
 // CP101
 
@@ -335,21 +335,21 @@ d3.csv("pd_genes.json", function(pdgenes) {
         .group(grp_fc_exp_cp101_t_hi)
       .x(d3.scale.linear()
         .domain([-10, 10])
-        .rangeRound([0, 20 * 24])),
+        .rangeRound([0, chartWidth * 24])),
 
     barChart()
         .dimension(dim_cv_exp_cp101_t_hi)
         .group(grp_cv_exp_cp101_t_hi)
       .x(d3.scale.linear()
         .domain([-10, 10])
-        .rangeRound([0, 20 * 24])),
+        .rangeRound([0, chartWidth * 24])),
 
     barChart()
         .dimension(dim_bh_cp101_t_hi)
         .group(grp_bh_cp101_t_hi)
       .x(d3.scale.linear()
         .domain([-40, 10])
-        .rangeRound([0, 20 * 24])),
+        .rangeRound([0, chartWidth * 24])),
 
 
     barChart()
@@ -357,7 +357,7 @@ d3.csv("pd_genes.json", function(pdgenes) {
         .group(grp_aim_pval_cp101_hi)
       .x(d3.scale.linear()
         .domain([-10, 0])
-        .rangeRound([0, 20 * 24])),
+        .rangeRound([0, chartWidth * 24])),
 
 
 //    barChart()
@@ -372,21 +372,21 @@ d3.csv("pd_genes.json", function(pdgenes) {
         .group(grp_cv_exp_cp101_t_lo)
       .x(d3.scale.linear()
         .domain([-10, 10])
-        .rangeRound([0, 20 * 24])),
+        .rangeRound([0, chartWidth * 24])),
 
     barChart()
         .dimension(dim_bh_cp101_t_lo)
         .group(grp_bh_cp101_t_lo)
       .x(d3.scale.linear()
         .domain([-40, 10])
-        .rangeRound([0, 20 * 24])),
+        .rangeRound([0, chartWidth * 24])),
 
     barChart()
         .dimension(dim_aim_pval_cp101_lo)
         .group(grp_aim_pval_cp101_lo)
       .x(d3.scale.linear()
         .domain([-10, 0])
-        .rangeRound([0, 20 * 24])),
+        .rangeRound([0, chartWidth * 24])),
 
 
 
@@ -441,7 +441,7 @@ d3.csv("pd_genes.json", function(pdgenes) {
   };
 
   function geneList(div) {
-    var probelist = dim_fc_exp_cp73_t_hi.top(500);
+    var probelist = dim_fc_exp_cp73_t_hi.top(1000);
 
     div.each(function() {
       var probeset = d3.select(this).selectAll(".flight")

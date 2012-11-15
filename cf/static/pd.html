@@ -614,6 +614,9 @@ d3.csv("pd_genes.json", function(pdgenes) {
               .attr("class", "reset")
               .text("reset")
               .style("display", "none");
+              
+          div.append("input")
+              .attr("size", "2");
 
           g = div.append("svg")
               .attr("width", width + margin.left + margin.right)

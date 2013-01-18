@@ -24,10 +24,10 @@ mo430names.index =  mo430names.probe_id
 mo430info = mo430symbol.merge(mo430names)
 mo430info.index = mo430info.probe_id
 
-def fitAIM(probeset, covar_subset, dataset):
+def fitAIM(probeset, covar_subset, dataset, AIM_dimension="totalAIM"):
     model = "AIM ~ expression"
     cur_gene = pandas.DataFrame( { "expression" : dataset.ix[probeset,covar_subset.filenames], 
-                                  "AIM" : list(covar_subset.totalAIM) } )
+                                  "AIM" : list(covar_subset[AIM_dimension].fillna(0)) } )
     test_model = ols(model, cur_gene).fit()
     return test_model
 

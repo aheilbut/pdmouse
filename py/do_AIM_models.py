@@ -196,8 +196,24 @@ o_m_cp101 = o_cp101.merge( o_cp101_chronicHigh_aim, left_index=True, right_index
 
 o = o_m_cp73.merge(o_m_cp101, left_index=True, right_index=True)
 
+
+m = []
+for k in alib.wikipath.hs_wp_symbols.keys():
+    matches = [a in set(alib.wikipath.hs_wp_symbols[k]) for a in [str(s).upper() for s in ss_cp73_filtered_allDoseAIMcorr.symbol]]
+    m.append( (k, np.sum(matches), len(alib.wikipath.hs_wp_symbols[k]), len(matches)) )
  
 """
+
+   
+fits_expr_dose = cPickle.load(open("/data/adrian/data/temp/fits_exprDoseModel.pickle", "rb"))
+fits_expr = cPickle.load(open("/data/adrian/data/temp/fits_expr.pickle", "rb"))
+    
+
+    model = "AIM ~ dose * expression"
+    model = "AIM ~ dose + expression"
+    model = "AIM ~ dose"
+    model = "AIM ~ expression"
+
 
 @dview.parallel
     def gomodel(x):

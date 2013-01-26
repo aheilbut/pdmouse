@@ -31,6 +31,38 @@ def fitAIM(probeset, covar_subset, dataset, AIM_dimension="totalAIM"):
     test_model = ols(model, cur_gene).fit()
     return test_model
 
+def fit_dose_expr_model(probeset, covar_subset, dataset, AIM_dimension="totalAIM"):
+    model = "AIM ~ expression*dose"
+    cur_gene = pandas.DataFrame( { "expression" : dataset.ix[probeset, covar_subset.filenames],
+                                          "AIM" : list(covar_subset[AIM_dimension].fillna(0)),
+                                         "dose" : [int(i) for i in covar_subset["DrugTreat"] == "Chronic high levodopa"]
+                                })
+    test_model = ols(model, cur_gene).fit()
+    return test_model
+
+def fit_model(model, probeset, covar_subset, dataset, AIM_dimension="totalAIM"):
+    cur_gene = pandas.DataFrame( { "expression" : dataset.ix[probeset, covar_subset.filenames],
+                                          "AIM" : list(covar_subset[AIM_dimension].fillna(0)),
+                                         "dose" : [int(i) for i in covar_subset["DrugTreat"] == "Chronic high levodopa"]
+                                })
+    test_model = ols(model, cur_gene).fit()
+    return test_model
+
+
+
+def fit_model_to_all_probes(model, probeset_list, covar_subset, dataset):
+    fits = pandas.DataFrame(index = probeset, 
+                            data = [fit_model(model, p, covar_subset, dataset) for p in probeset], 
+                            columns=["model"])
+    fits["pval"] = fits["model"].map( lambda x: x.pvalues["expression"] )
+    fits["expr_coef"] = fits["model"].map( lambda x: x.params["expression"] )
+    fits["bh"] = statsmodels.sandbox.stats.multicomp.multipletests(fits.pval, method="fdr_bh")[1]
+    fits["bonf"] = statsmodels.sandbox.stats.multicomp.multipletests(fits.pval, method="bonferroni")[1]
+    fits["sign"] = np.sign(fits["expr_coef"])
+    fits["rsq_adj"] = fits["model"].map( lambda x: x.rsquared_adj )
+    
+    return fits                                  
+
 def fitModels(probeset, covar_subset, dataset):
     fits = pandas.DataFrame( index = probeset, 
                             data = [fitAIM(p, covar_subset, dataset) for p in probeset], 
@@ -103,6 +135,7 @@ def plotBoth(d, covar, probeset):
     ax_legend.set_xticks([])
     ax_legend.set_yticks([])
     return f
+ 
     
 def calcChangeStats(d, exp_set, control_set):
     return pandas.DataFrame(

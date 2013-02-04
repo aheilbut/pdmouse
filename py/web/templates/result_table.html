@@ -1,0 +1,117 @@
+## -*- coding: utf-8 -*-
+<%
+import numpy
+
+%>
+<html>
+
+<head>
+
+<style type="text/css">
+
+body {
+	margin: 20px;
+
+}
+
+.datatable {
+	border: 1px solid lightgray;
+	font-size: 8pt;
+	font-family: Arial;
+}
+
+.datatable td {
+	border: 1px solid lightgray;
+	min-width: 100px;
+}	
+
+.sort_col_head {
+	background: lightblue;
+	font-size: 8pt;
+}
+
+.reg_col_head {
+	background: lightgray;
+	font-size: 8pt;
+}
+
+.uparrow {
+	text-decoration: none;
+	font-size: 12pt;
+}
+
+.downarrow {
+	text-decoration: none;
+	font-size: 12pt;
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<a href="/resulttable/cp73?page=0&sort_field=${sort_field}&sort_dir=${sort_dir}"> [first]</a>
+% if page > 0:
+<a href="/resulttable/cp73?page=${page-1}&sort_field=${sort_field}&sort_dir=${sort_dir}"> [<<< prev]</a>
+% else:
+<a style='color: grey'> [<<< prev]</a>
+% endif
+<a href="/resulttable/cp73?page=${page+1}&sort_field=${sort_field}&sort_dir=${sort_dir} "> [next >>>]</a>
+
+<br><br>
+
+<table border="1" class="datatable">
+
+<tr>
+  %for (colnum, col) in enumerate(table.columns):
+
+ <% 
+ if colnum == sort_field:
+ 	col_class = "sort_col_head"
+ else:
+ 	col_class = "reg_col_head"
+%>
+
+  	<th class=${col_class} style='min-width: ${col_widths.get(col, "10px")};'>
+  		<div>${col}</div>
+	  	<div>
+	  	 <a class="uparrow" href="/resulttable/cp73?page=0&sort_field=${colnum}&sort_dir=ASC"> ▲ </a>
+	  	</div>
+	  	 <div> 
+	  	 <a class="downarrow" href="/resulttable/cp73?page=0&sort_field=${colnum}&sort_dir=DESC"> ▼ </a>
+		</div>
+  	</th>
+  %endfor
+</tr>
+
+%for row in table.index:
+  <tr>
+  %for col in table.columns:
+  	%if table[col].dtype == numpy.dtype('float64'):
+  		<td>${"%3.3f" % table.ix[row, col]}</td>
+	%else:
+	  	<td>${table.ix[row, col]}</td>
+	%endif
+  %endfor
+  </tr>
+%endfor
+
+</table>
+
+<br>
+
+<a href="/resulttable/cp73?page=0&sort_field=${sort_field}&sort_dir=${sort_dir}"> [first]</a>
+% if page > 0:
+<a href="/resulttable/cp73?page=${page-1}&sort_field=${sort_field}&sort_dir=${sort_dir}"> [<<< prev]</a>
+% else:
+<a style='color: grey'> [<<< prev]</a>
+% endif
+<a href="/resulttable/cp73?page=${page+1}&sort_field=${sort_field}&sort_dir=${sort_dir} "> [next >>>]</a>
+
+
+</body>
+
+</html>
+

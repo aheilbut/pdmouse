@@ -24,53 +24,64 @@ mo430info = mo430symbol.merge(mo430names)
 mo430info.index = mo430info.probe_id
 
 # define subsets
-ss_cp73_chronicHigh = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
-                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                and pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa"))
 
-ss_cp73_chronicLow = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
-                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                and pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa"))
+def define_subsets():
+    ss_cp73_chronicHigh = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
+                                                    and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                    and pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa"))
 
-ss_cp101_chronicHigh = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
-                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                and pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")) 
+    ss_cp73_chronicLow = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
+                                                    and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                    and pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa"))
 
-ss_cp101_chronicLow = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
-                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                and pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" 
-                                                and pd_covar.ix[x, "MouseID"] != 1343)) 
+    ss_cp101_chronicHigh = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
+                                                    and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                    and pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")) 
 
-ss_cp101_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
-                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" 
-                                                     or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")
-                                                and pd_covar.ix[x, "MouseID"] != 1343)) 
+    ss_cp101_chronicLow = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
+                                                    and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                    and pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" 
+                                                    and pd_covar.ix[x, "MouseID"] != 1343)) 
 
-ss_cp101_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa") and pd_covar.ix[x, "MouseID"] != 1343)) 
+    ss_cp101_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
+                                                    and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                    and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" 
+                                                         or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")
+                                                    and pd_covar.ix[x, "MouseID"] != 1343)) 
 
-
-ss_cp73_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
-                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" \
-                                                     or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")
-                                                and pd_covar.ix[x, "MouseID"] != 1343)) 
+    ss_cp101_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa") and pd_covar.ix[x, "MouseID"] != 1343)) 
 
 
-ss_cp73_allChronic_LDOPA = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
-                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                and (pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa" or pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")))
+    ss_cp73_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
+                                                    and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                    and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" \
+                                                         or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")
+                                                    and pd_covar.ix[x, "MouseID"] != 1343)) 
+
+
+    ss_cp73_allChronic_LDOPA = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
+                                                    and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                    and (pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa" or pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")))
+                                              
+    ss_cp101_allChronic_LDOPA = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
+                                                    and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                    and pd_covar.ix[x, "MouseID"] != 1343
+                                                    and (pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa" or pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")))
                                           
-ss_cp101_allChronic_LDOPA = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
-                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                and pd_covar.ix[x, "MouseID"] != 1343
-                                                and (pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa" or pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")))
-                                          
+
+    cp73_chronic_saline = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP73" 
+                                                    and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                    and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")
+    
+    cp101_chronic_saline = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP101" 
+                                                    and pd_covar.ix[x, "LesionType"] == "6-OHDA"
+                                                    and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")
+
+
+    return locals()
 
 
 
-cp73_chronic_saline = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP73" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")
-cp101_chronic_saline = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP101" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")
 
 aim_model_set = ['aim_models_cp73_chronicHigh', 'aim_models_cp73_chronicLow', 
                  'aim_models_cp101_chronicHigh', 'aim_models_cp101_chronicLow']
@@ -94,7 +105,7 @@ print "calc change stats"
 cp73_highVsSaline_changeStats = pda.calcChangeStats(pd_all, ss_cp73_chronicHigh, cp73_chronic_saline)
 cp101_highVsSaline_changeStats = pda.calcChangeStats(pd_all, ss_cp101_chronicHigh, cp101_chronic_saline) 
 cp73_lowVsSaline_changeStats = pda.calcChangeStats(pd_all, ss_cp73_chronicLow, cp73_chronic_saline) 
-cp101_lowVsSaline_changeStats = pda.calcChangeStats(pd_all, ss_cp101_chronicLow, cp73_chronic_saline) 
+cp101_lowVsSaline_changeStats = pda.calcChangeStats(pd_all, ss_cp101_chronicLow, cp101_chronic_saline) 
 
 print "calc t tests"
 cp73_high_ttest = pda.calc_ttest(pd_all, ss_cp73_chronicHigh, cp73_chronic_saline)

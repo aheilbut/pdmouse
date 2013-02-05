@@ -11,6 +11,8 @@ import mako
 import sqlalchemy
 from sqlalchemy.sql.expression import *
 
+import urllib
+
 from mako.template import Template
 from mako.lookup import TemplateLookup
 
@@ -35,8 +37,8 @@ pd_all = pandas.read_table("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results
 pd_covar = pandas.read_table("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/Oct29/pd.covar.tab")
 
 
-#cp73_wide_info = cPickle.load(open("/data/adrian/data/temp/cp73_wide.pandas.pickle"))
-#cp101_wide_info = cPickle.load(open("/data/adrian/data/temp/cp101_wide.pandas.pickle"))
+cp73_wide_info = cPickle.load(open("/home/adrian/Dropbox/Projects/Broad/PD_mouse/results/jan30/cp73_m.pandas.pickle"))
+cp101_wide_info = cPickle.load(open("/home/adrian/Dropbox/Projects/Broad/PD_mouse/results/jan30/cp101_m.pandas.pickle"))
 
 t2_up = cPickle.load(open("/home/adrian/Dropbox/Projects/Broad/PD_mouse/results/jan30/t2_up.pickle"))
 
@@ -44,6 +46,11 @@ class PDC():
     def __init__(self):
         pass
     
+
+    def index(self):
+        t = tl.get_template("index.html")
+        return t.render()
+
     def probeset_report(self, probeset):
         t = tl.get_template("probeset_report.html")
         return t.render()
@@ -51,6 +58,7 @@ class PDC():
     def render_figure(self, probeset, fig_type, format):
 
         if fig_type == "scatter":
+            probeset = urllib.unquote_plus(probeset)
             # generate figure 
             fig = Figure()
             fig.set_size_inches(15, 6)
@@ -98,7 +106,7 @@ class PDC():
         else:
             s = s
 
-        s["probe_id"] = ["<a href='/probeset/figure/%s/scatter/png'>%s</a>" % (probe_id, probe_id) for probe_id in s.probe_id]
+        s["probe_id"] = ["<a href='/probeset/figure/%s/scatter/png'>%s</a>" % (urllib.quote_plus(probe_id), probe_id) for probe_id in s.probe_id]
         s["symbol"] = ["<a target='_ncbi' href='http://www.ncbi.nlm.nih.gov/gene/?term=%s'>%s</a>" % (sym, sym) for sym in s.symbol]
 
 
@@ -140,6 +148,12 @@ def setup_routes():
                      action = "result_table")
 
 
+    dispatch.connect(name = "index",
+                     route = "/",
+                     controller = pdc,
+                     action = "index")
+
+
     return dispatch
 
 
@@ -150,10 +164,11 @@ def start(config=None):
     conf = {
         '/' : {
         'request.dispatch' : setup_routes(),
-        'tools.staticdir.root' : "/data/adrian/code/projects/broad/pdmouse/web"
+        'tools.staticdir.root' : "/data/adrian/code/projects/broad/pdmouse/py/web"
         },
         
-        '/static' : { 'tools.staticdir.on' : True, 'tools.staticdir.dir' : 'static' }
+        '/static' : { 'tools.staticdir.on' : True, 
+                       'tools.staticdir.dir' : 'static' }
         }
         
     if config:

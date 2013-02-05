@@ -419,7 +419,7 @@ boxplot_Expression <- function(probe_id) {
   title <- paste( paste(probe_id, symbol, sep=" "), genename, sep="\n")
   data <- merge( melt(exprs(pd.eset)[probe_id,]), pd.covar, by.x="row.names", by.y="filenames")
   par(mar = c(10,4,4,2) + 0.1)
-  boxplot(value ~ DrugTreat + MouseType, data, las=2, xlab="treatment group", ylab="log2 expression", cex.axis=0.5, main=title)  
+  boxplot(value ~ DrugTreat + MouseType, data, las=2, xlab="treatment group", ylab="log2 expression", cex.axis=1, main=title)  
   beeswarm(value ~ DrugTreat + MouseType, data, las=2, add=TRUE)
 }
       
@@ -537,3 +537,28 @@ pdf("~/Dropbox/test.pdf")
   }
 dev.off()
 #mo430genenames[mo430genenames$probe_id %in% rownames(exprs(pd.eset))[as.integer(samfit$siggenes.table$genes.up[,"Gene Name"])]
+
+calc_anova_stats <- function(covar_subset, probeset) {
+  cur_expression <- as.data.frame( alldata[probeset,] )
+  colnames(cur_expression) <- "expression"
+  cur_merged <- merge(covar_subset, cur_expression, by.x="filenames", by.y=0)
+  a <- aov(expression ~ DrugTreat, data=cur_merged)
+  return(a)
+}
+      
+write_tukeyHSDpvals = function(covar_subset, subset_name) {
+  for (p in rownames(alldata)) {
+    # get the Tukey stats
+    a <- calc_anova_stats(covar_subset, p)
+    pv <- as.data.frame(TukeyHSD(a)$DrugTreat[,"p adj"])
+    colnames(pv) <- "tukeyHSD"
+    pv$probeset <- p
+    # append to file
+    write.table(pv, file=paste("~/Dropbox/Projects/Broad/PD_mouse/results/jan30/", subset_name, "_tukeyHSD.tab", sep=""), append=TRUE, sep="\t", col.names=FALSE, quote=FALSE)
+  }      
+}
+      
+cp73 <- subset(pd.covar, MouseType=="CP73" & LesionType=="6-OHDA")      
+cp101 <- subset(pd.covar, MouseType=="CP101" & LesionType=="6-OHDA")      
+      
+      

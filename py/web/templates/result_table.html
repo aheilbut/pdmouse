@@ -1,55 +1,12 @@
 ## -*- coding: utf-8 -*-
+<%inherit file="base.html"/>
+
 <%
 import numpy
 
 %>
-<html>
 
-<head>
-
-<style type="text/css">
-
-body {
-	margin: 20px;
-
-}
-
-.datatable {
-	border: 1px solid lightgray;
-	font-size: 8pt;
-	font-family: Arial;
-}
-
-.datatable td {
-	border: 1px solid lightgray;
-	min-width: 100px;
-}	
-
-.sort_col_head {
-	background: lightblue;
-	font-size: 8pt;
-}
-
-.reg_col_head {
-	background: lightgray;
-	font-size: 8pt;
-}
-
-.uparrow {
-	text-decoration: none;
-	font-size: 12pt;
-}
-
-.downarrow {
-	text-decoration: none;
-	font-size: 12pt;
-}
-
-</style>
-
-</head>
-
-<body>
+<div class="container-fluid" style="margin-top: 60px">
 
 
 <a href="/resulttable/${result_set}?page=0&sort_field=${sort_field}&sort_dir=${sort_dir}"> [first]</a>
@@ -90,7 +47,7 @@ body {
   <tr>
   %for col in table.columns:
   	%if table[col].dtype == numpy.dtype('float64'):
-  		<td>${"%3.3f" % table.ix[row, col]}</td>
+  		<td>${"%3.3g" % table.ix[row, col]}</td>
 	%else:
 	  	<td>${table.ix[row, col]}</td>
 	%endif
@@ -111,7 +68,5 @@ body {
 <a href="/resulttable/${result_set}?page=${page+1}&sort_field=${sort_field}&sort_dir=${sort_dir} "> [next >>>]</a>
 
 
-</body>
-
-</html>
+</div>
 

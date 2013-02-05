@@ -1,4 +1,4 @@
-import rpy2
+#import rpy2
 import psycopg2
 import numpy as np
 import networkx as nx

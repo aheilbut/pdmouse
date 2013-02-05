@@ -3,6 +3,7 @@ import psycopg2
 import numpy as np
 import networkx as nx
 import pandas
+import matplotlib as mp
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
 import random
@@ -86,7 +87,7 @@ def dofitModels():
     return (aim_models_cp73_chronicHigh, aim_models_cp73_chronicLow, aim_models_cp101_chronicHigh, aim_models_cp101_chronicLow)
 
 
-def plotProbe(d, pd_covar, probeset, mousetype):
+def plotProbe(d, pd_covar, probeset, mousetype, ax):   
     try:
         symbol = mo430info.ix[probeset,"symbol"]
         genename = mo430info.ix[probeset,"gene_name"]
@@ -94,30 +95,30 @@ def plotProbe(d, pd_covar, probeset, mousetype):
         symbol = "--"
         genename = "--"
 
-    plt.gca().patch.set_facecolor((0.9, 0.9, 0.9))
-    plt.gca().grid(which='both')        
+    ax.patch.set_facecolor((0.9, 0.9, 0.9))
+    ax.grid(which='both')        
         
-    plt.title(mousetype + " : " + probeset + " : " + symbol + "\n" + genename)
-    plt.xlabel("expression")
-    plt.ylabel("sum of AIM")
-    plt.ylim((-5, 160))
+    ax.set_title(mousetype + " : " + probeset + " : " + symbol + "\n" + genename)
+    ax.set_xlabel("expression")
+    ax.set_ylabel("sum of AIM")
+    ax.set_ylim((-5, 160))
     ss = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == mousetype and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")  
     cur_gene = pandas.DataFrame( { "expression" : d.ix[probeset,ss.filenames], "AIM" : list(ss.totalAIM) } )
-    plt.plot(cur_gene["expression"], cur_gene["AIM"], "b.", ms=15, label="Chronic High L-DOPA" )
+    ax.plot(cur_gene["expression"], cur_gene["AIM"], "b.", ms=15, label="Chronic High L-DOPA" )
     
     ss = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == mousetype and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")  
     cur_gene = pandas.DataFrame( { "expression" : d.ix[probeset,ss.filenames], "AIM" : list(ss.totalAIM) } )
-    plt.plot(cur_gene["expression"], cur_gene["AIM"], "r.", ms=15, label="Chronic low L-DOPA" )    
+    ax.plot(cur_gene["expression"], cur_gene["AIM"], "r.", ms=15, label="Chronic low L-DOPA" )    
     
     ss = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == mousetype and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Acute high levodopa")  
     cur_gene = pandas.DataFrame( { "expression" : d.ix[probeset,ss.filenames], "AIM" : list(ss.totalAIM) } )
-    plt.plot(cur_gene["expression"], cur_gene["AIM"], "m.", ms=15, label="Acute L-DOPA" )    
+    ax.plot(cur_gene["expression"], cur_gene["AIM"], "m.", ms=15, label="Acute L-DOPA" )    
 
     ss = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == mousetype and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")  
     cur_gene = pandas.DataFrame( { "expression" : d.ix[probeset,ss.filenames], "AIM" : list(ss.totalAIM) } )
-    plt.plot(cur_gene["expression"], cur_gene["AIM"], "g.", ms=15, label="Saline" )        
+    ax.plot(cur_gene["expression"], cur_gene["AIM"], "g.", ms=15, label="Saline" )        
     
-    return plt.gca().get_legend_handles_labels()
+    return True # plt.gca().get_legend_handles_labels()
 
 def plotBoth(d, covar, probeset):
     f = plt.figure(figsize=(18,5))

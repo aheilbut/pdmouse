@@ -34,9 +34,11 @@ tl = TemplateLookup(directories=["templates"],
 pd_all = pandas.read_table("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/Oct29/PD_arraydata.tab")
 pd_covar = pandas.read_table("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/Oct29/pd.covar.tab")
 
-cp73_wide_info = cPickle.load(open("/data/adrian/data/temp/cp73_wide.pandas.pickle"))
-cp101_wide_info = cPickle.load(open("/data/adrian/data/temp/cp101_wide.pandas.pickle"))
 
+#cp73_wide_info = cPickle.load(open("/data/adrian/data/temp/cp73_wide.pandas.pickle"))
+#cp101_wide_info = cPickle.load(open("/data/adrian/data/temp/cp101_wide.pandas.pickle"))
+
+t2_up = cPickle.load(open("/home/adrian/Dropbox/Projects/Broad/PD_mouse/results/jan30/t2_up.pickle"))
 
 class PDC():
     def __init__(self):
@@ -78,6 +80,12 @@ class PDC():
             s = cp73_wide_info
         elif result_set == "cp101":
             s = cp101_wide_info
+    	elif result_set == "t2_up_cp73_low_vs_saline":
+            s = t2_up["CP73"]["low vs. saline"]		
+        elif result_set == "t2_up_cp73_high_vs_saline":
+            s = t2_up["CP73"]["high vs. saline"]     
+        elif result_set == "t2_up_cp73_low_vs_high":
+            s = t2_up["CP73"]["low vs. high"]     
 
 
         if sort_dir == "ASC":
@@ -105,7 +113,9 @@ class PDC():
         return t.render_unicode(table = s.ix[s.index[row_start:row_start + 100],:],
                                  page=int(page), 
                                  col_widths={"gene_name" : "300px"},
-                                 sort_field=int(sort_field), sort_dir=sort_dir)
+                                 sort_field=int(sort_field),
+                                 sort_dir=sort_dir,
+                                 result_set=result_set)
 
 
 

@@ -52,13 +52,13 @@ body {
 <body>
 
 
-<a href="/resulttable/cp73?page=0&sort_field=${sort_field}&sort_dir=${sort_dir}"> [first]</a>
+<a href="/resulttable/${result_set}?page=0&sort_field=${sort_field}&sort_dir=${sort_dir}"> [first]</a>
 % if page > 0:
-<a href="/resulttable/cp73?page=${page-1}&sort_field=${sort_field}&sort_dir=${sort_dir}"> [<<< prev]</a>
+<a href="/resulttable/${result_set}?page=${page-1}&sort_field=${sort_field}&sort_dir=${sort_dir}"> [<<< prev]</a>
 % else:
 <a style='color: grey'> [<<< prev]</a>
 % endif
-<a href="/resulttable/cp73?page=${page+1}&sort_field=${sort_field}&sort_dir=${sort_dir} "> [next >>>]</a>
+<a href="/resulttable/${result_set}?page=${page+1}&sort_field=${sort_field}&sort_dir=${sort_dir} "> [next >>>]</a>
 
 <br><br>
 
@@ -77,10 +77,10 @@ body {
   	<th class=${col_class} style='min-width: ${col_widths.get(col, "10px")};'>
   		<div>${col}</div>
 	  	<div>
-	  	 <a class="uparrow" href="/resulttable/cp73?page=0&sort_field=${colnum}&sort_dir=ASC"> ▲ </a>
+	  	 <a class="uparrow" href="/resulttable/${result_set}?page=0&sort_field=${colnum}&sort_dir=ASC"> ▲ </a>
 	  	</div>
 	  	 <div> 
-	  	 <a class="downarrow" href="/resulttable/cp73?page=0&sort_field=${colnum}&sort_dir=DESC"> ▼ </a>
+	  	 <a class="downarrow" href="/resulttable/${result_set}?page=0&sort_field=${colnum}&sort_dir=DESC"> ▼ </a>
 		</div>
   	</th>
   %endfor
@@ -102,13 +102,13 @@ body {
 
 <br>
 
-<a href="/resulttable/cp73?page=0&sort_field=${sort_field}&sort_dir=${sort_dir}"> [first]</a>
+<a href="/resulttable/${result_set}?page=0&sort_field=${sort_field}&sort_dir=${sort_dir}"> [first]</a>
 % if page > 0:
-<a href="/resulttable/cp73?page=${page-1}&sort_field=${sort_field}&sort_dir=${sort_dir}"> [<<< prev]</a>
+<a href="/resulttable/${result_set}?page=${page-1}&sort_field=${sort_field}&sort_dir=${sort_dir}"> [<<< prev]</a>
 % else:
 <a style='color: grey'> [<<< prev]</a>
 % endif
-<a href="/resulttable/cp73?page=${page+1}&sort_field=${sort_field}&sort_dir=${sort_dir} "> [next >>>]</a>
+<a href="/resulttable/${result_set}?page=${page+1}&sort_field=${sort_field}&sort_dir=${sort_dir} "> [next >>>]</a>
 
 
 </body>

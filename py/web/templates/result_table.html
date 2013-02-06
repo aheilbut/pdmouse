@@ -6,23 +6,84 @@ import numpy
 
 %>
 
+<script>
+
+$().ready( function() { 
+
+	var dimlist = "${dimlist}";
+
+	$(".dimbox").click( function() {
+		if (this.checked) {
+			dimlist = dimlist + "," + this.value;
+			document.location = "/resulttable/${result_set}?page=${page}&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=" + dimlist
+		} else {
+			dimlist = dimlist.replace("," + this.value, "")
+			document.location = "/resulttable/${result_set}?page=${page}&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=" + dimlist
+		}
+
+	});
+
+	$("#alldim").click( function() {
+		dimlist = "0";
+		document.location = "/resulttable/${result_set}?page=${page}&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=" + dimlist
+
+	});
+
+});
+
+
+</script>
+
+
+
 <div class="container-fluid" style="margin-top: 60px">
 
+<div class="row-fluid">
 
-<a href="/resulttable/${result_set}?page=0&sort_field=${sort_field}&sort_dir=${sort_dir}"> [first]</a>
+<div class="span2">
+	<h10>dimensions</h10>
+	<div style="overflow: scroll; white-space: nowrap; height: 800px">
+	<table class='table table-condensed'>
+	<tr>
+	 <td> <label style="font-size: 8pt"><input id="alldim" type="checkbox" checked=true value=></input> clear all</label></td>
+	</tr>
+
+	% for (colnum, col) in enumerate(fulltable.columns):
+	<tr style="padding: 0px">
+		<td style="padding: 0px">
+			<small>
+			%if colnum in dimarray:
+			<label style="font-size: 8pt"><input class="dimbox" type="checkbox" checked=true value=${colnum}></input> ${col}</label>
+			%else:
+			<label style="font-size: 8pt"><input class="dimbox" type="checkbox" value=${colnum}></input> ${col}</label>
+			%endif
+			</small>
+		</td>
+		<td></td>
+	</tr>
+	% endfor
+	</table>
+	</div>
+</div>
+
+<div class="span10">
+
+<a href="/resulttable/${result_set}?page=0&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=${dimlist}"> [first]</a>
 % if page > 0:
-<a href="/resulttable/${result_set}?page=${page-1}&sort_field=${sort_field}&sort_dir=${sort_dir}"> [<<< prev]</a>
+<a href="/resulttable/${result_set}?page=${page-1}&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=${dimlist}"> [<<< prev]</a>
 % else:
 <a style='color: grey'> [<<< prev]</a>
 % endif
-<a href="/resulttable/${result_set}?page=${page+1}&sort_field=${sort_field}&sort_dir=${sort_dir} "> [next >>>]</a>
+<a href="/resulttable/${result_set}?page=${page+1}&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=${dimlist} "> [next >>>]</a>
 
 <br><br>
 
 <table border="1" class="datatable">
 
 <tr>
-  %for (colnum, col) in enumerate(table.columns):
+  %for (colnum, col) in enumerate(fulltable.columns):
+
+  % if colnum in dimarray:
 
  <% 
  if colnum == sort_field:
@@ -34,22 +95,25 @@ import numpy
   	<th class=${col_class} style='min-width: ${col_widths.get(col, "10px")};'>
   		<div>${col}</div>
 	  	<div>
-	  	 <a class="uparrow" href="/resulttable/${result_set}?page=0&sort_field=${colnum}&sort_dir=ASC"> ▲ </a>
+	  	 <a class="uparrow" href="/resulttable/${result_set}?page=0&sort_field=${colnum}&sort_dir=ASC&dimlist=${dimlist}"> ▲ </a>
 	  	</div>
 	  	 <div> 
-	  	 <a class="downarrow" href="/resulttable/${result_set}?page=0&sort_field=${colnum}&sort_dir=DESC"> ▼ </a>
+	  	 <a class="downarrow" href="/resulttable/${result_set}?page=0&sort_field=${colnum}&sort_dir=DESC&dimlist=${dimlist}"> ▼ </a>
 		</div>
   	</th>
+
+  %endif
+
   %endfor
 </tr>
 
-%for row in table.index:
+%for row in displaytable.index:
   <tr>
-  %for col in table.columns:
-  	%if table[col].dtype == numpy.dtype('float64'):
-  		<td>${"%3.3g" % table.ix[row, col]}</td>
+  %for col in displaytable.columns:
+  	%if displaytable[col].dtype == numpy.dtype('float64'):
+  		<td>${"%3.3g" % displaytable.ix[row, col]}</td>
 	%else:
-	  	<td>${table.ix[row, col]}</td>
+	  	<td>${displaytable.ix[row, col]}</td>
 	%endif
   %endfor
   </tr>
@@ -67,6 +131,7 @@ import numpy
 % endif
 <a href="/resulttable/${result_set}?page=${page+1}&sort_field=${sort_field}&sort_dir=${sort_dir} "> [next >>>]</a>
 
+</div>
 
 </div>
 

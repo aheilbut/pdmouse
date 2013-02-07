@@ -15,19 +15,22 @@ $().ready( function() {
 	$(".dimbox").click( function() {
 		if (this.checked) {
 			dimlist = dimlist + "," + this.value;
-			document.location = "/resulttable/${result_set}?page=${page}&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=" + dimlist
+			document.location = "/resulttable/${result_set}?cell_type=${cell_type}&contrast=${contrast}&page=${page}&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=" + dimlist
 		} else {
 			dimlist = dimlist.replace("," + this.value, "")
-			document.location = "/resulttable/${result_set}?page=${page}&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=" + dimlist
+			document.location = "/resulttable/${result_set}?cell_type=${cell_type}&contrast=${contrast}&page=${page}&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=" + dimlist
 		}
 
 	});
 
 	$("#alldim").click( function() {
 		dimlist = "0";
-		document.location = "/resulttable/${result_set}?page=${page}&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=" + dimlist
+		document.location = "/resulttable/${result_set}?cell_type=${cell_type}&contrast=${contrast}&page=${page}&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=" + dimlist
 
 	});
+
+    $('#datatable').height($(window).height() - 100);
+    $('#dimlist').height($(window).height() - 100);
 
 });
 
@@ -36,13 +39,13 @@ $().ready( function() {
 
 
 
-<div class="container-fluid" style="margin-top: 60px">
+<div class="container-fluid fill" style="margin-top: 60px;">
 
 <div class="row-fluid">
 
 <div class="span2">
 	<h10>dimensions</h10>
-	<div style="overflow: scroll; white-space: nowrap; height: 800px">
+	<div id="dimlist" style="overflow: scroll; white-space: nowrap; height: 800px">
 	<table class='table table-condensed'>
 	<tr>
 	 <td> <label style="font-size: 8pt"><input id="alldim" type="checkbox" checked=true value=></input> clear all</label></td>
@@ -66,15 +69,17 @@ $().ready( function() {
 	</div>
 </div>
 
-<div class="span10">
+<div id="datatable" class="span10" style="overflow: scroll; height: 900px">
 
-<a href="/resulttable/${result_set}?page=0&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=${dimlist}"> [first]</a>
+	<h2>${cell_type} ${contrast}</h2>
+
+<a href="/resulttable/${result_set}?cell_type=${cell_type}&contrast=${contrast}&page=0&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=${dimlist}"> [first]</a>
 % if page > 0:
-<a href="/resulttable/${result_set}?page=${page-1}&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=${dimlist}"> [<<< prev]</a>
+<a href="/resulttable/${result_set}?cell_type=${cell_type}&contrast=${contrast}&page=${page-1}&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=${dimlist}"> [<<< prev]</a>
 % else:
 <a style='color: grey'> [<<< prev]</a>
 % endif
-<a href="/resulttable/${result_set}?page=${page+1}&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=${dimlist} "> [next >>>]</a>
+<a href="/resulttable/${result_set}?cell_type=${cell_type}&contrast=${contrast}&page=${page+1}&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=${dimlist} "> [next >>>]</a>
 
 <br><br>
 
@@ -95,10 +100,10 @@ $().ready( function() {
   	<th class=${col_class} style='min-width: ${col_widths.get(col, "10px")};'>
   		<div>${col}</div>
 	  	<div>
-	  	 <a class="uparrow" href="/resulttable/${result_set}?page=0&sort_field=${colnum}&sort_dir=ASC&dimlist=${dimlist}"> ▲ </a>
+	  	 <a class="uparrow" href="/resulttable/${result_set}?cell_type=${cell_type}&contrast=${contrast}&page=0&sort_field=${colnum}&sort_dir=ASC&dimlist=${dimlist}"> ▲ </a>
 	  	</div>
 	  	 <div> 
-	  	 <a class="downarrow" href="/resulttable/${result_set}?page=0&sort_field=${colnum}&sort_dir=DESC&dimlist=${dimlist}"> ▼ </a>
+	  	 <a class="downarrow" href="/resulttable/${result_set}?cell_type=${cell_type}&contrast=${contrast}&page=0&sort_field=${colnum}&sort_dir=DESC&dimlist=${dimlist}"> ▼ </a>
 		</div>
   	</th>
 
@@ -116,6 +121,9 @@ $().ready( function() {
 	  	<td>${displaytable.ix[row, col]}</td>
 	%endif
   %endfor
+
+  	  <td><img src="" width=150/></td>
+
   </tr>
 %endfor
 
@@ -123,13 +131,13 @@ $().ready( function() {
 
 <br>
 
-<a href="/resulttable/${result_set}?page=0&sort_field=${sort_field}&sort_dir=${sort_dir}"> [first]</a>
+<a href="/resulttable/${result_set}?cell_type=${cell_type}&contrast=${contrast}&page=0&sort_field=${sort_field}&sort_dir=${sort_dir}"> [first]</a>
 % if page > 0:
-<a href="/resulttable/${result_set}?page=${page-1}&sort_field=${sort_field}&sort_dir=${sort_dir}"> [<<< prev]</a>
+<a href="/resulttable/${result_set}?cell_type=${cell_type}&contrast=${contrast}&page=${page-1}&sort_field=${sort_field}&sort_dir=${sort_dir}"> [<<< prev]</a>
 % else:
 <a style='color: grey'> [<<< prev]</a>
 % endif
-<a href="/resulttable/${result_set}?page=${page+1}&sort_field=${sort_field}&sort_dir=${sort_dir} "> [next >>>]</a>
+<a href="/resulttable/${result_set}?cell_type=${cell_type}&contrast=${contrast}&page=${page+1}&sort_field=${sort_field}&sort_dir=${sort_dir} "> [next >>>]</a>
 
 </div>
 

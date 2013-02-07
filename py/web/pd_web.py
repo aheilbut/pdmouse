@@ -141,7 +141,9 @@ class PDC():
                                  sort_dir=sort_dir,
                                  dimlist=dimlist,
                                  dimarray=dimarray,
-                                 result_set=result_set)
+                                 result_set=result_set,
+                                 cell_type=cell_type,
+                                 contrast=contrast)
 
 
 

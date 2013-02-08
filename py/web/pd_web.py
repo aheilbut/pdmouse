@@ -28,6 +28,8 @@ import StringIO
 
 import cPickle
 
+import alib.wikipath
+
 tl = TemplateLookup(directories=["templates"],
                     module_directory="tmp/mako_mod",
                     default_filters=["decode.utf8"],
@@ -43,6 +45,8 @@ cp101_wide_info = cPickle.load(open(pd_locals.datadir + "/jan30/cp101_m.pandas.p
 
 t2_up = cPickle.load(open(pd_locals.datadir + "/jan30/t2_up.pickle"))
 t2_down = cPickle.load(open(pd_locals.datadir + "/jan30/t2_down.pickle"))
+
+wp = alib.wikipath.WikiPathSets()
 
 class PDC():
     def __init__(self):
@@ -81,8 +85,17 @@ class PDC():
 
             return file_generator(buffer)
 
-    def geneset_enrichment_table(self, cell_type, contrast):
-        pass
+    def overlap_table(self, cell_type, contrast, direction):
+        t = tl.get_template("enrichment_table.html")
+
+        if direction == "UP":
+            test_set = t2_up[cell_type][contrast].symbol.unique()
+        elif direction == "DOWN":
+            test_set = t2_down[cell_type][contrast].symbol.unique()
+
+        s = alib.wikipath.calc_overlap_stats(test_set, wp.mouse_wp_symbols, 20826)
+
+        return t.render_unicode(overlaps = s)
 
 
     def result_table(self, result_set, sort_field=0, sort_dir="DESC", rows=100, dimlist=None, page=0, cell_type=None, contrast=None):
@@ -106,7 +119,7 @@ class PDC():
         else:
             s = s
 
-        s["probe_img"] = ["<img width=250 src='/probeset/figure/%s/scatter/png'/>" % urllib.quote_plus(probe_id) for probe_id in s.probe_id]
+        s["probe_img"] = ["<img width=350 src='/probeset/figure/%s/scatter/png'/>" % urllib.quote_plus(probe_id) for probe_id in s.probe_id]
 
         s["probe_id"] = ["<a href='/probeset/figure/%s/scatter/png'>%s</a>" % (urllib.quote_plus(probe_id), probe_id) for probe_id in s.probe_id]
         s["symbol"] = ["<a target='_ncbi' href='http://www.ncbi.nlm.nih.gov/gene/?term=%s'>%s</a>" % (sym, sym) for sym in s.symbol]
@@ -166,6 +179,12 @@ def setup_routes():
                      route = "/resulttable/{result_set}",
                      controller = pdc, 
                      action = "result_table")
+
+    dispatch.connect(name = "overlaps",
+                     route = "/overlaps",
+                     controller = pdc, 
+                     action = "overlap_table")
+
 
 
     dispatch.connect(name = "index",

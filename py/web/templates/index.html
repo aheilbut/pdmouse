@@ -1,0 +1,61 @@
+<%inherit file="base.html"/>
+
+<div class="container-fluid" style="margin-top: 60px">
+
+
+	<div class="row-fluid">
+
+
+	<div class="span5">
+	<h4>top differential genes (>=2-fold changes):</h4>
+
+
+	%for (direction_title, dataset_name, dataset) in [("UP", "t2_up",  t2_up), ("DOWN", "t2_down", t2_down)]:
+
+	<h5> >=2-fold ${direction_title}, FDR 0.10</h5>
+	<table class="table">
+	  <tr>
+	  	<td> </td>
+	  	<td>CP73</td>
+	  	<td>CP101</td>
+	  </tr>
+
+	  <tr>
+
+	  %for contrast in ["low vs. saline", "high vs. saline", "high vs. low"]:
+  	    <td> ${contrast}  </td>		
+
+  	    %for celltype in ["CP73", "CP101"]:
+	    <td> <a href="/resulttable/${dataset_name}?cell_type=${celltype}&contrast=${contrast}"> <b> ${len(dataset[celltype][contrast].symbol.unique())} </b> </a> [xls][csv]  <br> 
+	    	<small>
+	    	<ul>
+	    	<li> <a href="/overlaps?cell_type=${celltype}&contrast=${contrast}&direction=${direction_title}">enrichment</a> </li> 
+	    	<li> GSEA </li> 
+	    	</ul> 
+	     	</small>
+	    </td>
+	    %endfor 
+
+	  </tr>
+
+	  %endfor
+
+	</table>
+
+	%endfor
+
+
+  </div>
+
+  </div>
+
+
+
+  <h4>complete tables:</h4>
+	<h5><a href="/resulttable/cp73">all data: CP73</a> [xls][csv]</h5>
+	<h5><a href="/resulttable/cp101">all data: CP101</a> [xls][csv]</h5>
+
+
+
+</div>
+

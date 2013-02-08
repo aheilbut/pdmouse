@@ -1,0 +1,35 @@
+## -*- coding: utf-8 -*-
+<%inherit file="base.html"/>
+
+<%
+import numpy
+
+%>
+
+<div class="container-fluid" style="padding-top: 100px">
+
+<table>
+
+
+<tr>
+%for (colnum, col) in enumerate(overlaps.columns):
+	<th>${col}</th>
+%endfor
+</tr>
+
+
+%for row in overlaps.index:
+<tr>
+%for col in overlaps.columns:
+	
+  	%if overlaps[col].dtype == numpy.dtype('float64'):
+  		<td>${"%3.3g" % overlaps.ix[row, col]}</td>
+	%else:
+	  	<td>${overlaps.ix[row, col]}</td>
+	%endif
+%endfor
+</tr>
+%endfor
+</table>
+
+</div>

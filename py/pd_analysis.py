@@ -25,6 +25,9 @@ mo430names.index =  mo430names.probe_id
 mo430info = mo430symbol.merge(mo430names)
 mo430info.index = mo430info.probe_id
 
+
+
+
 def fitAIM(probeset, covar_subset, dataset, AIM_dimension="totalAIM"):
     model = "AIM ~ expression"
     cur_gene = pandas.DataFrame( { "expression" : dataset.ix[probeset,covar_subset.filenames], 
@@ -254,3 +257,22 @@ def plotAIMgraphs():
 
 
 
+def compareModels(cell_type_covar_ss, pd_all,  probeset):
+    cur_data = pandas.DataFrame( { "expression" : pd_all.ix[probeset, cell_type_covar_ss.filenames],
+                               "dose" : [int(i) for i in cell_type_covar_ss["DrugTreat"] == "Chronic high levodopa"], 
+                               "AIM" : list(cell_type_covar_ss["totalAIM"].fillna(0)) } )
+
+    aim_models = ["AIM ~ expression + C(dose) + expression:C(dose)", "AIM ~ expression + C(dose)", "AIM ~ C(dose)",  "AIM ~ expression"]
+    expr_models = ["expression ~ AIM*C(dose)", "expression ~ AIM + C(dose)", "expression ~ C(dose)"]
+
+    aim_model_fits = {}
+    for m in aim_models:
+        aim_model_fits[m] = ols(m, cur_data).fit()
+        
+    expr_model_fits = {}
+    for m in expr_models:
+        expr_model_fits[m] = ols(m, cur_data).fit()
+
+
+    return { "aim_models" : aim_models, "aim_model_fits" : aim_model_fits, 
+             "expr_models" : expr_models, "expr_model_fits" : expr_model_fits  }

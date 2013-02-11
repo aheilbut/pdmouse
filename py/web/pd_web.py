@@ -30,11 +30,6 @@ import cPickle
 
 import alib.wikipath
 
-tl = TemplateLookup(directories=["templates"],
-                    module_directory="tmp/mako_mod",
-                    default_filters=["decode.utf8"],
-                    output_encoding="utf-8")
-
 # load pd data
 pd_all = pandas.read_table(pd_locals.datadir + "/Oct29/PD_arraydata.tab")
 pd_covar = pandas.read_table(pd_locals.datadir + "/Oct29/pd.covar.tab")
@@ -45,6 +40,61 @@ cp101_wide_info = cPickle.load(open(pd_locals.datadir + "/jan30/cp101_m.pandas.p
 
 t2_up = cPickle.load(open(pd_locals.datadir + "/jan30/t2_up.pickle"))
 t2_down = cPickle.load(open(pd_locals.datadir + "/jan30/t2_down.pickle"))
+
+
+# define subsets
+ss_cp73_chronicHigh = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
+                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                and pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa"))
+
+ss_cp73_chronicLow = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
+                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                and pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa"))
+
+ss_cp101_chronicHigh = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
+                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                and pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")) 
+
+ss_cp101_chronicLow = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
+                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                and pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" 
+                                                and pd_covar.ix[x, "MouseID"] != 1343)) 
+
+ss_cp101_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
+                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" 
+                                                     or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")
+                                                and pd_covar.ix[x, "MouseID"] != 1343)) 
+
+ss_cp101_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa") and pd_covar.ix[x, "MouseID"] != 1343)) 
+
+
+ss_cp73_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
+                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" \
+                                                     or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")
+                                                and pd_covar.ix[x, "MouseID"] != 1343)) 
+
+
+ss_cp73_allChronic_LDOPA = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
+                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                and (pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa" or pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")))
+                                          
+ss_cp101_allChronic_LDOPA = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
+                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                and pd_covar.ix[x, "MouseID"] != 1343
+                                                and (pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa" or pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")))
+                                          
+
+cp73_chronic_saline = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP73" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")
+cp101_chronic_saline = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP101" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")
+
+
+tl = TemplateLookup(directories=["templates"],
+                    module_directory="tmp/mako_mod",
+                    default_filters=["decode.utf8"],
+                    output_encoding="utf-8")
+
 
 wp = alib.wikipath.WikiPathSets()
 
@@ -58,8 +108,17 @@ class PDC():
         return t.render(t2_up = t2_up, t2_down = t2_down)
 
     def probeset_report(self, probeset):
+
+        cp73_modelComp = pda.compareModels(ss_cp73_allchronic, pd_all, probeset)
+        cp101_modelComp = pda.compareModels(ss_cp101_allchronic, pd_all, probeset)
+
+        # get figure
+        aim_models_fig = 1
+        expr_models_fig = 1
+
+
         t = tl.get_template("probeset_report.html")
-        return t.render()
+        return t.render_unicode(probeset=probeset, cp73_modelComp = cp73_modelComp, cp101_modelComp = cp101_modelComp)
 
     def render_figure(self, probeset, fig_type, format):
 
@@ -184,8 +243,6 @@ def setup_routes():
                      route = "/overlaps",
                      controller = pdc, 
                      action = "overlap_table")
-
-
 
     dispatch.connect(name = "index",
                      route = "/",

@@ -1,0 +1,87 @@
+<%inherit file="base.html"/>
+
+
+<div class="container-fluid" style="margin-top: 60px">
+
+<img src="/probeset/figure/${probeset}/scatter/png"></img>
+
+<div class="row-fluid">
+
+<div class="span5">
+
+<h2> CP73 </h2>
+
+% for m in cp73_modelComp["aim_models"]:
+
+	<h4>Model: <br> ${m}</h4>
+	<div class="model">
+	${cp73_modelComp["aim_model_fits"][m].summary().as_html()}
+
+
+	</div>
+
+	<hr>
+
+% endfor
+
+
+<h2> CP101 </h2>
+
+% for m in cp101_modelComp["aim_models"]:
+
+	<h4>Model: <br> ${m}</h4>
+	<div class="model">
+	${cp101_modelComp["aim_model_fits"][m].summary().as_html()}
+
+	</div>
+
+	<hr>
+
+% endfor
+
+</div>
+
+</div>
+
+<div class="row-fluid">
+
+<div class="span5">
+
+<h2> CP73 </h2>
+
+% for m in cp73_modelComp["expr_models"]:
+
+	<h4>Model: <br> ${m}</h4>
+	<div class="model">
+	${cp73_modelComp["expr_model_fits"][m].summary().as_html()}
+
+
+	</div>
+
+	<hr>
+
+% endfor
+
+
+<h2> CP101 </h2>
+
+% for m in cp101_modelComp["expr_models"]:
+
+	<h4>Model: <br> ${m}</h4>
+	<div class="model">
+	${cp101_modelComp["expr_model_fits"][m].summary().as_html()}
+
+	</div>
+
+	<hr>
+
+% endfor
+
+</div>
+
+
+
+</div>
+
+</div>
+

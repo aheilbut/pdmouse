@@ -16,10 +16,10 @@ import scipy.stats as st
 import statsmodels.sandbox.stats.multicomp
 
 
-mo430symbol = pandas.read_table("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/Oct29/mo4302symbols.tab")
+mo430symbol = pandas.read_table(pd_locals.datadir +  "/Oct29/mo4302symbols.tab")
 mo430symbol.index = mo430symbol.probe_id
 
-mo430names = pandas.read_table("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/Oct29/mo4302genenames.tab")
+mo430names = pandas.read_table(pd_locals.datadir + "/Oct29/mo4302genenames.tab")
 mo430names.index =  mo430names.probe_id
 
 mo430info = mo430symbol.merge(mo430names)

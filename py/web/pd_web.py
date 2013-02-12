@@ -157,7 +157,7 @@ class PDC():
         return t.render_unicode(overlaps = s)
 
 
-    def result_table(self, result_set, sort_field=0, sort_dir="DESC", rows=100, dimlist=None, page=0, cell_type=None, contrast=None):
+    def result_table(self, result_set, format="HTML", sort_field=0, sort_dir="DESC", rows=100, dimlist=None, page=0, cell_type=None, contrast=None):
         if result_set == "cp73":
             s = cp73_wide_info
         elif result_set == "cp101":
@@ -177,6 +177,15 @@ class PDC():
             s = s.sort([s.columns.values[int(sort_field)]], ascending=sort_asc)
         else:
             s = s
+
+
+        if format == "txt":
+            cherrypy.response.headers['Content-Type'] = "text/plain"
+            buffer = StringIO.StringIO()
+            s.to_csv(buffer, sep="\t")
+            buffer.seek(0)
+
+            return file_generator(buffer)
 
         s["probe_img"] = ["<img width=350 src='/probeset/figure/%s/scatter/png'/>" % urllib.quote_plus(probe_id) for probe_id in s.probe_id]
 

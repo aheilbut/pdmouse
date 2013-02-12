@@ -14,7 +14,7 @@ import datetime
 import time, datetime
 import scipy.stats as st
 import statsmodels.sandbox.stats.multicomp
-
+import pd_locals
 
 mo430symbol = pandas.read_table(pd_locals.datadir +  "/Oct29/mo4302symbols.tab")
 mo430symbol.index = mo430symbol.probe_id

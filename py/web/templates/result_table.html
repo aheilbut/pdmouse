@@ -130,13 +130,13 @@ $().ready( function() {
 
 <br>
 
-<a href="/resulttable/${result_set}?cell_type=${cell_type}&contrast=${contrast}&page=0&sort_field=${sort_field}&sort_dir=${sort_dir}"> [first]</a>
+<a href="/resulttable/${result_set}?cell_type=${cell_type}&contrast=${contrast}&page=0&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=${dimlist}"> [first]</a>
 % if page > 0:
-<a href="/resulttable/${result_set}?cell_type=${cell_type}&contrast=${contrast}&page=${page-1}&sort_field=${sort_field}&sort_dir=${sort_dir}"> [<<< prev]</a>
+<a href="/resulttable/${result_set}?cell_type=${cell_type}&contrast=${contrast}&page=${page-1}&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=${dimlist}"> [<<< prev]</a>
 % else:
 <a style='color: grey'> [<<< prev]</a>
 % endif
-<a href="/resulttable/${result_set}?cell_type=${cell_type}&contrast=${contrast}&page=${page+1}&sort_field=${sort_field}&sort_dir=${sort_dir} "> [next >>>]</a>
+<a href="/resulttable/${result_set}?cell_type=${cell_type}&contrast=${contrast}&page=${page+1}&sort_field=${sort_field}&sort_dir=${sort_dir}&dimlist=${dimlist} "> [next >>>]</a>
 
 </div>
 

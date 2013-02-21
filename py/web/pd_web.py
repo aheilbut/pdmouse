@@ -180,7 +180,9 @@ class PDC():
 
 
         if format == "txt":
-            cherrypy.response.headers['Content-Type'] = "text/plain"
+            cherrypy.response.headers['Content-Type'] = "application/octet-stream"
+            filename = "PDAIMS_2013_%s_%s_%s.txt" % (result_set, cell_type, contrast) 
+            cherrypy.response.headers["Content-Disposition"] = "attachment; filename=%s" % filename
             buffer = StringIO.StringIO()
             s.to_csv(buffer, sep="\t")
             buffer.seek(0)
@@ -189,7 +191,7 @@ class PDC():
 
         s["probe_img"] = ["<img width=350 src='/probeset/figure/%s/scatter/png'/>" % urllib.quote_plus(probe_id) for probe_id in s.probe_id]
 
-        s["probe_id"] = ["<a href='/probeset/figure/%s/scatter/png'>%s</a>" % (urllib.quote_plus(probe_id), probe_id) for probe_id in s.probe_id]
+        s["probe_id"] = ["<a target='_detail'  href='/probeset/%s'>%s</a>" % (urllib.quote_plus(probe_id), probe_id) for probe_id in s.probe_id]
         s["symbol"] = ["<a target='_ncbi' href='http://www.ncbi.nlm.nih.gov/gene/?term=%s'>%s</a>" % (sym, sym) for sym in s.symbol]
 
 
@@ -269,7 +271,7 @@ def start(config=None):
     conf = {
         '/' : {
         'request.dispatch' : setup_routes(),
-        'tools.staticdir.root' : "/data/adrian/code/projects/broad/pdmouse/py/web"
+        'tools.staticdir.root' : pd_locals.staticdir
         },
         
         '/static' : { 'tools.staticdir.on' : True, 

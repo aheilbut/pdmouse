@@ -11,6 +11,9 @@ import mako
 import sqlalchemy
 from sqlalchemy.sql.expression import *
 
+import glob
+
+
 import urllib
 
 from mako.template import Template
@@ -38,33 +41,33 @@ pd_covar = pandas.read_table(pd_locals.datadir + "/Oct29/pd.covar.tab")
 cp73_wide_info = cPickle.load(open(pd_locals.datadir + "/jan30/cp73_m.pandas.pickle"))
 cp101_wide_info = cPickle.load(open(pd_locals.datadir + "/jan30/cp101_m.pandas.pickle"))
 
-t2_up = cPickle.load(open(pd_locals.datadir + "/jan30/t2_up.pickle"))
-t2_down = cPickle.load(open(pd_locals.datadir + "/jan30/t2_down.pickle"))
+t2_up = cPickle.load(open(pd_locals.datadir + "/feb25/t2_up.pickle"))
+t2_down = cPickle.load(open(pd_locals.datadir + "/feb25/t2_down.pickle"))
 
 
 # define subsets
 ss_cp73_chronicHigh = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
-                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                and pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa"))
+                                                 and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                 and pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa"))
 
 ss_cp73_chronicLow = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
                                                 and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
                                                 and pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa"))
 
 ss_cp101_chronicHigh = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
-                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                and pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")) 
+                                                  and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                  and pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")) 
 
 ss_cp101_chronicLow = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
-                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                and pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" 
-                                                and pd_covar.ix[x, "MouseID"] != 1343)) 
+                                                 and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                 and pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" 
+                                                 and pd_covar.ix[x, "MouseID"] != 1343)) 
 
 ss_cp101_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
-                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" 
-                                                     or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")
-                                                and pd_covar.ix[x, "MouseID"] != 1343)) 
+                                                 and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                 and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" 
+                                                      or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")
+                                                 and pd_covar.ix[x, "MouseID"] != 1343)) 
 
 ss_cp101_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa") and pd_covar.ix[x, "MouseID"] != 1343)) 
 
@@ -77,14 +80,14 @@ ss_cp73_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "
 
 
 ss_cp73_allChronic_LDOPA = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
-                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                and (pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa" or pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")))
-                                          
+                                                      and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                      and (pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa" or pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")))
+
 ss_cp101_allChronic_LDOPA = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
-                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                and pd_covar.ix[x, "MouseID"] != 1343
-                                                and (pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa" or pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")))
-                                          
+                                                       and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                       and pd_covar.ix[x, "MouseID"] != 1343
+                                                       and (pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa" or pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")))
+
 
 cp73_chronic_saline = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP73" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")
 cp101_chronic_saline = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP101" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")
@@ -101,7 +104,7 @@ wp = alib.wikipath.WikiPathSets()
 class PDC():
     def __init__(self):
         pass
-    
+
 
     def index(self):
         t = tl.get_template("index.html")
@@ -162,7 +165,7 @@ class PDC():
             s = cp73_wide_info
         elif result_set == "cp101":
             s = cp101_wide_info
-    	elif result_set == "t2_up":
+        elif result_set == "t2_up":
             s = t2_up[cell_type][contrast]		
         elif result_set == "t2_down":
             s = t2_down[cell_type][contrast]      
@@ -229,6 +232,13 @@ class PDC():
                                  contrast=contrast)
 
 
+    
+    def gsea_list(self):
+        t = tl.get_template("gsea_list.html")
+        gsea_directories = glob.glob("/data/adrian/code/projects/broad/pdmouse/py/web/static/gsea_output/*")
+        gsea_directories.sort()
+        
+        return t.render_unicode(gsea_directories = gsea_directories)
 
 pdc = PDC()
 
@@ -255,6 +265,11 @@ def setup_routes():
                      controller = pdc, 
                      action = "overlap_table")
 
+    dispatch.connect(name = "gsea_list",
+                     route = "/gsea",
+                     controller = pdc, 
+                     action = "gsea_list")
+    
     dispatch.connect(name = "index",
                      route = "/",
                      controller = pdc,
@@ -270,23 +285,23 @@ def setup_routes():
 def start(config=None):
     conf = {
         '/' : {
-        'request.dispatch' : setup_routes(),
-        'tools.staticdir.root' : pd_locals.staticdir
-        },
-        
+            'request.dispatch' : setup_routes(),
+            'tools.staticdir.root' : pd_locals.staticdir
+            },
+
         '/static' : { 'tools.staticdir.on' : True, 
-                       'tools.staticdir.dir' : 'static' }
-        }
-        
+                      'tools.staticdir.dir' : 'static' }
+    }
+
     if config:
         cherrypy.config.update(config)
 
 #    SATool.SAEnginePlugin(cherrypy.engine).subscribe()
 #    cherrypy.tools.db = SATool.SATool()
-        
+
     cherrypy.server.socket_host = "0.0.0.0"
     cherrypy.server.socket_port = 9080
-        
+
     app = cherrypy.tree.mount(None, config=conf)
     cherrypy.quickstart(app)
 

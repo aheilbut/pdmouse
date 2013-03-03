@@ -246,3 +246,50 @@ y = pda.fitModels(a, ss_cp101_allchronic, pd_all)
 end = time.time()
 print end-start
 """
+
+
+# write GCT files for GSEA using java tool
+# cp73 acute L-DOPA vs (acute) saline
+saveGCT( pd_all_collapsed[ ["Name", "Description"] + list(ss_cp73_acuteHigh.filenames) + list(ss_cp73_acuteSaline.filenames) ], 
+            "/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/feb25/gct/cp73_acuteHigh_vs_acuteSaline.gct")
+writeCLS(ss_cp73_acuteHigh, "cp73_acute_high", ss_cp73_acuteSaline, "cp73_acute_saline", "/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/feb25/gct/cp73_acuteHigh_vs_acuteSaline.cls")
+
+# cp73 acute L-DOPA vs chronic high L-DOPA
+saveGCT( pd_all_collapsed[ ["Name", "Description"] + list(ss_cp73_acuteHigh.filenames) + list(ss_cp73_chronicHigh.filenames) ], 
+            "/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/feb25/gct/cp73_acute_vs_chronic_high.gct")
+writeCLS(ss_cp73_acuteHigh, "cp73_acute_high", ss_cp73_chronicHigh, "cp73_chronic_high", "/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/feb25/gct/cp73_acute_vs_chronic_high.cls")
+
+# cp73 chronic high vs. chonic saline
+saveGCT( pd_all_collapsed[ ["Name", "Description"] + list(ss_cp73_chronicHigh.filenames) + list(cp73_chronic_saline.filenames) ], 
+            "/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/feb25/gct/cp73_chronic_high_vs_saline.gct")
+writeCLS(ss_cp73_chronicHigh, "cp73_chronic_high", cp73_chronic_saline, "cp73_chronic_saline", "/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/feb25/gct/cp73_chronic_high_vs_saline.cls")
+
+# cp73 chronic high vs. chonic saline
+saveGCT( pd_all_collapsed[ ["Name", "Description"] + list(ss_cp73_chronicLow.filenames) + list(cp73_chronic_saline.filenames) ], 
+            "/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/feb25/gct/cp73_chronic_low_vs_saline.gct")
+writeCLS(ss_cp73_chronicLow, "cp73_chronic_low", cp73_chronic_saline, "cp73_chronic_saline", "/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/feb25/gct/cp73_chronic_low_vs_saline.cls")
+
+# cp73 chronic high vs. chonic low
+saveGCT( pd_all_collapsed[ ["Name", "Description"] + list(ss_cp73_chronicHigh.filenames) + list(ss_cp73_chronicLow.filenames) ], 
+            "/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/feb25/gct/cp73_chronic_high_vs_low.gct")
+writeCLS(ss_cp73_chronicHigh, "cp73_chronic_high", ss_cp73_chronicLow, "cp73_chronic_low", "/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/feb25/gct/cp73_chronic_high_vs_low.cls")
+
+# cp101 chronic high vs saline
+saveGCT( pd_all_collapsed[ ["Name", "Description"] + list(ss_cp101_chronicHigh.filenames) + list(cp101_chronic_saline.filenames) ], 
+            "/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/feb25/gct/cp101_chronic_high_vs_saline.gct")
+writeCLS(ss_cp101_chronicHigh, "cp101_chronic_high", cp101_chronic_saline, "cp101_chronic_saline", "/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/feb25/gct/cp101_chronic_high_vs_saline.cls")
+
+# cp101 chronic low vs saline
+saveGCT( pd_all_collapsed[ ["Name", "Description"] + list(ss_cp101_chronicLow.filenames) + list(cp101_chronic_saline.filenames) ], 
+            "/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/feb25/gct/cp101_chronic_low_vs_saline.gct")
+writeCLS(ss_cp101_chronicLow, "cp101_chronic_low", cp101_chronic_saline, "cp101_chronic_saline", "/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/feb25/gct/cp101_chronic_low_vs_saline.cls")
+
+# cp101 chronic high vs low
+saveGCT( pd_all_collapsed[ ["Name", "Description"] + list(ss_cp101_chronicHigh.filenames) + list(ss_cp101_chronicLow.filenames) ], 
+            "/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/feb25/gct/cp101_chronic_high_vs_low.gct")
+writeCLS(ss_cp101_chronicHigh, "cp101_chronic_high", ss_cp101_chronicLow, "cp101_chronic_low", "/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/feb25/gct/cp101_chronic_high_vs_low.cls")
+
+
+
+
+

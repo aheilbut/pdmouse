@@ -22,20 +22,28 @@
 
 	  <tr>
 
-	  %for contrast in ["low vs. saline", "high vs. saline", "high vs. low"]:
+	  %for contrast in ["low vs. saline", "high vs. saline", "high vs. low", "acute vs. saline"]:
   	    <td> ${contrast}  </td>		
 
   	    %for celltype in ["CP73", "CP101"]:
+
+	    %if contrast in dataset[celltype]:	    
 	    <td> <a href="/resulttable/${dataset_name}?cell_type=${celltype}&contrast=${contrast}"> <b> ${len(dataset[celltype][contrast].symbol.unique())} </b> </a> 
 	    <a href="/resulttable/${dataset_name}?cell_type=${celltype}&contrast=${contrast}&format=txt"> [txt] </a>
 	     <br> 
 	    	<small>
 	    	<ul>
 	    	<li> <a href="/overlaps?cell_type=${celltype}&contrast=${contrast}&direction=${direction_title}">enrichment</a> </li> 
-	    	<li> GSEA </li> 
+	    	<li> <a href="/gsea">GSEA </li> 
 	    	</ul> 
 	     	</small>
 	    </td>
+	    
+	    %else:
+		<td></td>	    
+
+	    %endif
+	    
 	    %endfor 
 
 	  </tr>
@@ -57,7 +65,7 @@
 	<h5><a href="/resulttable/cp73">all data: CP73</a>  <a href="/resulttable/cp73?format=txt">[txt]</a></h5>
 	<h5><a href="/resulttable/cp101">all data: CP101</a> <a href="/resulttable/cp101?format=txt">[txt]</a></h5>
 
-
-
+  
+  
 </div>
 

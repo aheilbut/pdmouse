@@ -235,7 +235,7 @@ class PDC():
     
     def gsea_list(self):
         t = tl.get_template("gsea_list.html")
-        gsea_directories = glob.glob("/data/adrian/code/projects/broad/pdmouse/py/web/static/gsea_output/*")
+        gsea_directories = glob.glob(pd_locals.gsea_dir + "*")
         gsea_directories.sort()
         
         return t.render_unicode(gsea_directories = gsea_directories)

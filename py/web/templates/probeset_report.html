@@ -1,6 +1,8 @@
 <%inherit file="base.html"/>
 
 
+
+
 <div class="container-fluid" style="margin-top: 60px">
 
 <img src="/probeset/figure/${probeset}/scatter/png"></img>
@@ -9,36 +11,48 @@
 
 <div class="span5">
 
-<h2> CP73 </h2>
-
-% for m in cp73_modelComp["aim_models"]:
-
-	<h4>Model: <br> ${m}</h4>
-	<div class="model">
-	${cp73_modelComp["aim_model_fits"][m].summary().as_html()}
-
-
+	<div class="tabbable tabs-below">
+		<ul class="nav nav-tabs">
+		  <li class="active"><a href="#t1" data-toggle="tab">CP73</a></li>
+		  <li><a href="#t2" data-toggle="tab">CP101</a></li>
+		</ul>
+	
+	
+		<div class="tab-content">
+		
+			<div class="tab-pane active" id="t1">
+				<h2> CP73 </h2>
+				
+				% for m in cp73_modelComp["aim_models"]:
+				
+					<h4>Model: <br> ${m}</h4>
+					<div class="model">
+					${cp73_modelComp["aim_model_fits"][m].summary().as_html()}
+					</div>
+				
+					<hr>
+				
+				% endfor
+			</div>
+			
+			<div class="tab-pane" id="t2">
+				<h2> CP101 </h2>
+				
+				% for m in cp101_modelComp["aim_models"]:
+				
+					<h4>Model: <br> ${m}</h4>
+					<div class="model">
+					${cp101_modelComp["aim_model_fits"][m].summary().as_html()}
+				
+					</div>
+				
+					<hr>
+				
+				% endfor
+			</div>
+		
+		</div>
 	</div>
-
-	<hr>
-
-% endfor
-
-
-<h2> CP101 </h2>
-
-% for m in cp101_modelComp["aim_models"]:
-
-	<h4>Model: <br> ${m}</h4>
-	<div class="model">
-	${cp101_modelComp["aim_model_fits"][m].summary().as_html()}
-
-	</div>
-
-	<hr>
-
-% endfor
-
 </div>
 
 </div>

@@ -32,6 +32,8 @@ $().ready( function() {
     $('#datatable').height($(window).height() - 100);
     $('#dimlist').height($(window).height() - 100);
 
+    
+    $(".dimensiontitle").tooltip({ html: true });
 });
 
 
@@ -44,7 +46,7 @@ $().ready( function() {
 <div class="row-fluid">
 
 <div class="span2">
-	<h10>dimensions</h10>
+	<h10><a href="/dimlist">dimensions</a></h10>
 	<div id="dimlist" style="overflow: scroll; white-space: nowrap; height: 800px">
 	<table class='table table-condensed'>
 	<tr>
@@ -55,12 +57,16 @@ $().ready( function() {
 	<tr style="padding: 0px">
 		<td style="padding: 0px">
 			<small>
+			<a class="dimensiontitle" href="#" data-toggle="tooltip" title="${dim_descriptions.get(str(col),'')}">			
+			
 			%if colnum in dimarray:
 			<label style="font-size: 8pt"><input class="dimbox" type="checkbox" checked=true value=${colnum}></input> ${col}</label>
 			%else:
 			<label style="font-size: 8pt"><input class="dimbox" type="checkbox" value=${colnum}></input> ${col}</label>
 			%endif
 			</small>
+			
+			</a>
 		</td>
 		<td></td>
 	</tr>
@@ -83,7 +89,7 @@ $().ready( function() {
 
 <br><br>
 
-<table border="1" class="datatable">
+<table border="1" class="table table-striped datatable">
 
 <tr>
   %for (colnum, col) in enumerate(fulltable.columns):

@@ -26,8 +26,6 @@ mo430info = mo430symbol.merge(mo430names)
 mo430info.index = mo430info.probe_id
 
 
-
-
 def fitAIM(probeset, covar_subset, dataset, AIM_dimension="totalAIM"):
     model = "AIM ~ expression"
     cur_gene = pandas.DataFrame( { "expression" : dataset.ix[probeset,covar_subset.filenames], 

@@ -1,0 +1,23 @@
+## -*- coding: utf-8 -*-
+<%inherit file="base.html"/>
+
+
+
+<div class="container-fluid fill" style="margin-top: 60px;">
+
+<div class="row-fluid">
+
+
+<table class="table table-bordered">
+%for (name, desc) in dim_descriptions.items():
+<tr>
+ <td> ${name} <td>
+ <td> ${desc} </td>
+</tr>
+
+%endfor
+
+</table>
+
+</div>
+</div>

@@ -37,6 +37,8 @@ import alib.wikipath
 pd_all = pandas.read_table(pd_locals.datadir + "/Oct29/PD_arraydata.tab")
 pd_covar = pandas.read_table(pd_locals.datadir + "/Oct29/pd.covar.tab")
 
+dim_descriptions = dict([map(str.rstrip, a.split("\t")) for a in open(pd_locals.datadir + "/feb25/dim_description.txt").readlines()])
+
 
 cp73_wide_info = cPickle.load(open(pd_locals.datadir + "/jan30/cp73_m.pandas.pickle"))
 cp101_wide_info = cPickle.load(open(pd_locals.datadir + "/jan30/cp101_m.pandas.pickle"))
@@ -227,6 +229,7 @@ class PDC():
                                  sort_dir=sort_dir,
                                  dimlist=dimlist,
                                  dimarray=dimarray,
+                                 dim_descriptions=dim_descriptions,
                                  result_set=result_set,
                                  cell_type=cell_type,
                                  contrast=contrast)
@@ -240,6 +243,12 @@ class PDC():
         
         return t.render_unicode(gsea_directories = gsea_directories)
 
+    def dimlist(self):
+        t = tl.get_template("dim_list.html")
+        
+        return t.render_unicode(dim_descriptions=dim_descriptions)
+
+    
 pdc = PDC()
 
 def setup_routes():
@@ -269,6 +278,11 @@ def setup_routes():
                      route = "/gsea",
                      controller = pdc, 
                      action = "gsea_list")
+    
+    dispatch.connect(name = "dim_list",
+                     route= "/dimlist",
+                     controller = pdc,
+                     action = "dimlist")
     
     dispatch.connect(name = "index",
                      route = "/",

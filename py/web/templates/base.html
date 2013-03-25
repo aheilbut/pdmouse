@@ -59,6 +59,17 @@
 		width:300px;
 		white-space:pre-wrap;
 	}
+	
+	.sidenav {
+	  border-bottom: 1px solid lightgray;	
+		
+	
+	}
+	
+	.section {
+	    padding-top: 40px;
+	    margin-top: -40px;
+	}
 
 	</style>
  </head>
@@ -80,12 +91,15 @@
           <div class="nav-collapse collapse">
             <ul class="nav">
               <li class="active"><a href="/">Tables</a></li>
-              <li class="active"><a href="/gsea">GSEA</a></li>
-              <li class="active"><a href="/gsea">Raw Data</a></li>
-              <li class="active"><a href="/gsea">Source Code</a></li>
+              <li><a href="/gsea">GSEA</a></li>
+              <li><a href="/gsea">Raw Data</a></li>
+	      <li><a href="/methods">Methods</a></li>
+              <li><a href="/gsea">Source Code</a></li>
 	      </ul>
             <ul class="nav pull-right">
-              <li><a href="#contact">About</a></li>              
+		<li><form class="navbar-search pull-right" action="/search">
+		<input type="text" class="search-query" name="q" style="width: 120px" placeholder="search genes">
+	      </form></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>

@@ -5,59 +5,76 @@
 
 <div class="container-fluid" style="margin-top: 60px">
 
-<img src="/probeset/figure/${probeset}/scatter/png"></img>
-
 <div class="row-fluid">
 
-<div class="span5">
-
-	<div class="tabbable tabs-below">
-		<ul class="nav nav-tabs">
-		  <li class="active"><a href="#t1" data-toggle="tab">CP73</a></li>
-		  <li><a href="#t2" data-toggle="tab">CP101</a></li>
+	<div class="span2">
+	  <ul class="nav nav-list affix">
+	  	  
+	  <li class="nav-header"><a href="#rawdata">Individual<br> Measurements</a></li>
+	  
+	  <li class="nav-header"><a href="#groups">Group Comparisons</a></li>
+	  
+	  <li class="nav-header">Linear Models</li>
+	  
+	  <ul class="nav nav-list sidenav">
+	    <li class="sidenav"> <a href="#CP73">CP73</a></li>
+		<ul class="nav nav-list">
+		  <li class>model..</li>
 		</ul>
+	    
+	    
+	    <li class="sidenav"><a href="#CP101">CP101</a></li>
+	  
+	  </ul>
+	</div>
+
+<div class="span9">
+
+	<div class="row-fluid">
 	
-	
-		<div class="tab-content">
-		
-			<div class="tab-pane active" id="t1">
-				<h2> CP73 </h2>
-				
-				% for m in cp73_modelComp["aim_models"]:
-				
-					<h4>Model: <br> ${m}</h4>
-					<div class="model">
-					${cp73_modelComp["aim_model_fits"][m].summary().as_html()}
-					</div>
-				
-					<hr>
-				
-				% endfor
-			</div>
+		<div class="section" id="rawdata">
+		<img src="/probeset/figure/${probeset}/scatter/png"></img>
+		</div>
 			
-			<div class="tab-pane" id="t2">
-				<h2> CP101 </h2>
-				
-				% for m in cp101_modelComp["aim_models"]:
-				
-					<h4>Model: <br> ${m}</h4>
-					<div class="model">
-					${cp101_modelComp["aim_model_fits"][m].summary().as_html()}
-				
-					</div>
-				
-					<hr>
-				
-				% endfor
+		
+		<div class="section" id="CP73">
+		<h3> CP73 </h3>
+		
+		% for m in cp73_modelComp["aim_models"]:
+		
+			<h4>Model: <br> ${m}</h4>
+			<div class="model">
+			${cp73_modelComp["aim_model_fits"][m].summary().as_html()}
 			</div>
 		
+			<hr>
+		
+		% endfor
+		</div>
+	
+		<div class="section" id="CP101">
+		<h3> CP101 </h3>
+					
+		% for m in cp101_modelComp["aim_models"]:
+		
+			<h4>Model: <br> ${m}</h4>
+			<div class="model">
+			${cp101_modelComp["aim_model_fits"][m].summary().as_html()}
+		
+			</div>
+		
+			<hr>
+		
+		% endfor
 		</div>
 	</div>
-</div>
 
 </div>
 
-<div class="row-fluid">
+
+
+
+<!-- 
 
 <div class="span5">
 
@@ -76,7 +93,6 @@
 
 % endfor
 
-
 <h2> CP101 </h2>
 
 % for m in cp101_modelComp["expr_models"]:
@@ -92,8 +108,7 @@
 % endfor
 
 </div>
-
-
+-->
 
 </div>
 

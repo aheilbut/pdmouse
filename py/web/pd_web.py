@@ -12,6 +12,7 @@ import sqlalchemy
 from sqlalchemy.sql.expression import *
 
 import glob
+import re
 
 
 import urllib
@@ -32,6 +33,16 @@ import StringIO
 import cPickle
 
 import alib.wikipath
+
+
+mo430symbol = pandas.read_table(pd_locals.datadir +  "/Oct29/mo4302symbols.tab")
+mo430symbol.index = mo430symbol.probe_id
+
+mo430names = pandas.read_table(pd_locals.datadir + "/Oct29/mo4302genenames.tab")
+mo430names.index =  mo430names.probe_id
+
+mo430info = mo430symbol.merge(mo430names)
+mo430info.index = mo430info.probe_id
 
 # load pd data
 pd_all = pandas.read_table(pd_locals.datadir + "/Oct29/PD_arraydata.tab")
@@ -248,6 +259,22 @@ class PDC():
         
         return t.render_unicode(dim_descriptions=dim_descriptions)
 
+
+    def search(self, q):
+        t= tl.get_template("search_results.html")
+        
+        def matchProbe(x, query):
+            if ( re.match(".*%s.*" % query.lower(), mo430info.gene_name[x].lower()) 
+                or re.match(".*%s.*" % query.lower(), mo430info.symbol[x].lower())
+                or query == mo430info.probe_id[x]):
+                return True
+            else:
+                return False        
+            
+        matches = mo430info.select(lambda x: matchProbe(x, q))
+        
+        return t.render_unicode(matches = matches.sort("gene_name"))
+    
     
 pdc = PDC()
 
@@ -283,6 +310,11 @@ def setup_routes():
                      route= "/dimlist",
                      controller = pdc,
                      action = "dimlist")
+    
+    dispatch.connect(name = "search",
+                     route = "/search",
+                     controller = pdc,
+                     action = "search")
     
     dispatch.connect(name = "index",
                      route = "/",

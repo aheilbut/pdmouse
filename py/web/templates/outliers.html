@@ -1,0 +1,63 @@
+<%inherit file="base.html"/>
+
+
+<div class="container-fluid" style="margin-top: 60px">
+
+<div class="row-fluid">
+
+	<div class="span2">
+
+	
+	</div>
+	
+	<div class="span8">
+	<div class="page-header">
+	<h2>Mouse ${cptype} ${mouseid} vs. rest of group 
+	<small> potential expression outliers </small>
+	</h2>	
+	</div>
+	
+	%for k in outliers.keys():
+	
+	<h3>${k}</h3>
+
+	<%
+	table = outliers[k]	
+	%> 
+	
+	<table class="tabledata">
+
+	<tr>
+	  <th>probeset</th>
+	  <th>symbol</th>
+	  <th>gene name</th>
+	  <th>log2 fc vs. same group</th>
+	  <th>log2 fc as z-score</th>
+	</tr>
+
+
+	%for i in table.index:
+	
+	<%
+	  r = table.ix[i,:]
+	%>
+	
+	<tr>
+	  <td><a href='/probeset/${r["probe_id"]}'>${r["probe_id"]}</a></td>
+	  <td>${r["symbol"]}</td>
+	  <td>${r["gene_name"]}</td>
+	  <td>${"%2.2f" % r["difference"]}</td>
+	  <td>${"%2.2f" % r["zscore"]}</td>
+
+	</tr>
+	
+	%endfor
+	
+	</table>
+
+	%endfor
+	
+	</div>
+
+</div>
+

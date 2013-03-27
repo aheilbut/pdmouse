@@ -25,8 +25,8 @@ mo430names.index =  mo430names.probe_id
 mo430info = mo430symbol.merge(mo430names)
 mo430info.index = mo430info.probe_id
 
-pd_all = pandas.read_table("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/Oct29/PD_arraydata.tab")
-pd_covar = pandas.read_table("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/Oct29/pd.covar.tab")
+pd_all = pandas.read_table(pd_locals.datadir + "/Oct29/PD_arraydata.tab")
+pd_covar = pandas.read_table(pd_locals.datadir + "/Oct29/pd.covar.tab")
 
 
 def fitAIM(probeset, covar_subset, dataset, AIM_dimension="totalAIM"):

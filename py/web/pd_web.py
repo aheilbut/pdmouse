@@ -273,6 +273,15 @@ class PDC():
         return t.render_unicode(dim_descriptions=dim_descriptions)
 
 
+    
+    def outliers(self, cptype, mouseid, foldmin=2, zmin=3):
+        t = tl.get_template("outliers.html")
+        
+        outliers = pda.outlierSelect(pda.compareOutlier(cptype, int(mouseid)), foldmin, zmin)
+        
+        return t.render_unicode(cptype=cptype, mouseid=int(mouseid), outliers=outliers)
+        
+    
     def search(self, q):
         t= tl.get_template("search_results.html")
         
@@ -334,6 +343,11 @@ def setup_routes():
                      route = "/search",
                      controller = pdc,
                      action = "search")
+    
+    dispatch.connect(name = "outliers",
+                     route = "/outliers",
+                     controller = pdc, 
+                     action = "outliers")
     
     dispatch.connect(name = "index",
                      route = "/",

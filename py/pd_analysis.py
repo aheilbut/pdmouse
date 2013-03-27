@@ -300,3 +300,15 @@ def compareOutlier(cp_type, mouse_id):
     outlier_zscore = outlier_diff.div( reference_std )
     
     return pandas.DataFrame( { "difference" : outlier_diff, "zscore" : outlier_zscore } )
+
+
+def outlierSelect(o, foldchange_cutoff, zscore_cutoff):
+    return { "higher" : (o
+                .select(lambda x: o.difference[x] > foldchange_cutoff and abs(o.zscore[x]) > zscore_cutoff).sort_index(by="zscore")
+                .merge(mo430info, left_index=True, right_index=True)
+                .sort_index(by="zscore", ascending=False)),
+            "lower" : (o
+                .select(lambda x: o.difference[x] < -foldchange_cutoff and abs(o.zscore[x]) > zscore_cutoff).sort_index(by="zscore")
+                .merge(mo430info, left_index=True, right_index=True)
+                .sort_index(by="zscore"))                         
+            }

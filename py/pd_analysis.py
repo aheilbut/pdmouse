@@ -25,6 +25,9 @@ mo430names.index =  mo430names.probe_id
 mo430info = mo430symbol.merge(mo430names)
 mo430info.index = mo430info.probe_id
 
+pd_all = pandas.read_table("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/Oct29/PD_arraydata.tab")
+pd_covar = pandas.read_table("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/Oct29/pd.covar.tab")
+
 
 def fitAIM(probeset, covar_subset, dataset, AIM_dimension="totalAIM"):
     model = "AIM ~ expression"
@@ -88,7 +91,7 @@ def dofitModels():
     return (aim_models_cp73_chronicHigh, aim_models_cp73_chronicLow, aim_models_cp101_chronicHigh, aim_models_cp101_chronicLow)
 
 
-def plotProbe(d, pd_covar, probeset, mousetype, ax):   
+def plotProbe(d, pd_covar, probeset, mousetype, ax, legend=False, xlim=None):   
     try:
         symbol = mo430info.ix[probeset,"symbol"]
         genename = mo430info.ix[probeset,"gene_name"]
@@ -96,7 +99,7 @@ def plotProbe(d, pd_covar, probeset, mousetype, ax):
         symbol = "--"
         genename = "--"
 
-    ax.patch.set_facecolor((0.9, 0.9, 0.9))
+    #ax.patch.set_facecolor((0.9, 0.9, 0.9))
     ax.grid(which='both')        
         
     ax.set_title(mousetype + " : " + probeset + " : " + symbol + "\n" + genename)
@@ -105,20 +108,27 @@ def plotProbe(d, pd_covar, probeset, mousetype, ax):
     ax.set_ylim((-5, 160))
     ss = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == mousetype and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")  
     cur_gene = pandas.DataFrame( { "expression" : d.ix[probeset,ss.filenames], "AIM" : list(ss.totalAIM) } )
-    ax.plot(cur_gene["expression"], cur_gene["AIM"], "b.", ms=15, label="Chronic High L-DOPA" )
+    ax.plot(cur_gene["expression"], cur_gene["AIM"], "b.", ms=15, label="Chronic High L-DOPA", alpha=0.8 )
     
     ss = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == mousetype and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")  
     cur_gene = pandas.DataFrame( { "expression" : d.ix[probeset,ss.filenames], "AIM" : list(ss.totalAIM) } )
-    ax.plot(cur_gene["expression"], cur_gene["AIM"], "r.", ms=15, label="Chronic low L-DOPA" )    
+    ax.plot(cur_gene["expression"], cur_gene["AIM"], "r.", ms=15, label="Chronic low L-DOPA", alpha=0.8 )    
     
     ss = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == mousetype and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Acute high levodopa")  
     cur_gene = pandas.DataFrame( { "expression" : d.ix[probeset,ss.filenames], "AIM" : list(ss.totalAIM) } )
-    ax.plot(cur_gene["expression"], cur_gene["AIM"], "m.", ms=15, label="Acute L-DOPA" )    
+    ax.plot(cur_gene["expression"], cur_gene["AIM"], "m.", ms=15, label="Acute L-DOPA", alpha=0.8)    
 
     ss = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == mousetype and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")  
     cur_gene = pandas.DataFrame( { "expression" : d.ix[probeset,ss.filenames], "AIM" : list(ss.totalAIM) } )
-    ax.plot(cur_gene["expression"], cur_gene["AIM"], "g.", ms=15, label="Saline" )        
+    ax.plot(cur_gene["expression"], cur_gene["AIM"], "g.", ms=15, label="Saline", alpha=0.8)        
     
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    
+    if (legend == True):
+        #ax.legend()
+        ax.legend( bbox_to_anchor=(1.2, 0), loc='lower left', borderaxespad=0., title="groups")
+           
     return True # plt.gca().get_legend_handles_labels()
 
 def plotBoth(d, covar, probeset):
@@ -274,3 +284,19 @@ def compareModels(cell_type_covar_ss, pd_all,  probeset):
 
     return { "aim_models" : aim_models, "aim_model_fits" : aim_model_fits, 
              "expr_models" : expr_models, "expr_model_fits" : expr_model_fits  }
+
+
+def compareOutlier(cp_type, mouse_id):
+    outlier_selection = pd_covar.select( lambda x: pd_covar.MouseType[x] == cp_type and pd_covar.MouseID[x] == mouse_id )
+    reference_sample = pd_covar.select( lambda x: pd_covar.MouseType[x] == cp_type and pd_covar.MouseID[x] != mouse_id and pd_covar.DrugTreat[x] == outlier_selection.DrugTreat )
+    
+    outlier_data = pd_all[outlier_selection.filenames[outlier_selection.index[0]]]
+    reference_data = pd_all[reference_sample.filenames]
+    
+    reference_mean = reference_data.mean(axis = 1)
+    reference_std = reference_data.std(axis = 1)
+    
+    outlier_diff = outlier_data - reference_mean
+    outlier_zscore = outlier_diff.div( reference_std )
+    
+    return pandas.DataFrame( { "difference" : outlier_diff, "zscore" : outlier_zscore } )

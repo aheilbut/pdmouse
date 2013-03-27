@@ -72,13 +72,26 @@
 	}
 
 	</style>
- </head>
  
- <body>
+
    <script src="http://code.jquery.com/jquery-latest.js"></script>
    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
 
+   <link rel="stylesheet" href="/static/fancybox/jquery.fancybox.css?v=2.1.4" type="text/css" media="screen" />
+   <script type="text/javascript" src="/static/fancybox/jquery.fancybox.pack.js?v=2.1.4"></script>
+ 
+<script type="text/javascript"> 
+	
+ $(document).ready( function() {	
+   $(".fancybox").fancybox({ autoSize: false, fitToView : false, type: 'image' });
+ });
+  
+</script>
+ 
+ </head>
 
+   
+<body>  
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container-fluid">
@@ -87,13 +100,14 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span> 
           </a>
-          <a class="brand" href="/"><b>l-dopa / AIMS expression data</b></a>
+          <a class="brand" style="font-size: small" href="/"><b>LID / striatal gene expression</b></a>
           <div class="nav-collapse collapse">
             <ul class="nav">
               <li class="active"><a href="/">Tables</a></li>
               <li><a href="/gsea">GSEA</a></li>
+              <li><a href="/aims">AIMS data</a></li>
+	      <li><a href="/methods">Analysis Methods</a></li>
               <li><a href="/gsea">Raw Data</a></li>
-	      <li><a href="/methods">Methods</a></li>
               <li><a href="/gsea">Source Code</a></li>
 	      </ul>
             <ul class="nav pull-right">

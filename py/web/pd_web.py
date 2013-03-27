@@ -128,27 +128,40 @@ class PDC():
         cp73_modelComp = pda.compareModels(ss_cp73_allchronic, pd_all, probeset)
         cp101_modelComp = pda.compareModels(ss_cp101_allchronic, pd_all, probeset)
 
+        try:
+            (gene_symbol, gene_name) = mo430info.ix[ probeset, ["symbol", "gene_name"]]
+        except:
+            (gene_symbol, gene_name) = ("symbol_not_found", "name_not_found")
+        
         # get figure
         aim_models_fig = 1
         expr_models_fig = 1
 
 
         t = tl.get_template("probeset_report.html")
-        return t.render_unicode(probeset=probeset, cp73_modelComp = cp73_modelComp, cp101_modelComp = cp101_modelComp)
+        return t.render_unicode(probeset=probeset, gene_symbol=gene_symbol, gene_name=gene_name, cp73_modelComp = cp73_modelComp, cp101_modelComp = cp101_modelComp)
 
-    def render_figure(self, probeset, fig_type, format):
+    def render_figure(self, probeset, fig_type, format, r=None):
 
         if fig_type == "scatter":
             probeset = urllib.unquote_plus(probeset)
             # generate figure 
             fig = Figure()
             fig.set_size_inches(15, 6)
+            
             ax_cp73 = fig.add_subplot(121)
             ax_cp101 = fig.add_subplot(122)
 
-            pda.plotProbe(pd_all, pd_covar, probeset, "CP73", ax_cp73)
-            pda.plotProbe(pd_all, pd_covar, probeset, "CP101", ax_cp101)
+            if r == "a": # auto range 
+                xlim = None
+            elif r == "f":  # full range
+                xlim = (0, 15)
+            
+            pda.plotProbe(pd_all, pd_covar, probeset, "CP73", ax_cp73, legend=False, xlim=xlim)
+            pda.plotProbe(pd_all, pd_covar, probeset, "CP101", ax_cp101, legend=True, xlim=xlim)
 
+            fig.tight_layout(rect=[0, 0, 0.7, 1], h_pad=0.5)
+            fig.set_facecolor('w')
             canvas = FigureCanvas(fig)
         # render
 
@@ -276,6 +289,12 @@ class PDC():
         return t.render_unicode(matches = matches.sort("gene_name"))
     
     
+    def aims(self):
+        t = tl.get_template("aims.html")
+        
+        return t.render_unicode()
+    
+    
 pdc = PDC()
 
 def setup_routes():
@@ -287,9 +306,9 @@ def setup_routes():
                      action = "probeset_report")
 
     dispatch.connect(name = "render_figure",
-                     route = "/probeset/figure/{probeset}/{fig_type}/{format}",
+                     route = "/probeset/figure/{probeset}/{fig_type}/{r}/{format}",
                      controller = pdc,
-                     action = "render_figure")
+                     action = "render_figure" )
 
     dispatch.connect(name = "result_table",
                      route = "/resulttable/{result_set}",
@@ -321,6 +340,12 @@ def setup_routes():
                      controller = pdc,
                      action = "index")
 
+    dispatch.connect(name = "aims",
+                     route = "/aims",
+                     controller = pdc,
+                     action = "aims")
+    
+    
 
     return dispatch
 

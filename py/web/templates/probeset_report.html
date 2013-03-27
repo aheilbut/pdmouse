@@ -19,7 +19,7 @@
 	  <ul class="nav nav-list sidenav">
 	    <li class="sidenav"> <a href="#CP73">CP73</a></li>
 		<ul class="nav nav-list">
-		  <li class>model..</li>
+		  <li class></li>
 		</ul>
 	    
 	    
@@ -31,11 +31,21 @@
 <div class="span9">
 
 	<div class="row-fluid">
-	
+		<div class="page-header">
+		<h1> ${probeset} </h1>
+		<h1> ${gene_symbol} <small> ${gene_name} </small> </h1>
+
 		<div class="section" id="rawdata">
-		<img src="/probeset/figure/${probeset}/scatter/png"></img>
+		<h5>AIM Score vs. Gene Expression </h5>
+		Full X range:
+		<a class="fancybox" href="/probeset/figure/${probeset}/scatter/f/png"><img src="/probeset/figure/${probeset}/scatter/f/png"></img></a>
 		</div>
 			
+		<div class="section" id="rawdata">
+		Auto X range:
+		<a class="fancybox" href="/probeset/figure/${probeset}/scatter/a/png"><img src="/probeset/figure/${probeset}/scatter/a/png"></img></a>
+		</div>
+		
 		
 		<div class="section" id="CP73">
 		<h3> CP73 </h3>

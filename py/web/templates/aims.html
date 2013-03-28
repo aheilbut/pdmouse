@@ -12,6 +12,35 @@
 
 </style>
 
+<%def name="makeMouseTable(mice)">
+
+<div style="padding: 20px">
+<h4>Mice:</h4>
+<table class="datatable">	
+<tr>
+ <td>Mouse Type</td>
+ <td>Mouse ID #</td>
+ <td>Lesion Type</td>
+ <td>Drug Treatment</td>
+ <td>Total AIM score</td>
+ <td>link to expression outliers</td>
+ 
+</tr>
+% for i in mice.index:
+<tr>	
+ <td> ${mice.ix[i,"MouseType"]} </td>
+ <td> ${mice.ix[i,"MouseID"]} </td>
+ <td> ${mice.ix[i,"LesionType"]}</td>
+ <td> ${mice.ix[i,"DrugTreat"]} </td>
+ <td> ${mice.ix[i,"totalAIM"]} </td>
+ <td> <a href='${mice.ix[i,"outliers"]}'> [outlier report] </a> </td>
+</tr>
+% endfor		
+</table>		
+</div>
+
+</%def>
+
 
 <div class="container-fluid" style="margin-top: 60px">
 
@@ -58,6 +87,20 @@
 		<a class="fancybox" href="/static/aims/chronic_highdose_cp73_0.png"><img class="fixed_width" src="/static/aims/chronic_highdose_cp73_0.png"></img></a>
 		<a class="fancybox" href="/static/aims/chronic_highdose_cp73_1.png"><img class="fixed_width"  src="/static/aims/chronic_highdose_cp73_1.png"></img></a>
 		<a class="fancybox" href="/static/aims/chronic_highdose_cp73_2.png"><img class="fixed_width"  src="/static/aims/chronic_highdose_cp73_2.png"></img></a>
+
+		<div style="padding: 20px">
+		<h4>Spearman Correlations Between Integrated AIM components</h4>		
+		<table border="1" class="dataframe">  <thead>    <tr style="text-align: right;">      <th></th>      <th>Ax</th>      <th>Li</th>      <th>Lo</th>      <th>Ol</th>      <th>LiLoAxOlsum</th>      <th>LiAxOlsum</th>    </tr>  </thead>  <tbody>    <tr>      <th>Ax</th>      <td> 1.000</td>      <td> 0.943</td>      <td> 0.240</td>      <td> 0.862</td>      <td> 0.984</td>      <td> 0.982</td>    </tr>    <tr>      <th>Li</th>      <td> 0.943</td>      <td> 1.000</td>      <td> 0.030</td>      <td> 0.897</td>      <td> 0.950</td>      <td> 0.980</td>    </tr>    <tr>      <th>Lo</th>      <td> 0.240</td>      <td> 0.030</td>      <td> 1.000</td>      <td> 0.183</td>      <td> 0.273</td>      <td> 0.151</td>    </tr>    <tr>      <th>Ol</th>      <td> 0.862</td>      <td> 0.897</td>      <td> 0.183</td>      <td> 1.000</td>      <td> 0.888</td>      <td> 0.909</td>    </tr>    <tr>      <th>LiLoAxOlsum</th>      <td> 0.984</td>      <td> 0.950</td>      <td> 0.273</td>      <td> 0.888</td>      <td> 1.000</td>      <td> 0.984</td>    </tr>    <tr>      <th>LiAxOlsum</th>      <td> 0.982</td>      <td> 0.980</td>      <td> 0.151</td>      <td> 0.909</td>      <td> 0.984</td>      <td> 1.000</td>    </tr>  </tbody></table>		
+		</div>
+		
+		<%
+		mice = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP73" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa" )		
+		mice["outliers"] = pd_covar.apply(lambda x: "/outliers?cptype=%(MouseType)s&mouseid=%(MouseID)s" % x, axis=1)		
+		makeMouseTable(mice.sort_index(by="totalAIM", ascending=False))
+		%>
+		
+		
+		
 		</div>		
 
 		
@@ -66,6 +109,20 @@
 		<a class="fancybox" href="/static/aims/chronic_highdose_cp101_0.png"><img class="fixed_width"  src="/static/aims/chronic_highdose_cp101_0.png"></img></a>
 		<a class="fancybox" href="/static/aims/chronic_highdose_cp101_1.png"><img class="fixed_width" src="/static/aims/chronic_highdose_cp101_1.png"></img></a>
 		<a class="fancybox" href="/static/aims/chronic_highdose_cp101_2.png"><img class="fixed_width"  src="/static/aims/chronic_highdose_cp101_2.png"></img></a>
+
+		
+		<div style="padding: 20px">
+		<h4>Spearman Correlations Between Integrated AIM components</h4>		
+		<table border="1" class="dataframe">  <thead>    <tr style="text-align: right;">      <th></th>      <th>Ax</th>      <th>Li</th>      <th>Lo</th>      <th>Ol</th>      <th>LiLoAxOlsum</th>      <th>LiAxOlsum</th>    </tr>  </thead>  <tbody>    <tr>      <th>Ax</th>      <td> 1.000</td>      <td> 0.517</td>      <td> 0.533</td>      <td> 0.748</td>      <td> 0.933</td>      <td> 0.950</td>    </tr>    <tr>      <th>Li</th>      <td> 0.517</td>      <td> 1.000</td>      <td> 0.683</td>      <td> 0.756</td>      <td> 0.750</td>      <td> 0.717</td>    </tr>    <tr>      <th>Lo</th>      <td> 0.533</td>      <td> 0.683</td>      <td> 1.000</td>      <td> 0.613</td>      <td> 0.733</td>      <td> 0.667</td>    </tr>    <tr>      <th>Ol</th>      <td> 0.748</td>      <td> 0.756</td>      <td> 0.613</td>      <td> 1.000</td>      <td> 0.849</td>      <td> 0.882</td>    </tr>    <tr>      <th>LiLoAxOlsum</th>      <td> 0.933</td>      <td> 0.750</td>      <td> 0.733</td>      <td> 0.849</td>      <td> 1.000</td>      <td> 0.983</td>    </tr>    <tr>      <th>LiAxOlsum</th>      <td> 0.950</td>      <td> 0.717</td>      <td> 0.667</td>      <td> 0.882</td>      <td> 0.983</td>      <td> 1.000</td>    </tr>  </tbody></table>		
+		</div>
+		
+		
+		<%
+		mice = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP101" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa" )		
+		mice["outliers"] = pd_covar.apply(lambda x: "/outliers?cptype=%(MouseType)s&mouseid=%(MouseID)s" % x, axis=1)		
+		makeMouseTable(mice.sort_index(by="totalAIM", ascending=False))
+		%>
+		
 		</div>		
 		
 		</div>
@@ -78,6 +135,22 @@
 		<a class="fancybox" href="/static/aims/chronic_lowdose_cp73_0.png"><img class="fixed_width" src="/static/aims/chronic_lowdose_cp73_0.png"></img></a>
 		<a class="fancybox" href="/static/aims/chronic_lowdose_cp73_1.png"><img class="fixed_width" src="/static/aims/chronic_lowdose_cp73_1.png"></img></a>
 		<a class="fancybox" href="/static/aims/chronic_lowdose_cp73_2.png"><img class="fixed_width" src="/static/aims/chronic_lowdose_cp73_2.png"></img></a>
+
+		<div style="padding: 20px">
+		<h4>Spearman Correlations Between Integrated AIM components</h4>		
+		<table border="1" class="dataframe">  <thead>    <tr style="text-align: right;">      <th></th>      <th>Ax</th>      <th>Li</th>      <th>Lo</th>      <th>Ol</th>      <th>LiLoAxOlsum</th>      <th>LiAxOlsum</th>    </tr>  </thead>  <tbody>    <tr>      <th>Ax</th>      <td> 1.000</td>      <td> 0.866</td>      <td> 0.747</td>      <td> 0.751</td>      <td> 0.932</td>      <td> 0.886</td>    </tr>    <tr>      <th>Li</th>      <td> 0.866</td>      <td> 1.000</td>      <td> 0.615</td>      <td> 0.910</td>      <td> 0.954</td>      <td> 0.968</td>    </tr>    <tr>      <th>Lo</th>      <td> 0.747</td>      <td> 0.615</td>      <td> 1.000</td>      <td> 0.739</td>      <td> 0.785</td>      <td> 0.746</td>    </tr>    <tr>      <th>Ol</th>      <td> 0.751</td>      <td> 0.910</td>      <td> 0.739</td>      <td> 1.000</td>      <td> 0.907</td>      <td> 0.946</td>    </tr>    <tr>      <th>LiLoAxOlsum</th>      <td> 0.932</td>      <td> 0.954</td>      <td> 0.785</td>      <td> 0.907</td>      <td> 1.000</td>      <td> 0.986</td>    </tr>    <tr>      <th>LiAxOlsum</th>      <td> 0.886</td>      <td> 0.968</td>      <td> 0.746</td>      <td> 0.946</td>      <td> 0.986</td>      <td> 1.000</td>    </tr>  </tbody></table>
+
+		</div>
+				
+		
+		
+		<%
+		mice = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP73" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" )		
+		mice["outliers"] = pd_covar.apply(lambda x: "/outliers?cptype=%(MouseType)s&mouseid=%(MouseID)s" % x, axis=1)		
+		makeMouseTable(mice.sort_index(by="totalAIM", ascending=False))
+		%>
+		
+		
 		</div>		
 
 		
@@ -86,7 +159,22 @@
 		<a class="fancybox" href="/static/aims/chronic_lowdose_cp101_0.png"><img class="fixed_width" src="/static/aims/chronic_lowdose_cp101_0.png"></img></a>
 		<a class="fancybox" href="/static/aims/chronic_lowdose_cp101_1.png"><img class="fixed_width"  src="/static/aims/chronic_lowdose_cp101_1.png"></img></a>
 		<a class="fancybox" href="/static/aims/chronic_lowdose_cp101_2.png"><img class="fixed_width" src="/static/aims/chronic_lowdose_cp101_2.png"></img></a>
+
+		
+		
+		<div style="padding: 20px">
+		<h4>Spearman Correlations Between Integrated AIM components</h4>	
+		<table border="1" class="dataframe">  <thead>    <tr style="text-align: right;">      <th></th>      <th>Ax</th>      <th>Li</th>      <th>Lo</th>      <th>Ol</th>      <th>LiLoAxOlsum</th>      <th>LiAxOlsum</th>    </tr>  </thead>  <tbody>    <tr>      <th>Ax</th>      <td> 1.000</td>      <td> 0.790</td>      <td> 0.286</td>      <td> 0.595</td>      <td> 0.929</td>      <td> 0.833</td>    </tr>    <tr>      <th>Li</th>      <td> 0.790</td>      <td> 1.000</td>      <td>-0.012</td>      <td> 0.922</td>      <td> 0.862</td>      <td> 0.994</td>    </tr>    <tr>      <th>Lo</th>      <td> 0.286</td>      <td>-0.012</td>      <td> 1.000</td>      <td>-0.095</td>      <td> 0.238</td>      <td> 0.048</td>    </tr>    <tr>      <th>Ol</th>      <td> 0.595</td>      <td> 0.922</td>      <td>-0.095</td>      <td> 1.000</td>      <td> 0.762</td>      <td> 0.905</td>    </tr>    <tr>      <th>LiLoAxOlsum</th>      <td> 0.929</td>      <td> 0.862</td>      <td> 0.238</td>      <td> 0.762</td>      <td> 1.000</td>      <td> 0.905</td>    </tr>    <tr>      <th>LiAxOlsum</th>      <td> 0.833</td>      <td> 0.994</td>      <td> 0.048</td>      <td> 0.905</td>      <td> 0.905</td>      <td> 1.000</td>    </tr>  </tbody></table>		
+		</div>		
+		
+		
+		<%
+		mice = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP101" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" )		
+		mice["outliers"] = pd_covar.apply(lambda x: "/outliers?cptype=%(MouseType)s&mouseid=%(MouseID)s" % x, axis=1)		
+		makeMouseTable(mice.sort_index(by="totalAIM", ascending=False))
+		%>
 		</div>				
+		
 		
 		</div>
 
@@ -100,6 +188,14 @@
 		<a class="fancybox" href="/static/aims/acute_highdose_cp73_1.png"><img class="fixed_width" src="/static/aims/acute_highdose_cp73_1.png"></img></a>
 		<a class="fancybox" href="/static/aims/acute_highdose_cp73_2.png"><img class="fixed_width" src="/static/aims/acute_highdose_cp73_2.png"></img></a>
 		</div>	
+		
+		
+		<%
+		mice = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP73" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Acute high levodopa" )		
+		mice["outliers"] = pd_covar.apply(lambda x: "/outliers?cptype=%(MouseType)s&mouseid=%(MouseID)s" % x, axis=1)		
+		makeMouseTable(mice.sort_index(by="totalAIM", ascending=False))
+		%>
+		
 		
 		</div>
 		

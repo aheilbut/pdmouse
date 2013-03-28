@@ -301,7 +301,7 @@ class PDC():
     def aims(self):
         t = tl.get_template("aims.html")
         
-        return t.render_unicode()
+        return t.render_unicode(pd_covar=pd_covar)
     
     
 pdc = PDC()

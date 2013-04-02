@@ -10,6 +10,26 @@
   min-width: 600px;
 }
 
+
+.dataframe td {
+ padding-left: 6px;
+ padding-right: 6px;
+}
+
+.dataframe th {
+ background: lightblue;
+ padding-left: 6px;
+ padding-right: 6px;
+}
+
+.datatable th {
+ background: lightblue;
+ padding-left: 6px;
+ padding-right: 6px;
+}
+
+
+
 </style>
 
 <%def name="makeMouseTable(mice)">
@@ -18,12 +38,12 @@
 <h4>Mice:</h4>
 <table class="datatable">	
 <tr>
- <td>Mouse Type</td>
- <td>Mouse ID #</td>
- <td>Lesion Type</td>
- <td>Drug Treatment</td>
- <td>Total AIM score</td>
- <td>link to expression outliers</td>
+ <th>Mouse Type</th>
+ <th>Mouse ID #</th>
+ <th>Lesion Type</th>
+ <th>Drug Treatment</th>
+ <th>Total AIM score</th>
+ <th>link to expression outliers</th>
  
 </tr>
 % for i in mice.index:

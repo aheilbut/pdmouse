@@ -1,8 +1,8 @@
 <%inherit file="base.html"/>
+<%
+import pandas as pd
 
-
-
-
+%>
 <div class="container-fluid" style="margin-top: 60px">
 
 <div class="row-fluid">
@@ -33,7 +33,7 @@
 	<div class="row-fluid">
 		<div class="page-header">
 		<h1> ${probeset} </h1>
-		<h1> ${gene_symbol} <small> ${gene_name} </small> </h1>
+		<h1> <a href="http://www.ncbi.nlm.nih.gov/gene/?term=${gene_symbol}" target='_genepage' ">${gene_symbol}</a><small> ${gene_name} </small> </h1>
 		</div>
 		
 		<div class="section" id="rawdata">
@@ -50,6 +50,20 @@
 		
 		<div class="section" id="CP73">
 		<h3> CP73 </h3>
+
+		<h4> Model Comparison: AIM ~ expression + C(dose) vs AIM ~ C(dose) </h4>
+		
+		<%
+		c = cp73_modelComp["aim_model_fits"]["AIM ~ expression + C(dose)"].compare_f_test( cp73_modelComp["aim_model_fits"]["AIM ~ C(dose)"] )
+		%>
+	
+		<table class="datatable" >
+		<tr> <th>F-statistic</th> <th> p-value </th> <th> df difference </th> </tr>
+		<tr> <td> ${ "%3.3f" % c[0]} </td> <td> ${"%3.3f" % c[1]} </td> <td> ${c[2]} </td> </tr>
+		</table>
+		
+
+		
 		
 		% for m in cp73_modelComp["aim_models"]:
 		
@@ -65,7 +79,20 @@
 	
 		<div class="section" id="CP101">
 		<h3> CP101 </h3>
-					
+		
+		<h4> Model Comparison: AIM ~ expression + C(dose) vs AIM ~ C(dose) </h4>
+		
+		<%
+		c = cp101_modelComp["aim_model_fits"]["AIM ~ expression + C(dose)"].compare_f_test( cp101_modelComp["aim_model_fits"]["AIM ~ C(dose)"] )
+		%>
+	
+		<table class="datatable" >
+		<tr> <th>F-statistic</th> <th> p-value </th> <th> df difference </th> </tr>
+		<tr> <td> ${ "%3.3f" % c[0]} </td> <td> ${"%3.3f" % c[1]} </td> <td> ${c[2]} </td> </tr>
+		</table>
+		
+		
+		
 		% for m in cp101_modelComp["aim_models"]:
 		
 			<h4>Model: <br> ${m}</h4>

@@ -298,6 +298,10 @@ class PDC():
         return t.render_unicode(matches = matches.sort("gene_name"))
     
     
+    def methods(self):
+        t = tl.get_template("methods.html")
+        return t.render_unicode()
+    
     def aims(self):
         t = tl.get_template("aims.html")
         
@@ -343,6 +347,11 @@ def setup_routes():
                      route = "/search",
                      controller = pdc,
                      action = "search")
+    
+    dispatch.connect(name = 'methods',
+                     route = '/methods',
+                     controller = pdc,
+                     action = 'methods')
     
     dispatch.connect(name = "outliers",
                      route = "/outliers",

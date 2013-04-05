@@ -1,0 +1,76 @@
+	body {
+		margin: 20px;
+
+	}
+
+	.model table tr {
+		border: 1px solid gray;
+	}
+
+	.model table td {
+		border: 1px solid gray;
+	}
+
+
+	.datatable {
+		border: 1px solid lightgray;
+		font-size: 8pt;
+		font-family: Arial;
+		padding: 0px;
+	}
+
+	.datatable td {
+		border: 1px solid lightgray;
+		min-width: 100px;
+		padding: 0px;
+	}	
+
+	.sort_col_head {
+		background: lightblue;
+		font-size: 8pt;
+	}
+
+	.reg_col_head {
+		background: lightgray;
+		font-size: 8pt;
+	}
+
+	.uparrow {
+		text-decoration: none;
+		font-size: 12pt;
+	}
+
+	.downarrow {
+		text-decoration: none;
+		font-size: 12pt;
+	}
+	
+	.tooltip-inner {
+		max-width: none;
+		width:300px;
+		white-space:pre-wrap;
+	}
+	
+	.sidenav {
+	  border-bottom: 1px solid lightgray;	
+		
+	
+	}
+	
+	.section {
+	    padding-top: 40px;
+	    margin-top: -40px;
+	}
+
+	
+	.refs ul {
+	  	}
+
+	.refs li {
+	  list-style-type: none;
+	  padding: 10px;
+	}
+	
+	html, body {
+	  height: 99%;
+	}

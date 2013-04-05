@@ -1,0 +1,206 @@
+## -*- coding: utf-8 -*-
+<%inherit file="base.html"/>
+
+<script type="text/javascript" src="/static/js/slick.remotemodel.js"></script>
+<script type="text/javascript">
+  var grid = null;
+  var loader;
+
+</script>
+
+<%def name="docReady()">
+
+
+var TableRouter = Backbone.Router.extend({
+  
+  routes: {
+  "dataset/:dataset"  : "loadDataset",
+  },
+
+  
+  loadDataset : function(dataset) {
+      // get metadata
+      req = $.ajax({
+	  url : "/cube_info",
+	  type: "POST",
+	  timeout: 2000,
+	  data : $.toJSON({ "dataid" : dataset }),
+	  contentType:"application/json; charset=utf-8",
+	  dataType:"json", 
+	  async: true,
+      
+	  success: function(result, textStatus, jqXHR) {
+	       if (result["success"] == true) {
+		   $("#dataset_title").html( result["title"] );
+		   $("#dataset_description").html( result["description"] );
+		   
+		}  else {
+		   alert("error loading dataset");
+		}
+	  }       
+	}); 
+  
+  
+      // set up datasource
+      loader = new Slick.Data.RemoteModel({ cptype : dataset });
+      if (grid !== null) { 
+       grid.setData(loader); 
+       gruid.render();
+       grid.invalidate();
+//       grid.onViewportChanged.notify();
+      }
+  }
+
+  
+});
+
+var table_router = new TableRouter;
+
+Backbone.history.start();
+
+function setupGrid(target, columndict, data) {
+  var grid;
+  
+    
+  
+  grid = new Slick.Grid(target, data, columns, options);
+  grid.setSelectionModel(new Slick.RowSelectionModel());
+
+  
+  
+  $(window).resize(function () {
+      grid.resizeCanvas();
+  });  
+  
+}
+
+
+  // get the data spec: 
+  // available dimensions, columns, base parameters for remote model
+  
+  
+  // create RemoteModel for the grid to access the data
+
+ // var grid;
+
+
+  var columndict = {
+   "probeset" : { id : "probeset", name : "probeset", field : "probeset" },
+   "pval" : { id : "pval", name : "pval", field : "pval" },
+   "bh" : { id : "bh", name : "bh", field : "bh" },
+   "symbol" :  { id : "symbol", name : "symbol", field: "symbol" },
+   "gene_name" : { id : "gene_name", name : "gene_name", field : "gene_name" }
+  };
+
+  columns = [];
+  
+  function probeFormat( row, cell, value, columnDef, dataContext ) {
+	return '<a href="/probeset/' + 
+		  value + '" target="_probeset">' + value + '</a>'; }
+	    
+  for (k in columndict) {
+    if (k === "probeset") columndict[k]["formatter"] = probeFormat;
+  
+    columns.push(columndict[k]);
+  
+  }
+    
+  
+  
+  var options = {
+     editable: false,
+     enableAddRow: false,
+     enableCellNavigation: true,
+     forceFitColumns: true
+   };
+ 
+   var loadingIndicator = null;
+  
+
+$(function () {
+    grid = new Slick.Grid("#datatable", loader.data, columns, options);
+    grid.setSelectionModel(new Slick.RowSelectionModel());
+
+    grid.onViewportChanged.subscribe(function (e, args) {
+      var vp = grid.getViewport();
+      loader.ensureData(vp.top, vp.bottom);
+    });
+
+    grid.onSort.subscribe(function (e, args) {
+      loader.setSort(args.sortCol.field, args.sortAsc ? 1 : -1);
+      var vp = grid.getViewport();
+      loader.ensureData(vp.top, vp.bottom);
+    });
+
+    loader.onDataLoading.subscribe(function () {
+      if (!loadingIndicator) {
+        loadingIndicator = $("<span class='loading-indicator'><label>Buffering...</label></span>").appendTo(document.body);
+        var $g = $("#datatable");
+
+        loadingIndicator
+            .css("position", "absolute")
+            .css("top", $g.position().top + $g.height() / 2 - loadingIndicator.height() / 2)
+            .css("left", $g.position().left + $g.width() / 2 - loadingIndicator.width() / 2);
+      }
+
+      loadingIndicator.show();
+    });
+
+    loader.onDataLoaded.subscribe(function (e, args) {
+      for (var i = args.from; i <= args.to; i++) {
+        grid.invalidateRow(i);
+      }
+
+      grid.updateRowCount();
+      grid.render();
+
+      loadingIndicator.fadeOut();
+    });
+
+    $("#txtSearch").keyup(function (e) {
+      if (e.which == 13) {
+        loader.setSearch($(this).val());
+        var vp = grid.getViewport();
+        loader.ensureData(vp.top, vp.bottom);
+      }
+    });
+
+    // load the first page
+    grid.onViewportChanged.notify();
+      
+   $(window).resize(function () {
+	grid.resizeCanvas();
+    });  
+	
+    
+  })   
+   
+   
+   
+</%def>
+
+
+<div class="container-fluid fill" style="padding-top: 60px; height: 95%; min-height: 95%">
+
+  <div class="row-fluid" style="height: 95%; min-height: 95%">
+
+	<div class="span2">
+
+	</div>
+	
+	<div class="span10" style="height: 95%; min-height: 95%">
+  
+	<h3 id="dataset_title"></h3> 
+	<h6 id="dataset_description"></h6> 
+
+	<div	
+	
+	<div id="datatable" class="fill" style="display: block; min-height:100%; height: 100%; min-width: 100%">
+	</div>
+	
+	</div>
+	
+  </div>
+    
+	
+</div>

@@ -24,6 +24,8 @@ import pd_analysis as pda
 import pd_locals
 import pandas
 
+import numpy as np
+
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 
@@ -56,6 +58,9 @@ cp101_wide_info = cPickle.load(open(pd_locals.datadir + "/jan30/cp101_m.pandas.p
 
 t2_up = cPickle.load(open(pd_locals.datadir + "/feb25/t2_up.pickle"))
 t2_down = cPickle.load(open(pd_locals.datadir + "/feb25/t2_down.pickle"))
+
+cp73_modelcomp = cPickle.load(open(pd_locals.datadir + "/apr3/cp73_model_comp_stats.pickle"))
+cp101_modelcomp = cPickle.load(open(pd_locals.datadir + "/apr3/cp101_model_comp_stats.pickle"))
 
 
 # define subsets
@@ -307,6 +312,88 @@ class PDC():
         
         return t.render_unicode(pd_covar=pd_covar)
     
+
+    def table_view(self, queryspec=None):
+        """ return the html page with the tableviewer, hooked up to the requested data """
+        t = tl.get_template("table_view.html")
+
+        return t.render_unicode()
+    
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
+    def cube_info(self):
+        try:
+            query = cherrypy.request.json
+        except:
+            print "no query specified"
+            
+        
+        if query["dataid"] == "CP101":
+            return {
+                'success' : True,
+                "title" : "CP101 linear model comparison statistics",
+                "description" : "nominal and bh adjusted p-values for F-tests comparing AIM ~ expression + C(dose) vs AIM ~ C(dose)"
+            
+            }
+        
+        elif query["dataid"] == "CP73":
+            return {
+                'success' : True,                
+                "title" : "CP101 linear model comparison statistics",
+                "description" : "nominal and bh adjusted p-values for F-tests comparing AIM ~ expression + C(dose) vs AIM ~ C(dose)"
+            }
+            
+    
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
+    def cube_select(self):
+        """ return json formatted slickgrid table data for the specified query """  
+        try: 
+            query = cherrypy.request.json
+
+        except:
+            print "no query specified" 
+        
+        def cleanFormat(z):
+            if type(z) is not str and np.isnan(z):
+                return ""
+            elif type(z) is float:
+                return round(z,3)
+            else:
+                return z
+
+ 
+        start = int(query.get("offset", 0))
+        finish = start + int(query.get("count", 10))
+
+        print query["cptype"]
+            
+        if query["cptype"] == "CP101":
+            recs = cp101_modelcomp[start:finish].to_records()
+            datadesc = "CP101 linear model comparison statistics"
+        elif query["cptype"] == "CP73":
+            recs = cp73_modelcomp[start:finish].to_records()
+            datadesc = "CP73 linear model comparison statistics"
+            
+            
+        fieldset = recs.dtype.names
+        reclist = [dict( zip( fieldset, 
+                              [cleanFormat(z) for z in row]) )
+                   for row in recs.tolist()]
+    
+        columndef_dict = dict( [(f, {"id" : f, "name" : f, "field" : f  }) for f in fieldset] )
+        
+#        columndef_dict["probe_id"]["formatter"] = probeset_formatter
+        
+        columndef = columndef_dict.values()
+       
+        print "start: ", start
+        print "finish: ", finish
+        
+        result = { "success" : True,  "data" : reclist, "data_description" : datadesc, "start": start, "total": len(cp101_modelcomp), "count": finish-start, "column_dict" : columndef_dict }  
+            
+        return result
+        
     
 pdc = PDC()
 
@@ -367,7 +454,21 @@ def setup_routes():
                      route = "/aims",
                      controller = pdc,
                      action = "aims")
+    dispatch.connect(name = "tableview",
+                     route = "/table",
+                     controller = pdc,
+                     action = "table_view")
+
+    dispatch.connect(name = "cube_select",
+                     route = "/cube_select", 
+                     controller = pdc,
+                     action = 'cube_select')
     
+
+    dispatch.connect(name = "cube_info",
+                     route = "/cube_info",
+                     controller = pdc,
+                     action = "cube_info")
     
 
     return dispatch

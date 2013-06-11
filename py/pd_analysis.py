@@ -106,21 +106,34 @@ def plotProbe(d, pd_covar, probeset, mousetype, ax, legend=False, xlim=None):
     ax.set_xlabel("expression")
     ax.set_ylabel("sum of AIM")
     ax.set_ylim((-5, 160))
-    ss = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == mousetype and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")  
-    cur_gene = pandas.DataFrame( { "expression" : d.ix[probeset,ss.filenames], "AIM" : list(ss.totalAIM) } )
-    ax.plot(cur_gene["expression"], cur_gene["AIM"], "b.", ms=15, label="Chronic High L-DOPA", alpha=0.8 )
     
-    ss = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == mousetype and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")  
+    ss = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == mousetype 
+                         and pd_covar.ix[x, "LesionType"] == "Ascorbate" 
+                         and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")  
     cur_gene = pandas.DataFrame( { "expression" : d.ix[probeset,ss.filenames], "AIM" : list(ss.totalAIM) } )
-    ax.plot(cur_gene["expression"], cur_gene["AIM"], "r.", ms=15, label="Chronic low L-DOPA", alpha=0.8 )    
+    ax.plot(cur_gene["expression"], cur_gene["AIM"], "y.", ms=10, label="Ascorbate / Saline", alpha=0.6 )    
+    
+    ss = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == mousetype 
+                         and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                         and pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")  
+    cur_gene = pandas.DataFrame( { "expression" : d.ix[probeset,ss.filenames], "AIM" : list(ss.totalAIM) } )
+    ax.plot(cur_gene["expression"], cur_gene["AIM"], "b.", ms=10, label="Chronic High L-DOPA", alpha=0.6 )
+    
+    ss = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == mousetype 
+                         and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                         and pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")  
+    cur_gene = pandas.DataFrame( { "expression" : d.ix[probeset,ss.filenames], "AIM" : list(ss.totalAIM) } )
+    ax.plot(cur_gene["expression"], cur_gene["AIM"], "r.", ms=10, label="Chronic low L-DOPA", alpha=0.6 )    
     
     ss = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == mousetype and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Acute high levodopa")  
     cur_gene = pandas.DataFrame( { "expression" : d.ix[probeset,ss.filenames], "AIM" : list(ss.totalAIM) } )
-    ax.plot(cur_gene["expression"], cur_gene["AIM"], "m.", ms=15, label="Acute L-DOPA", alpha=0.8)    
+    ax.plot(cur_gene["expression"], cur_gene["AIM"], "m.", ms=10, label="Acute L-DOPA", alpha=0.6)    
 
-    ss = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == mousetype and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")  
+    ss = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == mousetype 
+                         and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                         and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")  
     cur_gene = pandas.DataFrame( { "expression" : d.ix[probeset,ss.filenames], "AIM" : list(ss.totalAIM) } )
-    ax.plot(cur_gene["expression"], cur_gene["AIM"], "g.", ms=15, label="Saline", alpha=0.8)        
+    ax.plot(cur_gene["expression"], cur_gene["AIM"], "g.", ms=10, label="6-OHDA / Saline", alpha=0.6)        
     
     if xlim is not None:
         ax.set_xlim(xlim)
@@ -131,6 +144,38 @@ def plotProbe(d, pd_covar, probeset, mousetype, ax, legend=False, xlim=None):
            
     return True # plt.gca().get_legend_handles_labels()
 
+
+
+def probe_boxPlots(probeset, d, groups, mousetype, ax):
+    mp.rcParams.update({'font.size': 10 })
+    l = []
+    for (group_name, group_colnames) in groups:
+        l.append( d.ix[probeset, group_colnames] )
+        
+    p = ax.boxplot(l)
+    for (i, d) in enumerate(l):
+        z = [(i+1)] * len(d)
+        ax.plot(z + np.random.rand(len(d))*0.2 - 0.1, d, '.', ms=5)
+    ax.xaxis.set_ticks(np.arange(0.5, len(l) + 1))
+    ax.xaxis.set_ticklabels( [g[0] for g in groups], rotation=45 )
+                      
+
+    try:
+        symbol = mo430info.ix[probeset,"symbol"]
+        genename = mo430info.ix[probeset,"gene_name"]
+    except:
+        symbol = "--"
+        genename = "--"
+
+    #ax.patch.set_facecolor((0.9, 0.9, 0.9))
+        
+    ax.set_title(mousetype + " : " + probeset + " : " + symbol + "\n" + genename + "\n expression vs. lesion / drug treatment\n")
+    ax.set_ylabel("log2 expression")
+    ax.set_xlabel("treatment")
+    ax.grid(which='both')        
+
+    return True
+    
 def plotBoth(d, covar, probeset):
     f = plt.figure(figsize=(18,5))
     plt.rcParams.update({'font.size': 8})
@@ -245,10 +290,15 @@ def plotAIMgraphs():
         plt.xlabel("Day")
         plt.ylim( (-1, 50) )
         plt.xlim( (-0.5, 4.5) )
-        drugtreat_group_color = { "Acute high levodopa" : "green", "Chronic saline" : "grey", "Acute saline" : "yellow", "Chronic high levodopa" : "red", "Chronic low levodopa" : "blue"  }
+        drugtreat_group_color = { "Acute high levodopa" : "green", 
+                                  "Chronic saline" : "grey", 
+                                  "Acute saline" : "yellow", 
+                                  "Chronic high levodopa" : "red", 
+                                  "Chronic low levodopa" : "blue"  }
         pd_groups = s.groupby(["MouseType", "LesionType", "DrugTreat"])
         for (mouse, lesion, drug) in pd_groups.groups.keys():
-            data = s.ix[pd_groups.groups[(mouse, lesion, drug)],["Day1AIM", "Day3AIM", "Day4AIM", "Day5AIM", "Day8AIM"]].transpose()
+            data = s.ix[pd_groups.groups[(mouse, lesion, drug)],
+                        ["Day1AIM", "Day3AIM", "Day4AIM", "Day5AIM", "Day8AIM"]].transpose()
             r = np.repeat(range(len(data.index)), len(data.columns)).reshape( (len(data.index), -1) )
             #xs = [range(len(data))
             r = r + random.random(shape(r)) * 0.15 - 0.075
@@ -270,8 +320,12 @@ def compareModels(cell_type_covar_ss, pd_all,  probeset):
                                "dose" : [int(i) for i in cell_type_covar_ss["DrugTreat"] == "Chronic high levodopa"], 
                                "AIM" : list(cell_type_covar_ss["totalAIM"].fillna(0)) } )
 
-    aim_models = ["AIM ~ expression + C(dose) + expression:C(dose)", "AIM ~ expression + C(dose)", "AIM ~ C(dose)",  "AIM ~ expression"]
-    expr_models = ["expression ~ AIM*C(dose)", "expression ~ AIM + C(dose)", "expression ~ C(dose)"]
+    aim_models = ["AIM ~ expression + C(dose) + expression:C(dose)", 
+                  "AIM ~ expression + C(dose)", "AIM ~ C(dose)",  
+                  "AIM ~ expression"]
+    expr_models = ["expression ~ AIM*C(dose)", 
+                   "expression ~ AIM + C(dose)", 
+                   "expression ~ C(dose)"]
 
     aim_model_fits = {}
     for m in aim_models:
@@ -287,8 +341,11 @@ def compareModels(cell_type_covar_ss, pd_all,  probeset):
 
 
 def compareOutlier(cp_type, mouse_id):
-    outlier_selection = pd_covar.select( lambda x: pd_covar.MouseType[x] == cp_type and pd_covar.MouseID[x] == mouse_id )
-    reference_sample = pd_covar.select( lambda x: pd_covar.MouseType[x] == cp_type and pd_covar.MouseID[x] != mouse_id and pd_covar.DrugTreat[x] == outlier_selection.DrugTreat )
+    outlier_selection = pd_covar.select( lambda x: pd_covar.MouseType[x] == cp_type 
+                                         and pd_covar.MouseID[x] == mouse_id )
+    reference_sample = pd_covar.select( lambda x: pd_covar.MouseType[x] == cp_type 
+                                        and pd_covar.MouseID[x] != mouse_id 
+                                        and pd_covar.DrugTreat[x] == outlier_selection.DrugTreat )
     
     outlier_data = pd_all[outlier_selection.filenames[outlier_selection.index[0]]]
     reference_data = pd_all[reference_sample.filenames]
@@ -304,11 +361,13 @@ def compareOutlier(cp_type, mouse_id):
 
 def outlierSelect(o, foldchange_cutoff, zscore_cutoff):
     return { "higher" : (o
-                .select(lambda x: o.difference[x] > foldchange_cutoff and abs(o.zscore[x]) > zscore_cutoff).sort_index(by="zscore")
+                .select(lambda x: o.difference[x] > foldchange_cutoff 
+                        and abs(o.zscore[x]) > zscore_cutoff).sort_index(by="zscore")
                 .merge(mo430info, left_index=True, right_index=True)
                 .sort_index(by="zscore", ascending=False)),
             "lower" : (o
-                .select(lambda x: o.difference[x] < -foldchange_cutoff and abs(o.zscore[x]) > zscore_cutoff).sort_index(by="zscore")
+                .select(lambda x: o.difference[x] < -foldchange_cutoff 
+                        and abs(o.zscore[x]) > zscore_cutoff).sort_index(by="zscore")
                 .merge(mo430info, left_index=True, right_index=True)
                 .sort_index(by="zscore"))                         
             }

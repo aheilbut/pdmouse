@@ -5,6 +5,8 @@ Created on Mon Feb  4 12:31:02 2013
 @author: adrian
 """
 
+import pandas
+
 # load tukeyHSD pvals from file
 cp73_tukey = pandas.DataFrame.from_csv("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/jan30/cp73_tukeyHSD.tab", 
                                         header=None, index_col=None, sep="\t" )

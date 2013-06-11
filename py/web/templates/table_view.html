@@ -61,12 +61,8 @@ Backbone.history.start();
 function setupGrid(target, columndict, data) {
   var grid;
   
-    
-  
   grid = new Slick.Grid(target, data, columns, options);
   grid.setSelectionModel(new Slick.RowSelectionModel());
-
-  
   
   $(window).resize(function () {
       grid.resizeCanvas();

@@ -87,7 +87,11 @@ ss_cp101_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == 
                                                       or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")
                                                  and pd_covar.ix[x, "MouseID"] != 1343)) 
 
-ss_cp101_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa") and pd_covar.ix[x, "MouseID"] != 1343)) 
+ss_cp101_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
+                                                 and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                 and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" 
+                                                      or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa") 
+                                                 and pd_covar.ix[x, "MouseID"] != 1343)) 
 
 
 ss_cp73_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
@@ -99,16 +103,41 @@ ss_cp73_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "
 
 ss_cp73_allChronic_LDOPA = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
                                                       and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                      and (pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa" or pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")))
+                                                      and (pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa" 
+                                                           or pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")))
 
 ss_cp101_allChronic_LDOPA = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
                                                        and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
                                                        and pd_covar.ix[x, "MouseID"] != 1343
-                                                       and (pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa" or pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")))
+                                                       and (pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa" 
+                                                            or pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")))
 
 
-cp73_chronic_saline = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP73" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")
-cp101_chronic_saline = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP101" and pd_covar.ix[x, "LesionType"] == "6-OHDA" and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")
+cp73_chronic_saline = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP73" 
+                                      and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                      and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")
+cp101_chronic_saline = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP101" 
+                                       and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                       and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")
+
+ss_cp73_ascorbate_saline = pd_covar.select( lambda x: pd_covar.ix[x, "MouseType"] == "CP73" 
+                                                    and pd_covar.ix[x, "DrugTreat"] == "Chronic saline" 
+                                                    and pd_covar.ix[x, "LesionType"] == "Ascorbate"  )
+
+ss_cp101_ascorbate_saline = pd_covar.select( lambda x: pd_covar.ix[x, "MouseType"] == "CP101" 
+                                                    and pd_covar.ix[x, "DrugTreat"] == "Chronic saline" 
+                                                    and pd_covar.ix[x, "LesionType"] == "Ascorbate"  )
+
+
+ss_cp73_acuteHigh =  pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
+                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                and pd_covar.ix[x, "DrugTreat"] == "Acute high levodopa"))
+
+ss_cp73_acuteSaline =  pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
+                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
+                                                and pd_covar.ix[x, "DrugTreat"] == "Acute saline"))
+
+
 
 
 tl = TemplateLookup(directories=["templates"],
@@ -152,7 +181,7 @@ class PDC():
             probeset = urllib.unquote_plus(probeset)
             # generate figure 
             fig = Figure()
-            fig.set_size_inches(15, 6)
+            fig.set_size_inches(16, 6)
             
             ax_cp73 = fig.add_subplot(121)
             ax_cp101 = fig.add_subplot(122)
@@ -170,6 +199,36 @@ class PDC():
             canvas = FigureCanvas(fig)
         # render
 
+        if fig_type == "boxplot":
+            probeset = urllib.unquote_plus(probeset)
+
+            fig = Figure()
+            fig.set_size_inches(15, 8)
+            
+            ax_cp73 = fig.add_subplot(121)
+            ax_cp101 = fig.add_subplot(122)
+            
+            cp73_groups = [("ASC / chronic saline", ss_cp73_ascorbate_saline.filenames),
+                           ("OHDA / chronic saline", cp73_chronic_saline.filenames),
+                           ("OHDA / acute saline", ss_cp73_acuteSaline.filenames),
+                           ("OHDA / acute High L-DOPA", ss_cp73_acuteHigh.filenames),
+                           ("OHDA / chronic Low L-DOPA", ss_cp73_chronicLow.filenames),
+                           ("OHDA / chronic High L-DOPA", ss_cp73_chronicHigh.filenames)
+                           ]
+            
+            cp101_groups = [("ASC / chronic saline", ss_cp101_ascorbate_saline.filenames),
+                           ("OHDA / chronic saline", cp101_chronic_saline.filenames),
+                           ("OHDA / chronic Low L-DOPA", ss_cp101_chronicLow.filenames),
+                           ("OHDA / chronic High L-DOPA", ss_cp101_chronicHigh.filenames)
+                           ]
+        
+            pda.probe_boxPlots(probeset, pd_all, cp73_groups, "CP73", ax_cp73)
+            pda.probe_boxPlots(probeset, pd_all, cp101_groups, "CP101", ax_cp101)
+            
+            fig.tight_layout(rect=[0, 0, 0.7, 1], h_pad=0.5)
+            fig.set_facecolor('w')
+            canvas = FigureCanvas(fig)
+        
         if format == "png":
             cherrypy.response.headers['Content-Type'] = "image/png"
             buffer = StringIO.StringIO()
@@ -178,6 +237,7 @@ class PDC():
 
             return file_generator(buffer)
 
+        
     def overlap_table(self, cell_type, contrast, direction):
         t = tl.get_template("enrichment_table.html")
 

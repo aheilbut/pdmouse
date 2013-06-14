@@ -4,6 +4,7 @@
  <head>
 
   <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="/static/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen">
   <link href='http://fonts.googleapis.com/css?family=Nova+Square' rel='stylesheet' type='text/css'>
  
    <link href="/static/SlickGrid/slick.grid.css" rel='stylesheet' type="text/css"/>  
@@ -26,6 +27,7 @@
   <script type="text/javascript" src="/static/SlickGrid/lib/jquery.event.drop-2.2.js"></script>  
    
   <script type="text/javascript" src="/static/SlickGrid/slick.core.js"></script>
+  <script type="text/javascript" src="/static/SlickGrid/plugins/slick.checkboxselectcolumn.js"></script>
   <script type="text/javascript" src="/static/SlickGrid/plugins/slick.rowselectionmodel.js"></script>
   <script type="text/javascript" src="/static/SlickGrid/slick.editors.js"></script>
   <script type="text/javascript" src="/static/SlickGrid/slick.formatters.js"></script>
@@ -79,10 +81,12 @@
       </div>
 
     </div>
-
+ 
+  <div style="height: 100%; min-height: 100%; ">
 
   ${self.body()}
-
+  </div>
+  
  </body>
 
  

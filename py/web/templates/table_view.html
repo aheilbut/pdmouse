@@ -4,22 +4,77 @@
 <script type="text/javascript" src="/static/js/slick.remotemodel.js"></script>
 <script type="text/javascript">
   var grid = null;
-  var loader;
+  var loader = null;
 
 </script>
 
 <%def name="docReady()">
 
+var DatasetModel = Backbone.Model.extend({
+  initialize: function() {
+    this.dimensions = new DimensionList();
+    
+    this.dimensions.reset( this.get("data") );
+  }
+  
+  
+});
+
+var DimensionModel = Backbone.Model.extend({
+
+});
+
+var DimensionView = Backbone.View.extend({
+  tagName: "li",
+  
+  render: function() {
+    this.$el.html(this.model.get("id"));
+    return this.$el;
+  }
+  
+});
+
+var DimensionList = Backbone.Collection.extend({
+  model: DimensionModel
+});
+
+var DatasetView = Backbone.View.extend({
+  el: "#dimensions",
+  
+  render: function() {
+  
+    that = this;
+  
+    this.model.dimensions.each( function(dim) {
+	var dimview = new DimensionView( { model : dim } );	
+	that.$el.append( dimview.render() );    
+    
+    });
+  
+  
+  }
+
+
+});
+
+var Predicate = Backbone.Model.extend({
+
+});
+
+var Query = Backbone.Collection.extend({
+  model: Predicate
+});
 
 var TableRouter = Backbone.Router.extend({
   
   routes: {
-  "dataset/:dataset"  : "loadDataset",
+  "dataset/:dataset(/q:query)"  : "loadDataset",
   },
 
   
   loadDataset : function(dataset) {
-      // get metadata
+    
+      // get metadata for this dataset
       req = $.ajax({
 	  url : "/cube_info",
 	  type: "POST",
@@ -33,39 +88,178 @@ var TableRouter = Backbone.Router.extend({
 	       if (result["success"] == true) {
 		   $("#dataset_title").html( result["title"] );
 		   $("#dataset_description").html( result["description"] );
+    		   $("#dataset_total").html( result["total"]);
 		   
-		}  else {
+		   ds.set("data", result);		   
+		   
+		   function probeFormat( row, cell, value, columnDef, dataContext ) {
+			  return '<a href="/probeset/' + 
+				    value + '" target="_probeset">' + value + '</a>'; }
+		  
+//		  var columndict = result["column_dict"];
+		  var columns = result["columns"];  
+      
+		  for (k in columns) {
+		    if (columns[k]["id"] === "probeset" || columns[k]["id"] === "probe_id") 
+		      { columns[k]["formatter"] = probeFormat; }
+ 		  }
+	  	
+		  
+		  
+		  var checkboxSelector = new Slick.CheckboxSelectColumn({
+		    cssClass: "slick-cell-checkboxsel"
+		  });
+		  
+		  var dim_columns = []
+		  dim_columns.push(checkboxSelector.getColumnDefinition());
+		  dim_columns.push({ "id" : "field", "name" : "dimension", "field" : "field" });
+				  
+		  var dim_data = columns;
+		  var dim_table_options = {
+		      editable: false,
+		      enableAddRow: false,
+		      enableCellNavigation: true,
+		      forceFitColumns: true
+		      
+		  };
+		  dimensionGrid = new Slick.Grid("#dimensiontable", dim_data, dim_columns, dim_table_options );
+		  dimensionGrid.setSelectionModel(new Slick.RowSelectionModel({selectActiveRow: true}));
+		  dimensionGrid.registerPlugin(checkboxSelector);
+
+		  dimensionGrid.onViewportChanged.subscribe(function (e, args) {
+		       var vp = dimensionGrid.getViewport();
+	      
+		       dimensionGrid.render();
+		     });
+
+		   $(window).resize(function () {
+			 dimensionGrid.resizeCanvas();
+			 dimensionGrid
+		     });  
+    	  
+		  
+		  // set up datasource
+		  if (loader !== null) {
+		    loader.clear();
+		    loader.setBaseQueryParams({ cptype : dataset });
+		  } 
+		  else {	     
+		    loader = new Slick.Data.RemoteModel({ cptype : dataset });
+		  }
+		  
+		  if (grid !== null) { 
+		     grid.invalidate();
+		     grid.setColumns(columns);
+		     var vp = grid.getViewport();
+		     loader.ensureData(vp.top, vp.bottom);
+		     grid.onViewportChanged.notify();  
+		 }
+	    
+		 else {
+		
+		    var options = {
+		       editable: false,
+		       enableAddRow: false,
+		       enableCellNavigation: true,
+		       syncColumnCellResize: true,
+		       enableColumnReorder: false,
+		       //   forceFitColumns: true
+		     };
+		   
+		     var loadingIndicator = null;    
+		      
+		     grid = new Slick.Grid("#datatable", loader.data, columns, options);
+		     grid.setSelectionModel(new Slick.RowSelectionModel());
+		  
+		     grid.onViewportChanged.subscribe(function (e, args) {
+		       var vp = grid.getViewport();
+		       loader.ensureData(vp.top, vp.bottom);
+		       grid.render();
+		     });
+		  
+		     grid.onSort.subscribe(function (e, args) {
+		       loader.setSort(args.sortCol.field, args.sortAsc ? 1 : -1);
+		       var vp = grid.getViewport();
+		       loader.ensureData(vp.top, vp.bottom);
+		     });
+		  
+		     loader.onDataLoading.subscribe(function () {
+		       if (!loadingIndicator) {
+			 loadingIndicator = $("<span class='loading-indicator'><label>Buffering...</label></span>").appendTo(document.body);
+			 var $g = $("#datatable");
+		  
+			 loadingIndicator
+			      .css("position", "absolute")
+			      .css("top", $g.position().top + $g.height() / 2 - loadingIndicator.height() / 2)
+			      .css("left", $g.position().left + $g.width() / 2 - loadingIndicator.width() / 2);
+			}
+			loadingIndicator.show();
+		      });
+		  
+		     loader.onDataLoaded.subscribe(function (e, args) {
+			for (var i = args.from; i <= args.to; i++) {
+			  grid.invalidateRow(i);
+			}
+		  
+			grid.updateRowCount();
+			grid.render();
+		  
+			loadingIndicator.fadeOut();
+		      });
+		  
+	      
+		      
+		      $("#txtSearch").keyup(function (e) {
+			if (e.which == 13) {
+			  loader.setSearch($(this).val());
+			  var vp = grid.getViewport();
+			  loader.ensureData(vp.top, vp.bottom);
+			}
+		      });
+		  
+		      // load the first page
+		      grid.onViewportChanged.notify();
+		      
+		    $(window).resize(function () {
+			 grid.resizeCanvas();
+		     });  
+		      
+		      
+		  }			  
+		  
+	      
+		}  
+		else {
 		   alert("error loading dataset");
 		}
 	  }       
 	}); 
   
-  
-      // set up datasource
-      loader = new Slick.Data.RemoteModel({ cptype : dataset });
-      if (grid !== null) { 
-       grid.setData(loader); 
-       gruid.render();
-       grid.invalidate();
-//       grid.onViewportChanged.notify();
-      }
-  }
-
+     
+    }
   
 });
 
 var table_router = new TableRouter;
 
+
+ds = new DatasetModel();
+dsv = new DatasetView( { model : ds } );
+
 Backbone.history.start();
+
+
+
 
 function setupGrid(target, columndict, data) {
   var grid;
+  
   
   grid = new Slick.Grid(target, data, columns, options);
   grid.setSelectionModel(new Slick.RowSelectionModel());
   
   $(window).resize(function () {
-      grid.resizeCanvas();
+      //grid.resizeCanvas();
   });  
   
 }
@@ -79,121 +273,47 @@ function setupGrid(target, columndict, data) {
 
  // var grid;
 
-
-  var columndict = {
-   "probeset" : { id : "probeset", name : "probeset", field : "probeset" },
-   "pval" : { id : "pval", name : "pval", field : "pval" },
-   "bh" : { id : "bh", name : "bh", field : "bh" },
-   "symbol" :  { id : "symbol", name : "symbol", field: "symbol" },
-   "gene_name" : { id : "gene_name", name : "gene_name", field : "gene_name" }
-  };
-
-  columns = [];
-  
-  function probeFormat( row, cell, value, columnDef, dataContext ) {
-	return '<a href="/probeset/' + 
-		  value + '" target="_probeset">' + value + '</a>'; }
-	    
-  for (k in columndict) {
-    if (k === "probeset") columndict[k]["formatter"] = probeFormat;
-  
-    columns.push(columndict[k]);
-  
-  }
-    
-  
-  
-  var options = {
-     editable: false,
-     enableAddRow: false,
-     enableCellNavigation: true,
-     forceFitColumns: true
-   };
  
-   var loadingIndicator = null;
-  
-
-$(function () {
-    grid = new Slick.Grid("#datatable", loader.data, columns, options);
-    grid.setSelectionModel(new Slick.RowSelectionModel());
-
-    grid.onViewportChanged.subscribe(function (e, args) {
-      var vp = grid.getViewport();
-      loader.ensureData(vp.top, vp.bottom);
-    });
-
-    grid.onSort.subscribe(function (e, args) {
-      loader.setSort(args.sortCol.field, args.sortAsc ? 1 : -1);
-      var vp = grid.getViewport();
-      loader.ensureData(vp.top, vp.bottom);
-    });
-
-    loader.onDataLoading.subscribe(function () {
-      if (!loadingIndicator) {
-        loadingIndicator = $("<span class='loading-indicator'><label>Buffering...</label></span>").appendTo(document.body);
-        var $g = $("#datatable");
-
-        loadingIndicator
-            .css("position", "absolute")
-            .css("top", $g.position().top + $g.height() / 2 - loadingIndicator.height() / 2)
-            .css("left", $g.position().left + $g.width() / 2 - loadingIndicator.width() / 2);
-      }
-
-      loadingIndicator.show();
-    });
-
-    loader.onDataLoaded.subscribe(function (e, args) {
-      for (var i = args.from; i <= args.to; i++) {
-        grid.invalidateRow(i);
-      }
-
-      grid.updateRowCount();
-      grid.render();
-
-      loadingIndicator.fadeOut();
-    });
-
-    $("#txtSearch").keyup(function (e) {
-      if (e.which == 13) {
-        loader.setSearch($(this).val());
-        var vp = grid.getViewport();
-        loader.ensureData(vp.top, vp.bottom);
-      }
-    });
-
-    // load the first page
-    grid.onViewportChanged.notify();
-      
-   $(window).resize(function () {
-	grid.resizeCanvas();
-    });  
-	
-    
-  })   
-   
-   
-   
 </%def>
 
 
-<div class="container-fluid fill" style="padding-top: 60px; height: 95%; min-height: 95%">
-
-  <div class="row-fluid" style="height: 95%; min-height: 95%">
-
-	<div class="span2">
-
-	</div>
-	
-	<div class="span10" style="height: 95%; min-height: 95%">
+<div id="maincontainer" class="container-fluid fill">
   
+  <div class="row-fluid">
+	<div class="span3">
+	  <div>
+	  <h5> dimension type atoms </h5>
+	  </div>
+  
+	  <div>
+	  <h5> dimension type ordering </h5>
+	  </div>
+      </div>	
+
+      <div class="span2"><h5>filters</h5>
+      </div>
+      
+      <div class="span7">
 	<h3 id="dataset_title"></h3> 
 	<h6 id="dataset_description"></h6> 
+	<h6> <span id="dataset_total"></span> records</h6> 
 
-	<div	
-	
-	<div id="datatable" class="fill" style="display: block; min-height:100%; height: 100%; min-width: 100%">
+      </div>
+  </div>
+
+  <div class="row-fluid fill">
+
+	<div class="span3" style="height: 100%; min-height: 100%;">
+    	    <div id="dimensiontable" class="fill" style="min-height:100%; height: 100%; min-width: 100%; overflow: auto"></div>
+	</div>
+
+	<div class="span2" style="height: 100%; min-height: 100%;">
+	    <div id="filter_drop_target" style="background: #FFEEEE; border: 1px solid grey; height: 200px; padding: 20px">Drag and drop dimension here to create a filter</div>
 	</div>
 	
+	
+	<div class="span7" style="height: 100%; min-height: 100%; box-sizing:border-box;">
+	  <div id="datatable" class="fill" style="min-height: 100%; height: 100%; min-width: 100%"></div>
 	</div>
 	
   </div>

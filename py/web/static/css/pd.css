@@ -1,7 +1,16 @@
-	body {
-		margin: 20px;
+* { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 
-	}
+
+html {
+ height: 100%;
+ padding: 1px; 
+}
+	
+body {
+ height: 100%;
+ padding-top: 40px;
+ padding-bottom: 100px;
+}
 
 	.model table tr {
 		border: 1px solid gray;
@@ -29,6 +38,7 @@
 		background: lightblue;
 		font-size: 8pt;
 	}
+
 
 	.reg_col_head {
 		background: lightgray;
@@ -71,6 +81,13 @@
 	  padding: 10px;
 	}
 	
-	html, body {
-	  height: 99%;
+
+	
+	.fill {
+	  box-sizing:border-box;
+	  min-height: 100%;
+	  height: 100%;
 	}
+	
+	
+	

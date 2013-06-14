@@ -216,3 +216,24 @@ input.editor-checkbox {
   color: blue;
   text-decoration: underline;
 }
+
+#dimensiontable .slick-cell {
+ font-size: 8pt;
+}
+
+.slick-header-columns {
+  word-wrap:break-word;
+  white-space: normal;
+  height: 100%;
+}
+
+.slick-header-column.ui-state-default {
+    height: 100%;
+}
+
+.slick-row.odd { 
+	  background: #efe; 
+      } 
+.slick-row.even { 
+  background: #fff; 	
+}	

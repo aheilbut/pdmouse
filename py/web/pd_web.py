@@ -389,19 +389,34 @@ class PDC():
             
         
         if query["dataid"] == "CP101":
-            return {
-                'success' : True,
-                "title" : "CP101 linear model comparison statistics",
-                "description" : "nominal and bh adjusted p-values for F-tests comparing AIM ~ expression + C(dose) vs AIM ~ C(dose)"
-            
-            }
-        
+            dataset = cp101_modelcomp
+            title = "CP101 linear model comparison statistics"
+            description = "nominal and bh adjusted p-values for F-tests comparing AIM ~ expression + C(dose) vs AIM ~ C(dose)"
+
         elif query["dataid"] == "CP73":
-            return {
-                'success' : True,                
-                "title" : "CP101 linear model comparison statistics",
-                "description" : "nominal and bh adjusted p-values for F-tests comparing AIM ~ expression + C(dose) vs AIM ~ C(dose)"
-            }
+            dataset = cp101_modelcomp
+            title = "CP73 linear model comparison statistics",
+            description = "nominal and bh adjusted p-values for F-tests comparing AIM ~ expression + C(dose) vs AIM ~ C(dose)"
+            
+        elif query["dataid"] == "cp73_wide":
+            dataset = cp73_wide_info
+            dataset  = dataset.reindex(pandas.Series(dataset.index.values, name=dataset.index.name + "_index"))
+            title = "cp73 wide"
+            description = ""
+                        
+        recs = dataset.to_records()
+        fieldset = [str(n) for n in recs.dtype.names]
+        #columndef_dict = dict( [(f, {"id" : f, "name" : f, "field" : f, "sortable" : True  }) for f in fieldset] )
+
+        columns = [ {"id" : f, "name" : f, "field" : f, "sortable" : True  } for f in fieldset] 
+        
+        return {                
+            "columns" : columns,
+            'success' : True,
+            "title" : title,
+            "description" : description,
+            "total" : len(dataset)
+        }
             
     
     @cherrypy.tools.json_in()
@@ -429,28 +444,44 @@ class PDC():
         print query["cptype"]
             
         if query["cptype"] == "CP101":
-            recs = cp101_modelcomp[start:finish].to_records()
+            dataset = cp101_modelcomp
+            recs = dataset[start:finish].to_records()
             datadesc = "CP101 linear model comparison statistics"
         elif query["cptype"] == "CP73":
-            recs = cp73_modelcomp[start:finish].to_records()
+            dataset = cp73_modelcomp
+            recs = dataset[start:finish].to_records()
             datadesc = "CP73 linear model comparison statistics"
+        elif query["cptype"] == "cp73_wide":
+            dataset = cp73_wide_info
+            dataset  = dataset.reindex(pandas.Series(dataset.index.values, name=dataset.index.name + "_index"))
+            datadesc = "CP73 wide"
+            recs = dataset[start:finish].to_records()
             
             
-        fieldset = recs.dtype.names
+        fieldset = [str(n) for n in recs.dtype.names]    
         reclist = [dict( zip( fieldset, 
                               [cleanFormat(z) for z in row]) )
                    for row in recs.tolist()]
-    
-        columndef_dict = dict( [(f, {"id" : f, "name" : f, "field" : f  }) for f in fieldset] )
         
+        #        columndef_dict = dict( [(f, {"id" : f, "name" : f, "field" : f, "sortable" : True }) for f in fieldset] )
+        
+        columns = [ {"id" : f, "name" : f, "field" : f, "sortable" : True } for f in fieldset]
+
 #        columndef_dict["probe_id"]["formatter"] = probeset_formatter
         
-        columndef = columndef_dict.values()
+#        columndef = columndef_dict.values()
        
         print "start: ", start
         print "finish: ", finish
         
-        result = { "success" : True,  "data" : reclist, "data_description" : datadesc, "start": start, "total": len(cp101_modelcomp), "count": finish-start, "column_dict" : columndef_dict }  
+        result = { "success" : True,  
+                   "data" : reclist, 
+                   "data_description" : datadesc, 
+                   "start": start, 
+                   "total": len(dataset), 
+                   "count": finish-start, 
+                   "columns" : columns 
+                   }  
             
         return result
         

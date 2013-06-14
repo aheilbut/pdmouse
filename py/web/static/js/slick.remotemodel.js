@@ -23,6 +23,11 @@
     }
 
 
+    function setBaseQueryParams(bqp) {
+      baseQueryParams = bqp;
+    }
+    
+
     function isDataLoaded(from, to) {
       for (var i = from; i <= to; i++) {
         if (data[i] == undefined || data[i] == null) {
@@ -125,6 +130,7 @@
     }
 
     function onSuccess(resp) {
+    
       var from = resp.start, to = from + resp.count;
       data.length = parseInt(resp.total);
 
@@ -172,7 +178,9 @@
       "reloadData": reloadData,
       "setSort": setSort,
       "setSearch": setSearch,
-
+      "setBaseQueryParams" : setBaseQueryParams,
+      
+      
       // events
       "onDataLoading": onDataLoading,
       "onDataLoaded": onDataLoaded

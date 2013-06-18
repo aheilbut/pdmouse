@@ -194,13 +194,15 @@ def plotBoth(d, covar, probeset):
     return f
  
     
-def calcChangeStats(d, exp_set, control_set):
+def calcChangeStats(d, exp_set, control_set, tags=()):
     return pandas.DataFrame(
-        { "median_exp" : d[list(exp_set.filenames)].median(axis=1),
-          "mean_exp" : d[list(exp_set.filenames)].mean(axis=1),
-          "fc_exp" : d[list(exp_set.filenames)].median(axis=1) - d[list(control_set.filenames)].median(axis=1),
-          "std_exp": d[list(exp_set.filenames)].std(axis=1),
-          "cv_exp" : d[list(exp_set.filenames)].std(axis=1) / d[list(exp_set.filenames)].mean(axis=1)
+        { tags + (("st", "median"),("cg", "exp"))       : d[list(exp_set.filenames)].median(axis=1),
+          tags + (("st", "mean"), ("cg", "exp"))        : d[list(exp_set.filenames)].mean(axis=1),
+          tags + (("st", "fc_medians"),)                   : d[list(exp_set.filenames)].median(axis=1) - d[list(control_set.filenames)].median(axis=1),
+          tags + (("st", "fc_means"),)                   : d[list(exp_set.filenames)].mean(axis=1) - d[list(control_set.filenames)].mean(axis=1),
+          tags + (("st", "stddev"), ("cg", "exp"))      : d[list(exp_set.filenames)].std(axis=1),
+          tags + (("st", "stddev"), ("cg", "ctrl"))     : d[list(exp_set.filenames)].std(axis=1),
+          tags + (("st", "cv"), ("cg", "exp"))          : d[list(exp_set.filenames)].std(axis=1) / d[list(exp_set.filenames)].mean(axis=1)
         })
 
 

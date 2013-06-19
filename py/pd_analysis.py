@@ -15,6 +15,7 @@ import time, datetime
 import scipy.stats as st
 import statsmodels.sandbox.stats.multicomp
 import pd_locals
+import json
 
 mo430symbol = pandas.read_table(pd_locals.datadir +  "/Oct29/mo4302symbols.tab")
 mo430symbol.index = mo430symbol.probe_id
@@ -27,6 +28,42 @@ mo430info.index = mo430info.probe_id
 
 pd_all = pandas.read_table(pd_locals.datadir + "/Oct29/PD_arraydata.tab")
 pd_covar = pandas.read_table(pd_locals.datadir + "/Oct29/pd.covar.tab")
+
+
+class TagMan():
+    def __init__(self):
+        pass
+    
+    # encode
+    def e(self, tagGroup):
+        # sort tag tree recursively 
+        return json.dumps( sorted( tagGroup ) )
+        
+    # decode
+    def d(self, tagString):
+        return json.loads(tagString)
+    
+    # match
+    # return all the strings that match the specified tags
+    # if only a tag type is specified, then any string containing that tag is ok, but must have that tag
+    # if a value is also specified, then value must match too
+    def m(self, searchTagList, encodedStrings):
+        resultStrings = []
+        for s in encodedStrings:
+            td = dict(self.d(s))
+            for searchTag in searchTagList:
+                print searchTag
+                if isinstance(searchTag, (list, tuple)):
+                    if td.get(searchTag[0], None) == searchTag[1]:
+                        resultStrings.append(s)
+                elif td.has_key(searchTag):
+                    resultStrings.append(s)
+        return resultStrings
+    
+
+tm = TagMan()
+    
+    # filter
 
 
 def fitAIM(probeset, covar_subset, dataset, AIM_dimension="totalAIM"):
@@ -196,22 +233,44 @@ def plotBoth(d, covar, probeset):
     
 def calcChangeStats(d, exp_set, control_set, tags=()):
     return pandas.DataFrame(
-        { tags + (("st", "median"),("cg", "exp"))       : d[list(exp_set.filenames)].median(axis=1),
-          tags + (("st", "mean"), ("cg", "exp"))        : d[list(exp_set.filenames)].mean(axis=1),
-          tags + (("st", "fc_medians"),)                   : d[list(exp_set.filenames)].median(axis=1) - d[list(control_set.filenames)].median(axis=1),
-          tags + (("st", "fc_means"),)                   : d[list(exp_set.filenames)].mean(axis=1) - d[list(control_set.filenames)].mean(axis=1),
-          tags + (("st", "stddev"), ("cg", "exp"))      : d[list(exp_set.filenames)].std(axis=1),
-          tags + (("st", "stddev"), ("cg", "ctrl"))     : d[list(exp_set.filenames)].std(axis=1),
-          tags + (("st", "cv"), ("cg", "exp"))          : d[list(exp_set.filenames)].std(axis=1) / d[list(exp_set.filenames)].mean(axis=1)
+        { tm.e( tags + (("st", "median"),("cg", "exp")) )      : d[list(exp_set.filenames)].median(axis=1),
+          tm.e( tags + (("st", "mean"), ("cg", "exp"))  )      : d[list(exp_set.filenames)].mean(axis=1),
+          tm.e( tags + (("st", "fc_medians"),)  )              : d[list(exp_set.filenames)].median(axis=1) - d[list(control_set.filenames)].median(axis=1),
+          tm.e( tags + (("st", "fc_means"),)    )              : d[list(exp_set.filenames)].mean(axis=1) - d[list(control_set.filenames)].mean(axis=1),
+          tm.e( tags + (("st", "stddev"), ("cg", "exp")) )     : d[list(exp_set.filenames)].std(axis=1),
+          tm.e( tags + (("st", "stddev"), ("cg", "ctrl")) )    : d[list(exp_set.filenames)].std(axis=1),
+          tm.e( tags + (("st", "cv"), ("cg", "exp")) )         : d[list(exp_set.filenames)].std(axis=1) / d[list(exp_set.filenames)].mean(axis=1)
         })
 
 
-def calc_ttest(data, exp_set, control_set):
+def calc_ttest(data, exp_set, control_set, tags=()):
     d = [ st.ttest_ind( data.ix[probeset, list(exp_set.filenames)], 
-                             data.ix[probeset, list(control_set.filenames)]) for probeset in data.index]
-    rs = pandas.DataFrame( index=data.index, data=d, columns=["t", "pval"])
-    rs["bonf"] = statsmodels.sandbox.stats.multicomp.multipletests(rs.pval, method="bonferroni")[1]
-    rs["bh"] = statsmodels.sandbox.stats.multicomp.multipletests(rs.pval, method="fdr_bh")[1] 
+                             data.ix[probeset, list(control_set.filenames)], equal_var=False) for probeset in data.index]
+    rs = pandas.DataFrame( index=data.index, data=d, columns=[ tm.e( tags+(("st", "t"),("tt", "welch ttest"))), tm.e( tags + (("st", "pval"), ("tt", "welch ttest"), ("mc", "nominal") ))])    
+    rs[tm.e( tags + (("tt", "welch ttest"), ("mc", "bonf")))] = statsmodels.sandbox.stats.multicomp.multipletests(rs.ix[:, tm.e( tags + (("st", "pval"), ("tt", "welch ttest"), ("mc", "nominal"))) ], method="bonferroni")[1]
+    rs[tm.e( tags + (("tt", "welch ttest"), ("mc", "bh")))] = statsmodels.sandbox.stats.multicomp.multipletests(rs.ix[:, tm.e( tags + (("st", "pval"), ("tt", "welch ttest"), ("mc", "nominal")))], method="fdr_bh")[1] 
+
+    d = [ st.ttest_ind( data.ix[probeset, list(exp_set.filenames)], 
+                             data.ix[probeset, list(control_set.filenames)], equal_var=True) for probeset in data.index]
+
+    rs[tm.e( tags+(("st", "t"),("tt", "student ttest")))] = [v[0] for v in d]
+    rs[tm.e( tags + (("st", "pval"), ("tt", "student ttest"), ("mc", "nominal") ))] = [v[1] for v in d]
+    
+    rs[tm.e( tags + (("tt", "student ttest"), ("mc", "bonf")))] = statsmodels.sandbox.stats.multicomp.multipletests(rs.ix[:, tm.e( tags + (("st", "pval"), ("tt", "student ttest"), ("mc", "nominal"))) ], method="bonferroni")[1]
+    rs[tm.e( tags + (("tt", "student ttest"), ("mc", "bh")))] = statsmodels.sandbox.stats.multicomp.multipletests(rs.ix[:, tm.e( tags + (("st", "pval"), ("tt", "student ttest"), ("mc", "nominal")))], method="fdr_bh")[1] 
+
+
+    # do diagnostic tests for heteroskedasticity
+    d = [st.levene( data.ix[probeset, list(exp_set.filenames)], data.ix[probeset, list(control_set.filenames)]) for probeset in data.index ]
+    rs[ tm.e( tags + (("tt", "levene"), ("st", "pval")))] = [z[1] for z in d]
+
+    # omnibus test for normality
+#    d = [st.normaltest( data.ix[probeset, list(exp_set.filenames)]) for probeset in data.index ]
+#    rs[ tm.e( tags + (("tt", "d-p omnibus"), ("st", "pval"), ("cg", "exp") ))] = [z[1] for z in d]
+
+#    d = [st.normaltest( data.ix[probeset, list(control_set.filenames)]) for probeset in data.index ]
+#    rs[ tm.e( tags + (("tt", "d-p omnibus"), ("st", "pval"), ("cg", "ctrl") ))] = [z[1] for z in d]
+
     return rs
 
 def changeFilter(model_stats, change_stats, probeinfo, fc_min=1.0, diff_max_bh_pval=0.20, aim_fit_max_pval=0.05, cv_min=0.01):

@@ -542,7 +542,7 @@ calc_anova_stats <- function(covar_subset, probeset) {
   cur_expression <- as.data.frame( alldata[probeset,] )
   colnames(cur_expression) <- "expression"
   cur_merged <- merge(covar_subset, cur_expression, by.x="filenames", by.y=0)
-  a <- aov(expression ~ DrugTreat, data=cur_merged)
+  a <- aov(expression ~ combinedTreat, data=cur_merged)
   return(a)
 }
       
@@ -550,11 +550,11 @@ write_tukeyHSDpvals = function(covar_subset, subset_name) {
   for (p in rownames(alldata)) {
     # get the Tukey stats
     a <- calc_anova_stats(covar_subset, p)
-    pv <- as.data.frame(TukeyHSD(a)$DrugTreat[,"p adj"])
+    pv <- as.data.frame(TukeyHSD(a)$combinedTreat[,"p adj"])
     colnames(pv) <- "tukeyHSD"
     pv$probeset <- p
     # append to file
-    write.table(pv, file=paste("~/Dropbox/Projects/Broad/PD_mouse/results/jan30/", subset_name, "_tukeyHSD.tab", sep=""), append=TRUE, sep="\t", col.names=FALSE, quote=FALSE)
+    write.table(pv, file=paste("~/Dropbox/Projects/Broad/PD_mouse/results/2013_june_13/", subset_name, "_tukeyHSD.tab", sep=""), append=TRUE, sep="\t", col.names=FALSE, quote=FALSE)
   }      
 }
       

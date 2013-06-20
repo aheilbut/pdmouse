@@ -52,7 +52,6 @@ class TagMan():
         for s in encodedStrings:
             td = dict(self.d(s))
             for searchTag in searchTagList:
-                print searchTag
                 if isinstance(searchTag, (list, tuple)):
                     if td.get(searchTag[0], None) == searchTag[1]:
                         resultStrings.append(s)
@@ -65,6 +64,14 @@ tm = TagMan()
     
     # filter
 
+    
+#def tagDF(df, df_col_type, tags):
+#    """ return the given dataframe with columns relabeled to have the tags specified, 
+#    and existing column names changed to tags of type df_col_type """
+#    df.columns = [ tags + ((df_col_type, cn),) for cn in df.columns]
+#    return df
+    
+    
 
 def fitAIM(probeset, covar_subset, dataset, AIM_dimension="totalAIM"):
     model = "AIM ~ expression"
@@ -247,8 +254,8 @@ def calc_ttest(data, exp_set, control_set, tags=()):
     d = [ st.ttest_ind( data.ix[probeset, list(exp_set.filenames)], 
                              data.ix[probeset, list(control_set.filenames)], equal_var=False) for probeset in data.index]
     rs = pandas.DataFrame( index=data.index, data=d, columns=[ tm.e( tags+(("st", "t"),("tt", "welch ttest"))), tm.e( tags + (("st", "pval"), ("tt", "welch ttest"), ("mc", "nominal") ))])    
-    rs[tm.e( tags + (("tt", "welch ttest"), ("mc", "bonf")))] = statsmodels.sandbox.stats.multicomp.multipletests(rs.ix[:, tm.e( tags + (("st", "pval"), ("tt", "welch ttest"), ("mc", "nominal"))) ], method="bonferroni")[1]
-    rs[tm.e( tags + (("tt", "welch ttest"), ("mc", "bh")))] = statsmodels.sandbox.stats.multicomp.multipletests(rs.ix[:, tm.e( tags + (("st", "pval"), ("tt", "welch ttest"), ("mc", "nominal")))], method="fdr_bh")[1] 
+    rs[tm.e( tags + (("tt", "welch ttest"), ("st", "pval"), ("mc", "bonf")))] = statsmodels.sandbox.stats.multicomp.multipletests(rs.ix[:, tm.e( tags + (("st", "pval"), ("tt", "welch ttest"), ("mc", "nominal"))) ], method="bonferroni")[1]
+    rs[tm.e( tags + (("tt", "welch ttest"), ("st", "pval"), ("mc", "bh")))] = statsmodels.sandbox.stats.multicomp.multipletests(rs.ix[:, tm.e( tags + (("st", "pval"), ("tt", "welch ttest"), ("mc", "nominal")))], method="fdr_bh")[1] 
 
     d = [ st.ttest_ind( data.ix[probeset, list(exp_set.filenames)], 
                              data.ix[probeset, list(control_set.filenames)], equal_var=True) for probeset in data.index]
@@ -256,8 +263,8 @@ def calc_ttest(data, exp_set, control_set, tags=()):
     rs[tm.e( tags+(("st", "t"),("tt", "student ttest")))] = [v[0] for v in d]
     rs[tm.e( tags + (("st", "pval"), ("tt", "student ttest"), ("mc", "nominal") ))] = [v[1] for v in d]
     
-    rs[tm.e( tags + (("tt", "student ttest"), ("mc", "bonf")))] = statsmodels.sandbox.stats.multicomp.multipletests(rs.ix[:, tm.e( tags + (("st", "pval"), ("tt", "student ttest"), ("mc", "nominal"))) ], method="bonferroni")[1]
-    rs[tm.e( tags + (("tt", "student ttest"), ("mc", "bh")))] = statsmodels.sandbox.stats.multicomp.multipletests(rs.ix[:, tm.e( tags + (("st", "pval"), ("tt", "student ttest"), ("mc", "nominal")))], method="fdr_bh")[1] 
+    rs[tm.e( tags + (("st", "pval"), ("tt", "student ttest"), ("mc", "bonf")))] = statsmodels.sandbox.stats.multicomp.multipletests(rs.ix[:, tm.e( tags + (("st", "pval"), ("tt", "student ttest"), ("mc", "nominal"))) ], method="bonferroni")[1]
+    rs[tm.e( tags + (("st", "pval"), ("tt", "student ttest"), ("mc", "bh")))] = statsmodels.sandbox.stats.multicomp.multipletests(rs.ix[:, tm.e( tags + (("st", "pval"), ("tt", "student ttest"), ("mc", "nominal")))], method="fdr_bh")[1] 
 
 
     # do diagnostic tests for heteroskedasticity

@@ -50,13 +50,28 @@ class TagMan():
     def m(self, searchTagList, encodedStrings):
         resultStrings = []
         for s in encodedStrings:
-            td = dict(self.d(s))
+            try:
+                td = dict(self.d(s))
+            except:
+                print "not an encoded tag list"
+            current_match = True
             for searchTag in searchTagList:
                 if isinstance(searchTag, (list, tuple)):
                     if td.get(searchTag[0], None) == searchTag[1]:
-                        resultStrings.append(s)
-                elif td.has_key(searchTag):
-                    resultStrings.append(s)
+                        pass
+                    else:
+                        current_match = False
+                        
+                else:
+                    if td.has_key(searchTag):
+                        pass
+                    else:
+                        current_match = False
+                    
+                    
+            if current_match is True:
+                resultStrings.append(s)
+                
         return resultStrings
     
 

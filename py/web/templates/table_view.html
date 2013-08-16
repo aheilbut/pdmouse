@@ -103,8 +103,7 @@ var TableRouter = Backbone.Router.extend({
 		    if (columns[k]["id"] === "probeset" || columns[k]["id"] === "probe_id") 
 		      { columns[k]["formatter"] = probeFormat; }
  		  }
-	  	
-		  
+	  			  
 		  
 		  var checkboxSelector = new Slick.CheckboxSelectColumn({
 		    cssClass: "slick-cell-checkboxsel"
@@ -242,18 +241,14 @@ var TableRouter = Backbone.Router.extend({
 
 var table_router = new TableRouter;
 
-
 ds = new DatasetModel();
 dsv = new DatasetView( { model : ds } );
 
 Backbone.history.start();
 
 
-
-
 function setupGrid(target, columndict, data) {
   var grid;
-  
   
   grid = new Slick.Grid(target, data, columns, options);
   grid.setSelectionModel(new Slick.RowSelectionModel());

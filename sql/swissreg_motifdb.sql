@@ -81,3 +81,53 @@ select geneName, mm9_refFlat.chrom, cdsStart, cdsEnd, mm9_refFlat.strand, motif_
   )
 
 
+CREATE TABLE mm9_gene_srmotifs_detail (
+	geneName VARCHAR(255),
+ 	chrom VARCHAR(255),
+	cdsStart BIGINT,
+	cdsEnd BIGINT,
+	txStart BIGINT,
+	txEnd BIGINT,
+	exonStarts TEXT,
+	exonEnds TEXT,
+	gene_strand CHAR(1),
+	motif_strand CHAR(1),
+	motif_type VARCHAR(255),
+	motif_score FLOAT,
+	motif_start BIGINT,
+	motif_end BIGINT,
+	motif_name VARCHAR(50)
+)
+
+
+
+insert into mm9_gene_srmotifs_detail
+
+select geneName, mm9_refFlat.chrom, cdsStart, cdsEnd, txStart, txEnd, exonStarts, exonEnds,
+    mm9_refFlat.strand, swissreg_sites.strand, motif_type, score, motif_start, motif_end, motif_name
+ from mm9_refFlat 
+ INNER JOIN swissreg_sites
+  ON 
+  swissreg_sites.chrom = mm9_refFlat.chrom
+  AND
+  (  
+  ( 
+   mm9_refFlat.strand = '+' 
+  	AND
+   swissreg_sites.motif_start > (mm9_refFlat.txStart - 10000)
+  	AND
+   swissreg_sites.motif_start < (mm9_refFlat.txEnd + 10000)
+  )
+  OR
+  (
+   mm9_refFlat.strand = '-' 
+  	AND
+   swissreg_sites.motif_start < (mm9_refFlat.txEnd + 10000)
+  	AND
+   swissreg_sites.motif_start > (mm9_refFlat.txStart - 10000)
+  )
+  )
+
+
+
+

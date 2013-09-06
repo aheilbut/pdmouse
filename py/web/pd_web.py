@@ -386,26 +386,26 @@ class PDC():
 
         return t.render_unicode()
     
-    @cherrypy.tools.json_in()
+#    @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
-    def cube_info(self):
-        try:
-            query = cherrypy.request.json
-        except:
-            print "no query specified"
+    def cube_info(self, dataid):
+#        try:
+#            query = cherrypy.request.json
+#        except:
+#            print "no query specified"
             
         
-        if query["dataid"] == "CP101":
+        if dataid == "CP101":
             dataset = cp101_modelcomp
             title = "CP101 linear model comparison statistics"
             description = "nominal and bh adjusted p-values for F-tests comparing AIM ~ expression + C(dose) vs AIM ~ C(dose)"
 
-        elif query["dataid"] == "CP73":
+        elif dataid == "CP73":
             dataset = cp101_modelcomp
             title = "CP73 linear model comparison statistics",
             description = "nominal and bh adjusted p-values for F-tests comparing AIM ~ expression + C(dose) vs AIM ~ C(dose)"
             
-        elif query["dataid"] == "cp73_wide":
+        elif dataid == "cp73_wide":
             dataset = cp73_wide_info
             dataset  = dataset.reindex(pandas.Series(dataset.index.values, name=dataset.index.name + "_index"))
             title = "cp73 wide"
@@ -597,7 +597,7 @@ def setup_routes():
     
 
     dispatch.connect(name = "cube_info",
-                     route = "/cube_info",
+                     route = "/cube_info/{dataid}",
                      controller = pdc,
                      action = "cube_info")
     
@@ -636,7 +636,7 @@ def start(config=None):
 #    cherrypy.tools.db = SATool.SATool()
 
     cherrypy.server.socket_host = "0.0.0.0"
-    cherrypy.server.socket_port = 9080
+    cherrypy.server.socket_port = pd_locals.web_port 
 
     app = cherrypy.tree.mount(None, config=conf)
     cherrypy.quickstart(app)

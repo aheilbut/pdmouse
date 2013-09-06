@@ -87,6 +87,13 @@ tm = TagMan()
 #    return df
     
     
+def uniqueSym(symbolSeries):
+    symbolSeries = symbolSeries.fillna("-")
+    r = set(symbolSeries)
+    r.discard(np.nan)
+    r.discard("-")
+    return(r)
+    
 
 def fitAIM(probeset, covar_subset, dataset, AIM_dimension="totalAIM"):
     model = "AIM ~ expression"

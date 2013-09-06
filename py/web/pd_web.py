@@ -13,9 +13,11 @@ from sqlalchemy.sql.expression import *
 
 import glob
 import re
+import sha
 
 
 import urllib
+import hashlib
 
 from mako.template import Template
 from mako.lookup import TemplateLookup
@@ -137,7 +139,8 @@ ss_cp73_acuteSaline =  pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] ==
                                                 and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
                                                 and pd_covar.ix[x, "DrugTreat"] == "Acute saline"))
 
-
+motifs = cPickle.load(open("/data/adrian/c_motifs.pickle"))
+toptfs = cPickle.load(open("/data/adrian/c_toptfs.pickle"))
 
 
 tl = TemplateLookup(directories=["templates"],
@@ -372,6 +375,10 @@ class PDC():
         
         return t.render_unicode(pd_covar=pd_covar)
     
+    def trm(self):
+        t = tl.get_template("linked_tables.html")
+        return t.render_unicode()
+    
 
     def table_view(self, queryspec=None):
         """ return the html page with the tableviewer, hooked up to the requested data """
@@ -417,6 +424,39 @@ class PDC():
             "description" : description,
             "total" : len(dataset)
         }
+
+
+
+
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
+    def gzdata(self):
+        try:
+            query = cherrypy.request.json
+        except:
+            print "no query specified"
+            
+        dataset = query["dataset"]
+        selection = query["selection"]        
+        
+        
+        
+        if dataset == "motifs":
+            selectormap = dict([ (hashlib.new('sha1', k).hexdigest(), k) for k in motifs.keys()])
+            key = selectormap[selection]
+            motifdata = motifs[k].drop("motif_occurrences", axis=1)          
+            result = map(lambda x: dict(zip(motifdata.columns, x)), motifdata.to_records(index=False))            
+            
+            return { "success" : True, "data" : result }
+            
+        if dataset == "tfs":
+            selectormap = dict([ (hashlib.new('sha1', k).hexdigest(), k) for k in motifs.keys()])
+            key = selectormap[selection]
+            tfdata = toptfs[k].drop("tf_associations", axis=1)          
+            result = map(lambda x: dict(zip(tfdata.columns, x)), tfdata.to_records(index=False))            
+            
+            return { "success" : True, "data" : result }
+            
             
     
     @cherrypy.tools.json_in()
@@ -560,6 +600,16 @@ def setup_routes():
                      route = "/cube_info",
                      controller = pdc,
                      action = "cube_info")
+    
+    dispatch.connect(name = "gzdata",
+                     route = "/gzdata",
+                     controller = pdc,
+                     action = "gzdata")
+                     
+    dispatch.connect(name = "trm",
+                     route = "/trm",
+                     controller = pdc, 
+                     action = "trm")
     
 
     return dispatch

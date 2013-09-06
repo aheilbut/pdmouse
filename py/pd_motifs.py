@@ -76,7 +76,11 @@ mat_tf = pd.DataFrame(mat_tf)
 
 # <codecell>
 
-mat_tf
+IPython.display.HTML( mat_tf[0:10].to_html() )
+
+# <codecell>
+
+mat_tf.to_csv("/data/adrian/Dropbox/Data/swissregulon/mat_tf_graph.tab", sep="\t")
 
 # <codecell>
 

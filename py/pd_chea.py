@@ -3,265 +3,612 @@
 
 # <codecell>
 
-sys.path.append("/data/adrian/code/projects/broad/")
+reload(gz)
+
+# <codecell>
+
+from IPython.external.mathjax import install_mathjax
+
+# <codecell>
+
+gz.GZConst(1.5).run()
+
+# <codecell>
+
+import pdgz as gz
+
+# <codecell>
+
+import pd_tfmotif_workflow as tf
+
+# <codecell>
+
+reload(gz)
+
+# <codecell>
+
+reload(tf)
+reload(tf.pda)
+
+# <codecell>
+
+import networkx as nx
+
+# <codecell>
+
+getFactorTypes = tf.GetFactorTypes()
+
+# <codecell>
+
+loadWideTable = tf.WideLoad()
+
+# <codecell>
+
+w = gz.GZWorkFlow()
+
+# <codecell>
+
+w.addWorkNode( loadWideTable )
+w.addWorkNode( getFactorTypes )
+
+# <codecell>
+
+w.plug( [ (loadWideTable.o.cp_both_wide_info, getFactorTypes.i.cp_both_wide_info) ] )
+
+# <codecell>
+
+loadWideTable.o.resultdict()
+
+# <codecell>
+
+loadWideTable.o.resultdict()
+
+# <codecell>
+
+for in_port in getFactorTypes.i.listports():
+    print in_port.port_name
+
+# <codecell>
+
+[p.port_name for p in loadWideTable.o.listports()]
+
+# <codecell>
+
+wr = gz.GZWorkRunner(w)
+
+# <codecell>
+
+n = wr.runFlow()
+
+# <codecell>
+
+def portAdaptor(
+
+# <codecell>
+
+reload(gz)
+reload(tf)
+
+# <codecell>
+
+w = gz.GZWorkFlow()
+calcTFTargetCounts = tf.CalcTFTargetCounts()
+calcMotifGeneCounts = tf.CalcMotifGeneCounts()
+loadCheaTable = tf.LoadCheaTable() 
+loadGeneMotifs = tf.LoadGeneMotifs()
+loadMatTFGraph = tf.LoadMatTFGraph()
+wideLoad = tf.WideLoad()
+getFactorTypes = tf.GetFactorTypes() 
+getEnrichedTFs = tf.GetEnrichedTFs() 
+getEnrichedSRMotifs = tf.GetEnrichedSRMotifs() 
+
+addEnrichedTFStats = tf.AddEnrichedTFStats() 
+addEnrichedMotifStats = tf.AddEnrichedMotifStats() 
+getContrastPatterns = tf.GetContrastPatterns() 
+fc_t = gz.GZConst(1.5)
+total_genes = gz.GZConst(22000)
+
+w.addWorkNodes( [calcTFTargetCounts, calcMotifGeneCounts, loadCheaTable, loadGeneMotifs,
+                 loadMatTFGraph, wideLoad, getFactorTypes, getEnrichedTFs, getEnrichedSRMotifs, 
+                 addEnrichedMotifStats, addEnrichedTFStats, getContrastPatterns,
+                 fc_t, total_genes ] ) 
+
+# <codecell>
+
+w.plug( [(loadCheaTable.o.chea, calcTFTargetCounts.i.chea) ] )
+
+w.plug( [(wideLoad.o.cp_both_wide_info, getEnrichedTFs.i.cp_both_wide_info),
+         (loadCheaTable.o.chea, getEnrichedTFs.i.chea) ] )
+
+w.plug( [(wideLoad.o.cp_both_wide_info, getFactorTypes.i.cp_both_wide_info)])
+
+w.plug( [(getFactorTypes.o.factortypes, getEnrichedTFs.i.factortypes),
+         (fc_t.o.value, getEnrichedTFs.i.fc_threshold )] )
+
+w.plug( [(wideLoad.o.cp_both_wide_info, getContrastPatterns.i.cp_both_wide_info),
+         (getFactorTypes.o.factortypes, getContrastPatterns.i.factortypes)] )
+
+w.plug( [(wideLoad.o.cp_both_wide_info, getEnrichedSRMotifs.i.cp_both_wide_info),
+         (loadGeneMotifs.o.mm9_gene_motifs, getEnrichedSRMotifs.i.mm9_gene_motifs),
+         (getFactorTypes.o.factortypes, getEnrichedSRMotifs.i.factortypes),
+         (fc_t.o.value, getEnrichedSRMotifs.i.fc_threshold) ] )
+
+w.plug( [(getEnrichedSRMotifs.o.enriched_motifs, addEnrichedMotifStats.i.top_motifs),
+         (calcMotifGeneCounts.o.mm9_motif_gene_counts, addEnrichedMotifStats.i.mm9_motif_gene_counts),
+         (total_genes.o.value, addEnrichedMotifStats.i.total_genes)] )
+
+w.plug( [(calcTFTargetCounts.o.tf_target_counts, addEnrichedTFStats.i.tf_target_counts),
+         (getEnrichedTFs.o.top_tfs, addEnrichedTFStats.i.top_tfs),
+         (total_genes.o.value, addEnrichedTFStats.i.total_genes)] )
+
+w.plug( [(loadGeneMotifs.o.mm9_gene_motifs, calcMotifGeneCounts.i.mm9_gene_motifs)])
+
+# <codecell>
+
+g = gz.GZWorkRunner(w).worknode_graph()
+
+# <codecell>
+
+c = gz.GZWorkRunner(w).runFlow()
+
+# <codecell>
+
+c.results[("AddEnrichedTFStats",1)]
+
+# <codecell>
+
+c.results.keys()
+
+# <codecell>
+
+c.results[ ('AddEnrichedTFStats', 1)]
+
+# <codecell>
+
+motifs = c.results[ ('AddEnrichedMotifStats', 1)]["enriched_motifs"]
+chea_binding = c.results[ ("AddEnrichedTFStats", 1) ]["tf_enrichment_stats"]
+
+# <codecell>
+
+contrastPatterns = c.results[ ("GetContrastPatterns",1)]["contrastPatterns"]
+
+# <codecell>
+
+mm9_motif_gene_counts = c.results[("CalcMotifGeneCounts",1)]["mm9_motif_gene_counts"]
+
+# <codecell>
+
+tf_target_counts = c.results[("CalcTFTargetCounts",1)]["tf_target_counts"]
+
+# <codecell>
+
+tf_target_counts
+
+# <codecell>
+
+mm9_motif_gene_counts
+
+# <codecell>
+
+motifs[motifs.keys()[0]].merge(mm9_motif_gene_counts, left_index=True, right_index=True)
+
+# <codecell>
+
+import IPython
+
+# <codecell>
+
+k = chea_binding.keys()[0]
+
+# <codecell>
+
+k
+
+# <codecell>
+
+a = motifs[k]
+
+# <codecell>
+
+a.merge(how='outer'
+
+# <codecell>
+
+chea_binding[k]
+
+# <codecell>
+
+corroborated = cur_group.merge( mj, how='outer', left_on="tf_name", right_on="tf_u", suffixes=("_tf", "_motif"))
+
+# <codecell>
+
+corroborated
+
+# <codecell>
+
+for x in corroborated.index:
+    print type(corroborated.ix[x, "tf_associations"]), type(corroborated.ix[x, "motif_occurrences"])    
+
+# <codecell>
+
+f = open("/data/adrian/Dropbox/tf_motif_intersection_sep4.html", "w")
+
+def listformatter(x):
+    return "<div style='max-height: 200px; overflow:auto'>" + x + "</div>"
+
+for k in chea_binding.keys():
+    if chea_binding[k] is not None:
+        cur_group = chea_binding[k].merge(tf_target_counts, left_index=True, right_index=True)
+        mj = (motifs[k].merge(mm9_motif_gene_counts, left_index=True, right_index=True, suffixes=('','_y'))
+              .merge( motif_tf["mat_tf_graph"], left_on="motif_name", right_on="motif_name" ) )
+#              
+#              )
+#        print mj.columns
+        corroborated = cur_group.merge( mj, how='inner', left_on="tf_name", right_on="tf_u", suffixes=("_tf", "_motif"))
+    #    corroborated = cur_group.select( lambda x: cur_group.ix[x, "tf_name"] in set( map(lambda x: x.upper(), list(mj.tf_symbol)) ) )
+        corroborated["overlap_count"] = corroborated.apply( lambda x: len( set( x.ix["tf_associations"].symbol ).intersection( x.ix["motif_occurrences"].symbol )) if type(x.ix["motif_occurrences"]) != float and type(x.ix["tf_associations"]) != float else None, axis=1 )
+        corroborated["overlap_genes"] = corroborated.apply( lambda x: str(sort(list( set( x.ix["tf_associations"].symbol ).intersection( x.ix["motif_occurrences"].symbol )))) if type(x.ix["motif_occurrences"]) != float and type(x.ix["tf_associations"]) != float else None, axis=1 )
+        
+        
+#        print k
+        f.write("<hr>")
+        f.write("<h2>" + k + "</h2>")
+        f.write( (corroborated[["count_tf", "tf_name", "tf_u", "total_genes_in_group_tf", "chea_target_count", "pval_tf", 
+                             "motif_name", "count_motif", "motif_gene_count", "pval_motif", "overlap_count", "overlap_genes"]]
+        .select(lambda x: corroborated.ix[x, "pval_tf"] < 0.20 or corroborated.ix[x, "pval_motif"] < 0.20)
+        .sort_index(by="pval_tf", ascending=True)).to_html(escape=False, formatters={"overlap_genes" : listformatter }) )
+
+# <codecell>
+
+chea_binding[k]
+
+# <codecell>
+
+(cur_group.drop("tf_associations", axis=1)
+    .sort_index(by="pval", ascending=True)
+    .select(lambda x: cur_group.ix[x, "pval"] < 0.10).to_json(orient='records') )
+
+# <codecell>
+
+chea_binding[k].tf_associations[0]
+
+# <codecell>
+
+import hashlib
+
+# <codecell>
+
+[ hashlib.new('sha1', m).hexdigest() for m in motifs[k].motif_name ]
+
+# <codecell>
+
+motifs[k]["divid"] = [ hashlib.new('sha1', m).hexdigest() for m in motifs[k].motif_name ]
+
+# <codecell>
+
+(motifs[k].merge(mm9_motif_gene_counts, left_index=True, right_index=True, suffixes=('','_y'))
+     .select(lambda x: motifs[k].ix[x, "pval"] < 0.20)
+     .sort_index(by="pval", ascending=True)
+     .drop("motif_occurrences", axis=1).to_json(orient='records') )
+
+# <codecell>
+
+mj.drop("motif_occurrences", axis=1).to_json(orient='records')
+
+# <codecell>
+
+corroborated.index
+
+# <codecell>
+
+corroborated["motif_divid"] = [ hashlib.new('sha1', m).hexdigest() for m in corroborated.motif_name ]
+
+# <codecell>
+
+corroborated[["tf_name", "motif_divid"]].to_json(orient="records")
+
+# <codecell>
+
+loadGeneMotifs.run.__func__
+
+# <codecell>
+
+f.close()
+
+# <codecell>
+
+pd.DataFrame.to_html(
+
+# <codecell>
+
 import pandas as pd
-import pd_analysis as pda
-#import alib.plots
-import pandasql
-import cPickle
-import psycopg2
+
+# <codecell>
+
+pd.set_printoptions(max_colwidth=100000)
+
+# <codecell>
+
+tftarg = set( [a.upper() for a in corroborated.tf_associations[43].symbol] )
+motiftarg = set( [a.upper() for a in corroborated.motif_occurrences[43].symbol] )
+
+# <codecell>
+
+#for i in corroborated.index:
+corroborated["overlap_size"] = corroborated.apply( lambda x: len( set( x.ix["tf_associations"].symbol ).intersection( x.ix["motif_occurrences"].symbol )), axis=1 )
+corroborated["overlap_genes"] = corroborated.apply( lambda x: str(list( set( x.ix["tf_associations"].symbol ).intersection( x.ix["motif_occurrences"].symbol ))), axis=1 )
+
+# <codecell>
+
+list( set( x.ix["tf_associations"].symbol ).intersection( x.ix["motif_occurrences"].symbol ))
+
+# <codecell>
+
+sort(["a", "b", "z", "c"])
+
+# <codecell>
+
+corroborated["overlap_genes"]
+
+# <codecell>
+
+corroborated.tf_associations[43][0:10].target
+
+# <codecell>
+
+corroborated.motif_occurrences[43][0:10]
+
+# <codecell>
+
+ tftarg.intersection(motiftarg) 
+
+# <codecell>
+
+IPython.display.HTML( (corroborated[["count_tf", "tf_name", "total_genes_in_group_tf", "pval_tf", 
+                             "motif_name", "count_motif", "pval_motif", "overlap_size"]]
+        .select(lambda x: corroborated.ix[x, "pval_tf"] < 0.20 and corroborated.ix[x, "pval_motif"] < 0.20)
+        .sort_index(by="pval_tf", ascending=True)).to_html() )
+
+# <codecell>
+
+corroborated.columns
+
+# <codecell>
+
+(corroborated[["count_tf", "tf_name", "pval_tf", "motif_name", "pval_motif"]]
+    .select(lambda x: corroborated.ix[x, "pval_tf"] < 0.20 and corroborated.ix[x, "pval_motif"] < 0.20)
+    .sort_index(by="pval_tf", ascending=True))
+
+# <codecell>
+
+
+len( set( chea_binding[motifs.keys()[0]].tf_name).intersection( set( map(lambda x: x.upper(), list(mj.tf_symbol)) ) ))
+
+# <codecell>
+
+w.worknodes["GetEnrichedSRMotifs"][1].inputs
+
+# <codecell>
+
+motif_tf = c.results[ ('LoadMatTFGraph', 1)]
+
+# <codecell>
+
+motif_tf
+
+# <codecell>
+
+mj = motifs[motifs.keys()[0]].merge( motif_tf["mat_tf_graph"], left_on="motif_name", right_on="motif_name" )
+
+# <codecell>
+
+mj[["count", "motif_name", "tf_symbol"]][0:10]
+
+# <codecell>
+
+m = c.results[('LoadGeneMotifs',1)]["mm9_gene_motifs"]
+
+# <codecell>
+
+c.results.keys()
+
+# <codecell>
+
+t = c.results[('LoadCheaTable', 1)]["chea"]
+
+# <codecell>
+
+t
+
+# <codecell>
+
+motifs = c.results[ ('GetEnrichedSRMotifs', 1)]["enriched_motifs"]
+
+# <codecell>
+
+motifs
+
+# <codecell>
+
+
+# <codecell>
+
+t.select(lambda x: t.ix[x, "target"] == "DRD1A")
+
+# <codecell>
+
+
+# <codecell>
+
+
+# <codecell>
+
+m["tf_u"] = m.tf.
+
+# <codecell>
+
+m.select( lambda x: m.ix[x, "genename"] == "Drd1a" )
+    .merge( motif_tf["mat_tf_graph"], left_on="motif_name", right_on="motif_name" )
+
+# <codecell>
+
+motif_tf["mat_tf_graph"]["tf_u"] = [a.upper() for a in motif_tf["mat_tf_graph"].tf_symbol]
+
+# <codecell>
+
+td = t.select(lambda x: t.ix[x, "target"] == "DRD1A")
+
+# <codecell>
+
+td
+
+# <codecell>
+
+(m.select( lambda x: m.ix[x, "genename"] == "Drd1a" )
+ .merge( motif_tf["mat_tf_graph"], left_on="motif_name", right_on="motif_name" ))
+
+# <codecell>
+
+(m.select( lambda x: m.ix[x, "genename"] == "Drd1a" )
+ .merge( motif_tf["mat_tf_graph"], left_on="motif_name", right_on="motif_name" )
+ .merge( td, left_on="tf_u", right_on="tf")
+  )
+
+# <codecell>
+
+motifs[motifs.keys()[0]]
+
+# <codecell>
+
+tf.LoadGeneMotifs( 
+
+# <codecell>
+
+class T():
+    class P():
+        a = 0
+        b = 0
+    ports = P()
+    
+    def __init__(self, **kwargs):
+        print kwargs
+
+# <codecell>
+
+t = T({"a" : "B"})
+
+# <codecell>
+
+for (k, v) in c.results.items():
+    print k, v.keys()
+
+# <codecell>
+
+import networkx as nx
+
+# <codecell>
+
+figsize(13, 13)
+nx.draw_graphviz(g, 'dot')
+
+# <codecell>
+
+nx.topological_sort(g)[0]
+
+# <codecell>
+
+dict( g.nodes(data=True) )[nx.topological_sort(g)[0]]["worknode"].run()
+
+# <codecell>
+
+reload(gz)
+
+# <codecell>
+
+w.wires
+
+# <codecell>
+
+a = LoadGeneMotifs()
+
+# <codecell>
+
 import alib.plots
 
 # <codecell>
 
-
-# <codecell>
-
-class GZWorkNode():
-    pass
-
-class GZWorkFlow():
-    pass
-
-class GZWorkRunner():
-    pass
-
-# <codecell>
+class EnrichmentFlow(GZWorkFlow):
+    """
+    functional view:
+    GetEnrichedTFs( cp_both_wide_info = WideLoad.cp_both_wide_info,
+                    chea = LoadCheaTable.chea,
+                    fc_threshold = 1.5,
+                    factortypes = GetFactorTypes.factortypes
+                    )
 
 
-# <codecell>
 
-conn = psycopg2.connect(database="mousegenome", user="adrian", password="adrian", host="localhost")
-
-# <codecell>
-
-class LoadGeneMotifs(GZWorkNode):
-    inputs = ["conn"]
-    outputs = ["mm9_gene_motifs"]
+    graph view:
     
-    def run(self, conn):
-        result = {}
-        import pandas.io.sql as sql
-        cur = conn.cursor()
-        result["mm9_gene_motifs"] = sql.read_frame("select * from mm9_gene_motifs_distinct where max_motif_score >= 0.7", conn)
-        return result
-
-# <codecell>
-
-class WideLoad(GZWorkNode):
-    inputs = []
-    outputs = ["cp_both_wide_info"]
+    WideLoad.cp_both_wide_info -> GetEnrichedTFs.cp_both_wide_info
+    LoadCheaTable.chea -> GetEnrichedTFs.chea
+    const(1.5) -> GetEnrichedTFs.fc_threshold 
     
+    use WideLoad, LoadCheaTable, GetFactorTypes
     
-    def run():
-        # load amalgamated table of statistics by probeset from pickled pandas file.  This file was generated by the pd_calc_stats notebook or script
-        result["cp_both_wide_info"] = cPickle.load( open("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/2013_july_9/cp_both_wide_info.pandas.pickle") )
-        return result
-    
+    connect(WideLoad.cp_both_wide_info, GetEnrichedTFs.cp_both_wide_info)
+    connect(LoadCheaTable.chea, GetEnrichedTFs.chea)
+    connect(WideLoad.cp_both_wide_info, GetFactorTypes.cp_both_wide_info)
+    connect(GetFactorTypes.factortypes, GetEnrichedTFs.factortypes)
+    connect(Constant(1.5), GetEnrichedTFs.fc_threshold)
+
+  """
 
 # <codecell>
 
-class GetFactorTypes(GZWorkNode):
-    inputs = ["cp_both_wide_info"]
-    outputs = ["factortypes"]
-
-    def run(cp_both_wide_info):
-        factortypes = {}
-        for c in cp_both_wide_info.drop(["probe_id", "symbol", "gene_name"], axis=1).columns:
-            for (k, v) in dict(pda.tm.d(c)).items():
-                if isinstance(k, list):
-                    k = tuple(k)
-                if isinstance(v, list):
-                    v = tuple(v)
-                if factortypes.has_key(k):
-                    factortypes[k].add(v)
-                else:
-                    factortypes[k] = set([v])
-
-# <codecell>
-
-def getContrasts(x):
-    res = {}
-#    print x
-    for fc_threshold in [1.5]:
-        for comparison in factortypes["cmp"]:
-            for celltype in factortypes["ct"]:
-                #print comparison
-                test_query = test_info + [ ["cmp", list(comparison)] ] + [ ["ct", celltype] ]
-                fc_query = fc_info + [ ["cmp", list(comparison)] ] + [ ["ct", celltype] ]
-                #td = dict(tm.d(c))
-                if pda.tm.e(test_query) in set(cp_both_wide_info.columns):
-#                    print pda.tm.e(test_query), pda.tm.e(fc_query)
-                    res[pda.tm.e(fc_query)] = int((x[ pda.tm.e(test_query) ] < 0.10)) * x[ pda.tm.e(fc_query) ] * int(abs(x[pda.tm.e(fc_query)]) > log2(fc_threshold))
-    return pd.Series(res)
-#                current_group = cp_both_wide_info.select(
-#                        lambda x: cp_both_wide_info.ix[x, pda.tm.e(test_query) ] < 0.10
-#                              and abs(cp_both_wide_info.ix[x, pda.tm.e(fc_query) ]) >= log2(fc_threshold)
-#                                and isinstance(cp_both_wide_info.ix[x, "symbol" ], str) )[["probe_id", "symbol",pda.tm.e(test_query), pda.tm.e(fc_query)]] 
-
-# <codecell>
-
-patternGroups = sign( activePatterns ).groupby( list(activePatterns.columns), axis=0 )
+activePatterns = c.results[("GetContrastPatterns",1)]["activePatterns"]
+patternGroups = c.results[("GetContrastPatterns",1)]["patternGroups"]
 
 # <codecell>
 
 alib.plots.clusterHeatmap( pd.DataFrame( patternGroups.groups.keys(), columns=activePatterns.columns), 
                           "", None, None, width=6, height=15,
-                          cluster_rows= True, cluster_columns=True, distmethod='correlation')
+                          cluster_rows= True, cluster_columns=True, distmethod='jaccard')
 
 # <codecell>
 
-contrastPatterns = cp_both_wide_info.apply( getContrasts, axis=1 )
-
-# <codecell>
-
-activePatterns = contrastPatterns.select( lambda x: contrastPatterns.ix[x, :].abs().sum() > 0 ) 
-
-# <codecell>
-
-figsize(10, 40)
-alib.plots.clusterHeatmap(activePatterns[0:300], "", None, None, height=150, width=8,
+figsize(10, 15)
+alib.plots.clusterHeatmap(activePatterns, "", None, None, height=15, width=8,
                           cluster_rows=True, cluster_columns=True,
                           distmethod='euclidean')
 
 # <codecell>
 
-getContrasts(cp_both_wide_info.ix[cp_both_wide_info.index[3], :])
+reload(alib.plots)
 
 # <codecell>
 
-test_info = [["mc", "bh"], ["st", "pval"], ["tt", "welch ttest"]]
-fc_info = [["st", "fc_medians"]]
+import fastcluster
 
 # <codecell>
 
-test_info = [["mc", "bh"], ["st", "pval"], ["tt", "welch ttest"]]
-fc_info = [["st", "fc_medians"]]
-fc_threshold = log2(1.5)
-
-summary = {}
-top_tfs = {}
-
-for fc_threshold in [1.5]:
-    for comparison in factortypes["cmp"]:
-        for celltype in factortypes["ct"]:
-            #print comparison
-            test_query = test_info + [ ["cmp", list(comparison)] ] + [ ["ct", celltype] ]
-            fc_query = fc_info + [ ["cmp", list(comparison)] ] + [ ["ct", celltype] ]
-            #td = dict(tm.d(c))
-            if pda.tm.e(test_query) in set(cp_both_wide_info.columns):
-                print pda.tm.e(test_query)
-                current_group = cp_both_wide_info.select(
-                        lambda x: cp_both_wide_info.ix[x, pda.tm.e(test_query) ] < 0.10
-                              and abs(cp_both_wide_info.ix[x, pda.tm.e(fc_query) ]) >= log2(fc_threshold)
-                                and isinstance(cp_both_wide_info.ix[x, "symbol" ], str) )[["probe_id", "symbol",pda.tm.e(test_query), pda.tm.e(fc_query)]] 
-                k = pda.tm.e([ ["cmp", list(comparison)] ] 
-                                 + [ ["ct", celltype] ]
-                                 + [ ["dir", "any"]])
-                try:
-                    top_tfs[k] = getTFMatches( current_group, 1)
-                except:
-                    top_tfs[k] = None
-                
-                
-                current_group = cp_both_wide_info.select(
-                        lambda x: cp_both_wide_info.ix[x, pda.tm.e(test_query) ] < 0.10
-                              and cp_both_wide_info.ix[x, pda.tm.e(fc_query) ] >= log2(fc_threshold)
-                                and isinstance(cp_both_wide_info.ix[x, "symbol" ], str) )[["probe_id", "symbol",pda.tm.e(test_query), pda.tm.e(fc_query)]]  
-                k = pda.tm.e([ ["cmp", list(comparison)] ] 
-                                 + [ ["ct", celltype] ]
-                                 + [ ["dir", "up"]])                
-                
-                try:
-                    top_tfs[ k ] = getTFMatches( current_group, 1)
-                except:
-                    top_tfs[ k ] = None
-
-                    
-                current_group = cp_both_wide_info.select(
-                        lambda x: cp_both_wide_info.ix[x, pda.tm.e(test_query) ] < 0.10
-                              and cp_both_wide_info.ix[x, pda.tm.e(fc_query) ] <= -log2(fc_threshold)
-                                and isinstance(cp_both_wide_info.ix[x, "symbol" ], str) )[["probe_id", "symbol",pda.tm.e(test_query), pda.tm.e(fc_query)]] 
-                k = pda.tm.e([ ["cmp", list(comparison)] ] 
-                                 + [ ["ct", celltype] ]
-                                 + [ ["dir", "down"]])                
-                try:
-                    top_tfs[ k ] = getTFMatches( current_group, 1)
-                except:
-                    top_tfs[ k ] = None
-                    
-                
-#                summary[ (celltype, comparison, fc_threshold, "changed") ] = len(uniqueSym( cp_both_wide_info.select(
-#                        lambda x: cp_both_wide_info.ix[x, tm.e(test_query) ] < 0.10
-#                              and abs(cp_both_wide_info.ix[x, tm.e(fc_query) ]) >= log2(fc_threshold)
-#                                and isinstance(cp_both_wide_info.ix[x, "symbol" ], str) ).symbol ))
-#                summary[ (celltype, comparison, fc_threshold, "up") ] = len(uniqueSym( cp_both_wide_info.select(
-#                        lambda x: cp_both_wide_info.ix[x, tm.e(test_query) ] < 0.10
-#                              and cp_both_wide_info.ix[x, tm.e(fc_query) ] >= log2(fc_threshold)
-#                                and isinstance(cp_both_wide_info.ix[x, "symbol" ], str) ).symbol ))
-#                summary[ (celltype, comparison, fc_threshold, "down") ] = len(uniqueSym( cp_both_wide_info.select(
-#                        lambda x: cp_both_wide_info.ix[x, tm.e(test_query) ] < 0.10
-#                              and cp_both_wide_info.ix[x, tm.e(fc_query) ] <= -log2(fc_threshold)
-#                                and isinstance(cp_both_wide_info.ix[x, "symbol" ], str) ).symbol ))
-            else:
-                print "--"
+import scipy
 
 # <codecell>
 
-test_info = [["mc", "bh"], ["st", "pval"], ["tt", "welch ttest"]]
-fc_info = [["st", "fc_medians"]]
-fc_threshold = log2(1.5)
+distances = scipy.cluster.hierarchy.distance.pdist(activePatterns.values[0:5000], "correlation") 
 
-summary = {}
-top_motifs = {}
+# <codecell>
 
-for fc_threshold in [1.5]:
-    for comparison in factortypes["cmp"]:
-        for celltype in factortypes["ct"]:
-            #print comparison
-            test_query = test_info + [ ["cmp", list(comparison)] ] + [ ["ct", celltype] ]
-            fc_query = fc_info + [ ["cmp", list(comparison)] ] + [ ["ct", celltype] ]
-            #td = dict(tm.d(c))
-            if pda.tm.e(test_query) in set(cp_both_wide_info.columns):
-                print pda.tm.e(test_query)
-                current_group = cp_both_wide_info.select(
-                        lambda x: cp_both_wide_info.ix[x, pda.tm.e(test_query) ] < 0.10
-                              and abs(cp_both_wide_info.ix[x, pda.tm.e(fc_query) ]) >= log2(fc_threshold)
-                                and isinstance(cp_both_wide_info.ix[x, "symbol" ], str) )[["probe_id", "symbol",pda.tm.e(test_query), pda.tm.e(fc_query)]]
-                k = pda.tm.e([ ["cmp", list(comparison)] ] 
-                                 + [ ["ct", celltype] ]
-                                 + [ ["dir", "any"]])
-                try:
-                    top_motifs[k] = getMotifMatches( current_group, 1)
-                except:
-                    top_motifs[k] = None
-                
-                
-                current_group = cp_both_wide_info.select(
-                        lambda x: cp_both_wide_info.ix[x, pda.tm.e(test_query) ] < 0.10
-                              and cp_both_wide_info.ix[x, pda.tm.e(fc_query) ] >= log2(fc_threshold)
-                                and isinstance(cp_both_wide_info.ix[x, "symbol" ], str) )[["probe_id", "symbol",pda.tm.e(test_query), pda.tm.e(fc_query)]]  
-                k = pda.tm.e([ ["cmp", list(comparison)] ] 
-                                 + [ ["ct", celltype] ]
-                                 + [ ["dir", "up"]])                
-                
-                try:
-                    top_motifs[ k ] = getMotifMatches( current_group, 1)
-                except:
-                    top_motifs[ k ] = None
+rowY = fastcluster.linkage( distances )
 
-                    
-                current_group = cp_both_wide_info.select(
-                        lambda x: cp_both_wide_info.ix[x, pda.tm.e(test_query) ] < 0.10
-                              and cp_both_wide_info.ix[x, pda.tm.e(fc_query) ] <= -log2(fc_threshold)
-                                and isinstance(cp_both_wide_info.ix[x, "symbol" ], str) )[["probe_id", "symbol",pda.tm.e(test_query), pda.tm.e(fc_query)]]  
-                k = pda.tm.e([ ["cmp", list(comparison)] ] 
-                                 + [ ["ct", celltype] ]
-                                 + [ ["dir", "down"]])                
-                try:
-                    top_motifs[ k ] = getMotifMatches( current_group, 1)
-                except:
-                    top_motifs[ k ] = None
+# <codecell>
+
+rowZ = scipy.cluster.hierarchy.dendrogram(rowY, orientation='right', no_plot=True)
+
+# <codecell>
+
+activePatterns
                     
 
 # <codecell>
@@ -319,15 +666,6 @@ top_tfs.items()[0]
 
 # <codecell>
 
-for k in top_tfs.keys():
-    if top_tfs[k] is not None:
-        top_tfs[k]["pval"] = top_tfs[k].merge(tf_target_counts, left_on="tf_name", right_index=True).apply( lambda x: (
-         scipy.stats.hypergeom.sf(
-              x.ix["count"]-1, # number of differentially expressed genes in set
-              total_genes,           # total number of genes
-              x.ix["chea_target_count"],   # number of genes in current set
-              x.ix["total_genes_in_group"])),     # total number of genes in test set
-            axis=1 )
 
 # <codecell>
 
@@ -336,15 +674,6 @@ total_genes = 22000
 
 # <codecell>
 
-for k in top_motifs.keys():
-    if top_motifs[k] is not None and len(top_motifs[k].index) > 0:
-        top_motifs[k]["pval"] = top_motifs[k].merge(mm9_motif_gene_counts, left_on="motif_name", right_index=True).apply( lambda x: (
-         scipy.stats.hypergeom.sf(
-              x.ix["count"]-1, # number of differentially expressed genes in set
-              total_genes,           # total number of genes
-              x.ix["motif_gene_count"],   # number of genes in current set
-              x.ix["total_genes_in_group"])),     # total number of genes in test set
-            axis=1 )
 
 # <codecell>
 
@@ -369,6 +698,10 @@ out_path = "/data/adrian/Dropbox/ptables"
 # <codecell>
 
 pd.set_printoptions(max_colwidth=10000)
+
+# <codecell>
+
+top_tfs = chea_binding
 
 # <codecell>
 
@@ -399,7 +732,36 @@ for k in top_tfs.keys():
 
 # <codecell>
 
-top_tfs.keys()
+(top_tfs[k].sort_index(by="pval", ascending=True)
+    .merge(tf_target_counts, left_on="tf_name", right_index=True).drop("tf_associations", axis=1).to_json(orient='records'))
+
+# <codecell>
+
+top_motifs[k]
+
+# <codecell>
+
+m = motifs[k].drop("motif_occurrences",axis=1)
+
+# <codecell>
+
+m.to_dict(
+
+# <codecell>
+
+map(lambda x: dict(zip(motifs[k].columns, x)), motifs[k].drop("motif_occurrences",axis=1)[0:10].to_records(index=False))
+
+# <codecell>
+
+intop_tfs[k]
+
+# <codecell>
+
+top_motifs = motifs
+
+# <codecell>
+
+top_motifs[k].drop("motif_occurrences", axis=1).to_json(orient='records')
 
 # <codecell>
 
@@ -541,12 +903,6 @@ imshow( g.get_group(656).as_matrix(), interpolation="nearest", cmap=get_cmap("gr
 
 # <codecell>
 
-def uniqueSym(symbolSeries):
-    symbolSeries = symbolSeries.fillna("-")
-    r = set(symbolSeries)
-    r.discard(nan)
-    r.discard("-")
-    return(r)
 
 # <codecell>
 
@@ -555,13 +911,9 @@ tfs = cz.tf.unique()
 
 # <codecell>
 
-chea = pd.read_table("/data/adrian/Dropbox/Data/chea/chea-background.csv", header=None, 
-                     names=["chea_id", "tf", "tf_pmid", "target", 
-                            "pmid", "exp_type", "cell_type", "organism", "date"], sep=",")
 
 # <codecell>
 
-chea = chea.astype('unicode')
 
 # <codecell>
 
@@ -664,76 +1016,10 @@ def countMotifCombos( genegroup, combination_size ):
 
 # <codecell>
 
-def getTFMatches( genegroup, combination_size=1):
-    genegroup["upper_sym"] = [a.upper() if isinstance(a, str) else "-" for a in genegroup.symbol ]
-    cz = chea.merge( genegroup, left_on="target", right_on="upper_sym")
-    
-    total_genes_in_group = len( uniqueSym(genegroup.symbol) )
-    
-    print(len(cz.index))
-    result = []
-    for k, z in cz.groupby("tf"):
-        result.append( { "tf_name" : k,
-                         "count" : len(uniqueSym(z.symbol)),
-                         "total_genes_in_group" : total_genes_in_group,
-                         "tf_associations" : z
-                         })
-    result = pd.DataFrame(result)
-    result.index = result.tf_name
-    return result
 
 # <codecell>
 
-def getMotifMatches( genegroup, combination_size ):
-    cz= mm9_gene_motifs.merge(genegroup, left_on="genename", right_on="symbol") 
-    
-    total_genes_in_group = len( uniqueSym(genegroup.symbol) )
-    
-    print(len(cz.index))
-    
-    result = []
-    for k, z in cz.groupby("motif_name"):
-        result.append( { "motif_name"  : k,
-                         "count" : len(uniqueSym(z.symbol)),
-                         "total_genes_in_group" : total_genes_in_group,
-                         "motif_occurrences": z
-                        }  )
-        
-    result = pd.DataFrame(result)
-    result.index = result.motif_name
-    return result
 
-# <codecell>
-
-r = getTFMatches( cp73_chronicHigh_up, 1)
-
-# <codecell>
-
-r.ix["AHR","tf_associations"]
-
-# <codecell>
-
-r.index = r.motif_name
-
-# <codecell>
-
-pd.options.display.max_columns=100
-
-# <codecell>
-
-r.ix["bHLH_family.p2","motif_occurrences"].
-
-# <codecell>
-
-r.ix[row, "total_genes_in_group"]
-
-# <codecell>
-
-r = top_motifs[k]
-
-# <codecell>
-
-r.sort_index(by="pval", ascending=True).index
 
 # <codecell>
 
@@ -765,68 +1051,7 @@ r.ix[1, "motif_occurrences"].sort_index(by=r.ix[1, "motif_occurrences"].columns[
 
 # <codecell>
 
-help( pd.options.display.chop_threshold )
-
-# <codecell>
-
-r.ix[1, "motif_occurrences"][0:5]
-
-# <codecell>
-
-r.ix[1, "motif_occurrences"][0:5]
-
-# <codecell>
-
-IPython.display.HTML( c.sort_index(by=c.columns[8], ascending=False).to_html() )
-
-# <codecell>
-
-for k, g in cz.groupby("tf"):
-    print k, len(g.target.unique())
-
-# <codecell>
-
-cz.groupby("motif_name")
-
-# <codecell>
-
-countMotifCombos( cp73_chronicHigh_up, 1)[0:20]
-
-# <codecell>
-
-test = countTFcombos( cp73_chronicHigh_up, 1)
-
-# <codecell>
-
-test = pd.DataFrame( countTFcombos( cp73_chronicHigh_up, 1).items(), columns=["tf", "count"]).sort_index(by="count", ascending=False) 
-
-# <codecell>
-
-test[0:10].merge(tf_target_counts, left_on="tf", right_index=True)[0:10]
-
-# <codecell>
-
 test.merge(tf_target_counts, left_on="tf", right_index=True)[0:10]
-
-# <codecell>
-
-len(z)
-
-# <codecell>
-
-tf_target_counts = []
-for (k, g) in chea.groupby("tf"):
-    tf_target_counts.append( { "tf" : k, "chea_target_count" : len( uniqueSym( g.target )) } )
-tf_target_counts = pd.DataFrame.from_dict(tf_target_counts)
-tf_target_counts.index = tf_target_counts.tf
-
-# <codecell>
-
-mm9_motif_gene_counts = []
-for (k, g) in mm9_gene_motifs.groupby("motif_name"):
-    mm9_motif_gene_counts.append( { "motif_name" : k, "motif_gene_count" : len(g.genename.unique()) } )
-mm9_motif_gene_counts = pd.DataFrame.from_dict( mm9_motif_gene_counts )
-mm9_motif_gene_counts.index = mm9_motif_gene_counts.motif_name
 
 # <codecell>
 
@@ -904,4 +1129,125 @@ alib.plots.clusterHeatmap( czm_df, "", None, None,
                             cluster_columns=True, 
                             cluster_rows=True, 
                             distmethod='jaccard')
+
+# <codecell>
+
+import pandas as pd
+
+# <codecell>
+
+tfppi = pd.DataFrame.from_csv("/data/adrian/Dropbox/Data/mouse-2hybrid/mouse2hybid-table3.tab", sep="\t") 
+
+# <codecell>
+
+tfppi
+
+# <codecell>
+
+top_tfs[k].tf_name
+
+# <codecell>
+
+tfppi[ ["geneid1symbol", "geneid2symbol"] ]
+
+# <codecell>
+
+tfppi["tf1"] = tfppi["geneid1symbol"].apply(lambda x: x.upper())
+
+# <codecell>
+
+tfppi["tf2"] = tfppi["geneid2symbol"].apply(lambda x: x.upper())
+
+# <codecell>
+
+tfppi[["tf1", "tf2"]].select( lambda x: tfppi.ix[x, "tf1"] in set( top_tfs[k].tf_name ) and tfppi.ix[x, "tf2"] in set( top_tfs[k].tf_name )  ).to_json(orient='records')
+
+# <codecell>
+
+set( top_tfs[k].tf_name )
+
+# <codecell>
+
+len( top_tfs[k].index )
+
+# <codecell>
+
+tfc = zeros( (202, 202) )
+
+# <codecell>
+
+invindex = dict( [ (a[1], a[0]) for a in enumerate( top_tfs[k].index )] ) 
+
+# <codecell>
+
+for i in tfppi.index:
+    ppi = tfppi.ix[i, :]
+    try:
+        tfc[invindex[ppi["tf1"]], invindex[ppi["tf2"]] ] = 1
+        tfc[invindex[ppi["tf2"]], invindex[ppi["tf2"]] ] = 1
+    except:
+        pass
+
+# <codecell>
+
+import scipy.cluster
+
+# <codecell>
+
+distances = scipy.cluster.hierarchy.distance.pdist(tfc + 0.001, "jaccard") 
+
+# <codecell>
+
+rowY = fastcluster.linkage( distances )
+
+# <codecell>
+
+rowZ = scipy.cluster.hierarchy.dendrogram(rowY, orientation='right', no_plot=False)
+
+# <codecell>
+
+rowZ['leaves']
+
+# <codecell>
+
+top_tfs[k].ix[ top_tfs[k].index[ rowZ['leaves'] ], : ].drop("tf_associations", axis=1).to_json(orient='records')
+
+# <codecell>
+
+tf_target_counts.merge( loadCheaTable.o.chea.val, left_on="tf", right_on="target")[0:10]
+
+# <codecell>
+
+loadCheaTable.o.chea.val.tf.unique()
+
+# <codecell>
+
+tf_target_counts
+
+# <codecell>
+
+import cPickle
+
+# <codecell>
+
+cPickle.dump( motifs, open("/data/adrian/c_motifs.pickle","w"), protocol=2)
+
+# <codecell>
+
+tf
+
+# <codecell>
+
+cPickle.dump( top_tfs, open("/data/adrian/c_toptfs.pickle","w"), protocol=2)
+
+# <codecell>
+
+cPickle.dump( mm9_motif_gene_counts, open("/data/adrian/c_mm9_motif_gene_counts.pickle", "w"), protocol=2)
+
+# <codecell>
+
+cPickle.dump( tf_target_counts, open("/data/adrian/c_tf_target_counts", "w"), protocol=2)
+
+# <codecell>
+
 

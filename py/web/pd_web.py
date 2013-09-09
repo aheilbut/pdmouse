@@ -14,7 +14,7 @@ from sqlalchemy.sql.expression import *
 import glob
 import re
 import sha
-
+import sys
 
 import urllib
 import hashlib
@@ -139,9 +139,10 @@ ss_cp73_acuteSaline =  pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] ==
                                                 and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
                                                 and pd_covar.ix[x, "DrugTreat"] == "Acute saline"))
 
-motifs = cPickle.load(open("/data/adrian/c_motifs.pickle"))
-toptfs = cPickle.load(open("/data/adrian/c_toptfs.pickle"))
-
+motifs = cPickle.load(open(pd_locals.datadir + "/2013_sep_8/c_motifs.pickle"))
+toptfs = cPickle.load(open(pd_locals.datadir + "/2013_sep_8/c_toptfs.pickle"))
+motif_tf_graph = cPickle.load(open(pd_locals.datadir + "/2013_sep_8/c_motif_tf_graph.pickle"))
+tf_tf_graph = cPickle.load(open(pd_locals.datadir + "/2013_sep_8/c_tf_tf.pickle"))
 
 tl = TemplateLookup(directories=["templates"],
                     module_directory="tmp/mako_mod",
@@ -433,31 +434,118 @@ class PDC():
     def gzdata(self):
         try:
             query = cherrypy.request.json
+            dataset = query["dataset"]
+            print query
         except:
+            print sys.exc_info()
             print "no query specified"
-            
-        dataset = query["dataset"]
-        selection = query["selection"]        
-        
-        
-        
+                    
         if dataset == "motifs":
+            selection = query["selection"]        
+     
             selectormap = dict([ (hashlib.new('sha1', k).hexdigest(), k) for k in motifs.keys()])
             key = selectormap[selection]
-            motifdata = motifs[k].drop("motif_occurrences", axis=1)          
+            motifdata = motifs[key].drop("motif_occurrences", axis=1).sort_index(by="pval")
+            motifdata = motifdata.select(lambda x: motifdata.ix[x, "pval"] < 0.20)
+            motifdata["divid"] = [ hashlib.new("sha1", m).hexdigest() for m in motifdata.motif_name ]
             result = map(lambda x: dict(zip(motifdata.columns, x)), motifdata.to_records(index=False))            
+            columns = list( map(str, motifdata.columns))
+            columns.remove("divid") 
             
-            return { "success" : True, "data" : result }
+            return { "success" : True, "data" : result, "columns" : columns, "idcol" : "divid"  }
             
         if dataset == "tfs":
+            dataset = query["dataset"]
+            selection = query["selection"]        
+     
             selectormap = dict([ (hashlib.new('sha1', k).hexdigest(), k) for k in motifs.keys()])
             key = selectormap[selection]
-            tfdata = toptfs[k].drop("tf_associations", axis=1)          
+            tfdata = toptfs[key].drop("tf_associations", axis=1).sort_index(by="pval")
+            tfdata = tfdata.select(lambda x: tfdata.ix[x, "pval"] < 0.20)
             result = map(lambda x: dict(zip(tfdata.columns, x)), tfdata.to_records(index=False))            
+
+            columns = map(str, tfdata.columns)            
             
-            return { "success" : True, "data" : result }
+            return { "success" : True, "data" : result, "columns" : columns, "idcol" : "tf_name"  }
             
             
+        if dataset == "tf_motif_associations":
+            dataset = query["dataset"]
+            selection = query["selection"]             
+
+            selectormap = dict([ (hashlib.new('sha1', k).hexdigest(), k) for k in motifs.keys()])
+            key = selectormap[selection]
+            motif_tf_graph["tf_u"] = [a.upper() for a in motif_tf_graph.tf_symbol];
+    
+            tfdata = toptfs[key]
+            tfdata = tfdata.select(lambda x: tfdata.ix[x, "pval"] < 0.20)
+            
+            mj = motifs[key].merge( motif_tf_graph, left_on="motif_name", right_on="motif_name")
+            mj["divid"] = [ hashlib.new("sha1", m).hexdigest() for m in mj.motif_name ]
+            mj = mj.select(lambda x: mj.ix[x, "pval"] < 0.20)            
+            
+            
+            corroborated = tfdata.merge( mj, left_on="tf_name", right_on="tf_u", suffixes=("_tf", "_motif"))
+            
+            
+            result = corroborated[["tf_name", "divid"]]
+            result.columns = ["source_id", "target_id"]
+            result = map(lambda x: dict(zip(result.columns, x)), result.to_records(index=False))
+            return { "success" : True, 
+                    "connections" : result, 
+                    "connector_class" : "connected_across",
+                    "connector_color" : "rgba(243,140,18,0.5)", 
+                    "connector_locations" : ["Right", "Left"] } 
+
+
+        if dataset == "tf_tf_physical":
+            dataset = query["dataset"]
+            selection = query["selection"]        
+         
+            result = map(lambda x: dict(zip(tf_tf_graph.columns, x)), tf_tf_graph.to_records(index=False))
+            return { "success" : True, 
+                     "connections" : result,
+                     "connector_class" : "connected_same",
+                     "connector_color" : "rgba(243, 40, 18, 0.5)",
+                     "connector_locations" : ["Left", "Left"]                    
+                    }            
+            
+            
+        if dataset == "tf_targets":
+            selectormap = dict([ (hashlib.new('sha1', k).hexdigest(), k) for k in motifs.keys()])
+            key = selectormap[query["group"]]
+
+            tfdata = toptfs[key]
+            targets = tfdata.ix[query["tf"], "tf_associations"]
+
+            
+            result = map(lambda x: dict(zip(targets.columns, x)), targets.to_records(index=False))
+            
+            return { "success" : True,
+                    "data" : result, 
+                    "columns" : map(str, targets.columns),
+                    "idcol" : "chea_id" 
+                    }
+            
+        if dataset == "motif_targets":
+            selectormap = dict([ (hashlib.new('sha1', k).hexdigest(), k) for k in motifs.keys()])
+            key = selectormap[query["group"]]
+            motif_key = query["motif_key"]
+
+            motifdata = motifs[key].sort_index(by="pval")
+            motifdata["divid"] = [ hashlib.new("sha1", m).hexdigest() for m in motifdata.motif_name ]
+            motif_occurrences = motifdata.select(lambda x: motifdata.ix[x, "divid"] == motif_key)["motif_occurrences"][0]
+ #           motif_occurrences["id"] = [ hashlib.new("sha1", m).hexdigest() for m in motif_occurrences.index ]
+            
+            result = map(lambda x: dict(zip(motif_occurrences.columns, x)), motif_occurrences.to_records(index=False))            
+            
+            return {
+                "success" : True,
+                "data" : result,
+                "columns" : map(str, motif_occurrences.columns),
+                "idcol" : "id"
+            }
+    
     
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()

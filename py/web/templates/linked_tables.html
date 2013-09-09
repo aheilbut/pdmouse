@@ -1,4 +1,7 @@
-<html>
+## -*- coding: utf-8 -*-
+<%inherit file="base.html"/>
+
+
 
 <style>
 
@@ -11,7 +14,7 @@
  }
  
  .connected_across {
-  background: lightblue
+  background: orange
  }
  
  table {
@@ -20,40 +23,56 @@
  
  td {
     border-bottom: 1px solid grey;
+	hanging-punctuation: none;
+	white-space: nowrap;
+ }
+
+ th {
+    border-bottom: 1px solid grey;
  }
  
- 
+
+ body {
+	width: 100%;
+ }
 </style>
 
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../static/jsPlumb/js/jquery.jsPlumb-1.4.0-all-min.js"></script>
-<script type="text/javascript" src="../static/js/tablednd.js"></script>
 
-<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-
-
-<script type='text/javascript'>
-
-
-top_tfs = [{"count":657,"tf_name":"KDM5B","total_genes_in_group":2668,"pval":1.624494131e-27,"chea_target_count":3724,"tf":"KDM5B"},{"count":902,"tf_name":"CREM","total_genes_in_group":2668,"pval":1.442908566e-20,"chea_target_count":5776,"tf":"CREM"},{"count":571,"tf_name":"SMARCA4","total_genes_in_group":2668,"pval":2.663991101e-16,"chea_target_count":3481,"tf":"SMARCA4"},{"count":491,"tf_name":"FOXA2","total_genes_in_group":2668,"pval":0.0,"chea_target_count":2968,"tf":"FOXA2"},{"count":360,"tf_name":"OLIG2","total_genes_in_group":2668,"pval":0.0,"chea_target_count":2040,"tf":"OLIG2"},{"count":395,"tf_name":"TEAD4","total_genes_in_group":2668,"pval":0.0,"chea_target_count":2293,"tf":"TEAD4"},{"count":440,"tf_name":"FOXO3","total_genes_in_group":2668,"pval":0.0,"chea_target_count":2630,"tf":"FOXO3"},{"count":825,"tf_name":"MITF","total_genes_in_group":2668,"pval":0.0,"chea_target_count":5578,"tf":"MITF"},{"count":361,"tf_name":"DMRT1","total_genes_in_group":2668,"pval":0.0,"chea_target_count":2144,"tf":"DMRT1"},{"count":112,"tf_name":"CEBPD","total_genes_in_group":2668,"pval":0.0000000001,"chea_target_count":504,"tf":"CEBPD"},{"count":381,"tf_name":"YAP1","total_genes_in_group":2668,"pval":0.0000000001,"chea_target_count":2329,"tf":"YAP1"},{"count":198,"tf_name":"PAX3-FKHR","total_genes_in_group":2668,"pval":0.0000000002,"chea_target_count":1063,"tf":"PAX3-FKHR"},{"count":954,"tf_name":"HNF4A","total_genes_in_group":2668,"pval":0.0000000011,"chea_target_count":6749,"tf":"HNF4A"},{"count":506,"tf_name":"ASH2L","total_genes_in_group":2668,"pval":0.0000000074,"chea_target_count":3336,"tf":"ASH2L"},{"count":608,"tf_name":"TCF4","total_genes_in_group":2668,"pval":0.0000000224,"chea_target_count":4138,"tf":"TCF4"},{"count":188,"tf_name":"NRF2","total_genes_in_group":2668,"pval":0.0000000236,"chea_target_count":1055,"tf":"NRF2"},{"count":207,"tf_name":"TFAP2C","total_genes_in_group":2668,"pval":0.0000000752,"chea_target_count":1203,"tf":"TFAP2C"},{"count":300,"tf_name":"GFI1B","total_genes_in_group":2668,"pval":0.0000001076,"chea_target_count":1871,"tf":"GFI1B"},{"count":621,"tf_name":"SIN3B","total_genes_in_group":2668,"pval":0.0000002199,"chea_target_count":4302,"tf":"SIN3B"},{"count":162,"tf_name":"MYB","total_genes_in_group":2668,"pval":0.0000006005,"chea_target_count":923,"tf":"MYB"},{"count":247,"tf_name":"TCF7","total_genes_in_group":2668,"pval":0.0000008841,"chea_target_count":1529,"tf":"TCF7"},{"count":361,"tf_name":"SFPI1","total_genes_in_group":2668,"pval":0.0000010547,"chea_target_count":2369,"tf":"SFPI1"},{"count":246,"tf_name":"NFE2L2","total_genes_in_group":2668,"pval":0.0000015729,"chea_target_count":1533,"tf":"NFE2L2"},{"count":174,"tf_name":"PRDM5","total_genes_in_group":2668,"pval":0.0000025944,"chea_target_count":1029,"tf":"PRDM5"},{"count":474,"tf_name":"ZFX","total_genes_in_group":2668,"pval":0.0000029419,"chea_target_count":3249,"tf":"ZFX"},{"count":467,"tf_name":"ERG","total_genes_in_group":2668,"pval":0.0000059185,"chea_target_count":3216,"tf":"ERG"},{"count":80,"tf_name":"CLOCK","total_genes_in_group":2668,"pval":0.000007819,"chea_target_count":407,"tf":"CLOCK"},{"count":435,"tf_name":"MTF2","total_genes_in_group":2668,"pval":0.0000081308,"chea_target_count":2981,"tf":"MTF2"},{"count":190,"tf_name":"SIN3A","total_genes_in_group":2668,"pval":0.000028107,"chea_target_count":1186,"tf":"SIN3A"},{"count":685,"tf_name":"PPARG","total_genes_in_group":2668,"pval":0.0000385579,"chea_target_count":4976,"tf":"PPARG"},{"count":275,"tf_name":"WT1","total_genes_in_group":2668,"pval":0.0000386942,"chea_target_count":1817,"tf":"WT1"},{"count":140,"tf_name":"CHD1","total_genes_in_group":2668,"pval":0.0000598647,"chea_target_count":843,"tf":"CHD1"},{"count":691,"tf_name":"SUZ12","total_genes_in_group":2668,"pval":0.0000615873,"chea_target_count":5042,"tf":"SUZ12"},{"count":141,"tf_name":"BCL3","total_genes_in_group":2668,"pval":0.0000932645,"chea_target_count":858,"tf":"BCL3"},{"count":287,"tf_name":"PRDM14","total_genes_in_group":2668,"pval":0.0001556959,"chea_target_count":1944,"tf":"PRDM14"},{"count":400,"tf_name":"MYCN","total_genes_in_group":2668,"pval":0.0001747109,"chea_target_count":2809,"tf":"MYCN"},{"count":403,"tf_name":"RCOR3","total_genes_in_group":2668,"pval":0.0003015562,"chea_target_count":2851,"tf":"RCOR3"},{"count":313,"tf_name":"JARID1A","total_genes_in_group":2668,"pval":0.0004192587,"chea_target_count":2171,"tf":"JARID1A"},{"count":295,"tf_name":"GATA4","total_genes_in_group":2668,"pval":0.0004938869,"chea_target_count":2039,"tf":"GATA4"},{"count":161,"tf_name":"PADI4","total_genes_in_group":2668,"pval":0.0005156031,"chea_target_count":1037,"tf":"PADI4"},{"count":129,"tf_name":"TFEB","total_genes_in_group":2668,"pval":0.0006079694,"chea_target_count":808,"tf":"TFEB"},{"count":136,"tf_name":"THAP11","total_genes_in_group":2668,"pval":0.0007867303,"chea_target_count":864,"tf":"THAP11"},{"count":826,"tf_name":"E2F1","total_genes_in_group":2668,"pval":0.0008764442,"chea_target_count":6240,"tf":"E2F1"},{"count":279,"tf_name":"SOX17","total_genes_in_group":2668,"pval":0.0012529665,"chea_target_count":1947,"tf":"SOX17"},{"count":361,"tf_name":"EOMES","total_genes_in_group":2668,"pval":0.0013487678,"chea_target_count":2581,"tf":"EOMES"},{"count":239,"tf_name":"FOXP3","total_genes_in_group":2668,"pval":0.0014966467,"chea_target_count":1648,"tf":"FOXP3"},{"count":525,"tf_name":"PPARD","total_genes_in_group":2668,"pval":0.0017540879,"chea_target_count":3876,"tf":"PPARD"},{"count":653,"tf_name":"CREB1","total_genes_in_group":2668,"pval":0.0023640579,"chea_target_count":4907,"tf":"CREB1"},{"count":988,"tf_name":"RUNX1","total_genes_in_group":2668,"pval":0.0032609517,"chea_target_count":7624,"tf":"RUNX1"},{"count":319,"tf_name":"TBX5","total_genes_in_group":2668,"pval":0.003836936,"chea_target_count":2296,"tf":"TBX5"},{"count":855,"tf_name":"AR","total_genes_in_group":2668,"pval":0.0051546122,"chea_target_count":6575,"tf":"AR"},{"count":74,"tf_name":"DROSHA","total_genes_in_group":2668,"pval":0.0054230976,"chea_target_count":456,"tf":"DROSHA"},{"count":103,"tf_name":"CRX","total_genes_in_group":2668,"pval":0.0059617372,"chea_target_count":668,"tf":"CRX"},{"count":482,"tf_name":"TET1","total_genes_in_group":2668,"pval":0.0060131387,"chea_target_count":3596,"tf":"TET1"},{"count":500,"tf_name":"FOXP1","total_genes_in_group":2668,"pval":0.0067835383,"chea_target_count":3745,"tf":"FOXP1"},{"count":358,"tf_name":"VDR","total_genes_in_group":2668,"pval":0.0068561365,"chea_target_count":2625,"tf":"VDR"},{"count":173,"tf_name":"STAT5","total_genes_in_group":2668,"pval":0.0073387203,"chea_target_count":1197,"tf":"STAT5"},{"count":52,"tf_name":"HCFC1","total_genes_in_group":2668,"pval":0.007382493,"chea_target_count":306,"tf":"HCFC1"},{"count":153,"tf_name":"MEF2A","total_genes_in_group":2668,"pval":0.0079273561,"chea_target_count":1048,"tf":"MEF2A"},{"count":206,"tf_name":"MEIS1","total_genes_in_group":2668,"pval":0.008096858,"chea_target_count":1452,"tf":"MEIS1"},{"count":105,"tf_name":"AHR","total_genes_in_group":2668,"pval":0.0081210935,"chea_target_count":690,"tf":"AHR"},{"count":238,"tf_name":"POU3F2","total_genes_in_group":2668,"pval":0.0089682946,"chea_target_count":1702,"tf":"POU3F2"},{"count":604,"tf_name":"KLF4","total_genes_in_group":2668,"pval":0.0103056017,"chea_target_count":4598,"tf":"KLF4"},{"count":272,"tf_name":"SCL","total_genes_in_group":2668,"pval":0.0107670809,"chea_target_count":1973,"tf":"SCL"},{"count":475,"tf_name":"TAL1","total_genes_in_group":2668,"pval":0.0121459313,"chea_target_count":3578,"tf":"TAL1"},{"count":605,"tf_name":"GATA1","total_genes_in_group":2668,"pval":0.0123344379,"chea_target_count":4617,"tf":"GATA1"},{"count":208,"tf_name":"PHF8","total_genes_in_group":2668,"pval":0.0149719927,"chea_target_count":1490,"tf":"PHF8"},{"count":493,"tf_name":"E2F4","total_genes_in_group":2668,"pval":0.0170659378,"chea_target_count":3741,"tf":"E2F4"},{"count":271,"tf_name":"FOXP2","total_genes_in_group":2668,"pval":0.0189371563,"chea_target_count":1990,"tf":"FOXP2"},{"count":154,"tf_name":"ELF5","total_genes_in_group":2668,"pval":0.021026252,"chea_target_count":1087,"tf":"ELF5"},{"count":95,"tf_name":"TCF7L2","total_genes_in_group":2668,"pval":0.0253575161,"chea_target_count":645,"tf":"TCF7L2"},{"count":275,"tf_name":"RAD21","total_genes_in_group":2668,"pval":0.0258086215,"chea_target_count":2036,"tf":"RAD21"},{"count":85,"tf_name":"EWS-FLI1","total_genes_in_group":2668,"pval":0.0293050622,"chea_target_count":574,"tf":"EWS-FLI1"},{"count":33,"tf_name":"HOXD13","total_genes_in_group":2668,"pval":0.0316242909,"chea_target_count":196,"tf":"HOXD13"},{"count":109,"tf_name":"DCP1A","total_genes_in_group":2668,"pval":0.0324332264,"chea_target_count":758,"tf":"DCP1A"},{"count":206,"tf_name":"TTF2","total_genes_in_group":2668,"pval":0.0352715647,"chea_target_count":1510,"tf":"TTF2"},{"count":171,"tf_name":"EKLF","total_genes_in_group":2668,"pval":0.0365600731,"chea_target_count":1239,"tf":"EKLF"},{"count":447,"tf_name":"RUNX2","total_genes_in_group":2668,"pval":0.0377238044,"chea_target_count":3423,"tf":"RUNX2"},{"count":264,"tf_name":"NR3C1","total_genes_in_group":2668,"pval":0.0389106681,"chea_target_count":1970,"tf":"NR3C1"},{"count":30,"tf_name":"THRA","total_genes_in_group":2668,"pval":0.0410569409,"chea_target_count":179,"tf":"THRA"},{"count":143,"tf_name":"ARNT","total_genes_in_group":2668,"pval":0.0434962099,"chea_target_count":1029,"tf":"ARNT"},{"count":148,"tf_name":"TBX3","total_genes_in_group":2668,"pval":0.0438469171,"chea_target_count":1068,"tf":"TBX3"},{"count":96,"tf_name":"PDX1","total_genes_in_group":2668,"pval":0.044341289,"chea_target_count":669,"tf":"PDX1"},{"count":220,"tf_name":"SRF","total_genes_in_group":2668,"pval":0.0478306428,"chea_target_count":1634,"tf":"SRF"},{"count":484,"tf_name":"TCF3","total_genes_in_group":2668,"pval":0.0527901248,"chea_target_count":3743,"tf":"TCF3"},{"count":14,"tf_name":"GLI1","total_genes_in_group":2668,"pval":0.0540212042,"chea_target_count":73,"tf":"GLI1"},{"count":79,"tf_name":"STAT6","total_genes_in_group":2668,"pval":0.0558823306,"chea_target_count":547,"tf":"STAT6"},{"count":893,"tf_name":"FLI1","total_genes_in_group":2668,"pval":0.0562157454,"chea_target_count":7063,"tf":"FLI1"},{"count":778,"tf_name":"TP53","total_genes_in_group":2668,"pval":0.0625881807,"chea_target_count":6136,"tf":"TP53"},{"count":640,"tf_name":"SMAD4","total_genes_in_group":2668,"pval":0.0628548642,"chea_target_count":5016,"tf":"SMAD4"},{"count":179,"tf_name":"EZH2","total_genes_in_group":2668,"pval":0.0666032083,"chea_target_count":1328,"tf":"EZH2"},{"count":62,"tf_name":"ESR2","total_genes_in_group":2668,"pval":0.0676848336,"chea_target_count":424,"tf":"ESR2"},{"count":107,"tf_name":"NACC1","total_genes_in_group":2668,"pval":0.0702137645,"chea_target_count":769,"tf":"NACC1"},{"count":23,"tf_name":"CHD7","total_genes_in_group":2668,"pval":0.0849465794,"chea_target_count":141,"tf":"CHD7"},{"count":102,"tf_name":"SREBP1","total_genes_in_group":2668,"pval":0.0860553032,"chea_target_count":738,"tf":"SREBP1"},{"count":68,"tf_name":"KDM6A","total_genes_in_group":2668,"pval":0.0934312855,"chea_target_count":479,"tf":"KDM6A"},{"count":23,"tf_name":"TRP63","total_genes_in_group":2668,"pval":0.0957833481,"chea_target_count":143,"tf":"TRP63"},{"count":147,"tf_name":"SREBP2","total_genes_in_group":2668,"pval":0.097712294,"chea_target_count":1095,"tf":"SREBP2"},{"count":9,"tf_name":"E2F7","total_genes_in_group":2668,"pval":0.0982574843,"chea_target_count":46,"tf":"E2F7"}];
-
-tf_columns = ["count", "tf_name", "total_genes_in_group", "pval", "chea_target_count" ];
-
-top_motifs = [{"count":1262,"motif_name":"TFDP1.p2","total_genes_in_group":2668,"pval":2.401272775e-33,"divid":"ecdc2351638f760269957fd67c67c9de60592744","motif_gene_count":8067,"motif_name_y":"TFDP1.p2"},{"count":1001,"motif_name":"TFAP2B.p2","total_genes_in_group":2668,"pval":1.178355688e-28,"divid":"2caa409204e0a1305287e0572d9fdadb9f916ef5","motif_gene_count":6217,"motif_name_y":"TFAP2B.p2"},{"count":1227,"motif_name":"TFAP2{A,C}.p2","total_genes_in_group":2668,"pval":6.538212206e-26,"divid":"76cbd18392e4ebf432c70331372dc46a76686476","motif_gene_count":8076,"motif_name_y":"TFAP2{A,C}.p2"},{"count":1694,"motif_name":"SP1.p2","total_genes_in_group":2668,"pval":1.094470341e-22,"divid":"361080c90e5a41371bc1f00e9f62fd54e010f641","motif_gene_count":12044,"motif_name_y":"SP1.p2"},{"count":735,"motif_name":"HIC1.p2","total_genes_in_group":2668,"pval":1.153060377e-20,"divid":"1590ddfb01938251ef708d15e00ed031b73289bf","motif_gene_count":4518,"motif_name_y":"HIC1.p2"},{"count":903,"motif_name":"PAX5.p2","total_genes_in_group":2668,"pval":6.079912279e-20,"divid":"7a8b3955bdf448967f3ddc19ead2acff54cfa290","motif_gene_count":5810,"motif_name_y":"PAX5.p2"},{"count":551,"motif_name":"ZFP161.p2","total_genes_in_group":2668,"pval":1.084339381e-16,"divid":"feeb5f12e18a802bbca9b46f2c955d2424fa1212","motif_gene_count":3321,"motif_name_y":"ZFP161.p2"},{"count":613,"motif_name":"EGR1..3.p2","total_genes_in_group":2668,"pval":0.0,"divid":"9958bbfc8cdcd51440dc5ba1da57a35e9d7fbb3e","motif_gene_count":3885,"motif_name_y":"EGR1..3.p2"},{"count":1433,"motif_name":"PATZ1.p2","total_genes_in_group":2668,"pval":0.0,"divid":"33697d2d007c1556288723b416233c69b0cc1302","motif_gene_count":10334,"motif_name_y":"PATZ1.p2"},{"count":1489,"motif_name":"MAZ.p2","total_genes_in_group":2668,"pval":0.0,"divid":"6a27fd7a26cbd8edf9582b1d7e051f72941667a9","motif_gene_count":10878,"motif_name_y":"MAZ.p2"},{"count":479,"motif_name":"NRF1.p2","total_genes_in_group":2668,"pval":0.0,"divid":"eb18cdbb1842025f5790b030ffdde6732c3c3825","motif_gene_count":3000,"motif_name_y":"NRF1.p2"},{"count":287,"motif_name":"ZNF143.p2","total_genes_in_group":2668,"pval":0.0,"divid":"8cc9eafc02142a7ed90f627588dcbe858f877248","motif_gene_count":1642,"motif_name_y":"ZNF143.p2"},{"count":495,"motif_name":"MTF1.p2","total_genes_in_group":2668,"pval":0.0000000001,"divid":"35d44ae8b264a9d19305dd1532c968d81f757ef7","motif_gene_count":3146,"motif_name_y":"MTF1.p2"},{"count":519,"motif_name":"MAFB.p2","total_genes_in_group":2668,"pval":0.0000000003,"divid":"60003f50e6cb0a346d6605dc3134c40e2df1be6b","motif_gene_count":3359,"motif_name_y":"MAFB.p2"},{"count":1471,"motif_name":"KLF4.p3","total_genes_in_group":2668,"pval":0.0000000004,"divid":"56b700ce67674aba4cc94e12f075868975703894","motif_gene_count":10899,"motif_name_y":"KLF4.p3"},{"count":322,"motif_name":"AHR_ARNT_ARNT2.p2","total_genes_in_group":2668,"pval":0.0000000091,"divid":"f0406435df18c7d301bca2e5d89c8947af5dfb8f","motif_gene_count":1983,"motif_name_y":"AHR_ARNT_ARNT2.p2"},{"count":440,"motif_name":"ZNF148.p2","total_genes_in_group":2668,"pval":0.0000021989,"divid":"6b4cc2033347bf475b75cf7bb540ed02784a60b4","motif_gene_count":2982,"motif_name_y":"ZNF148.p2"},{"count":654,"motif_name":"ELK1,4_GABP{A,B1}.p3","total_genes_in_group":2668,"pval":0.0000034557,"divid":"968883fa4192cea8cbc06bf984e3847dd5124970","motif_gene_count":4645,"motif_name_y":"ELK1,4_GABP{A,B1}.p3"},{"count":423,"motif_name":"NHLH1,2.p2","total_genes_in_group":2668,"pval":0.0000071681,"divid":"a29247e5eda65dd17c7b2c7358bc677d79e6df55","motif_gene_count":2886,"motif_name_y":"NHLH1,2.p2"},{"count":781,"motif_name":"ELF1,2,4.p2","total_genes_in_group":2668,"pval":0.0000188144,"divid":"c7a3aea598d7600c7e9ee1026116aa4959da6fe2","motif_gene_count":5707,"motif_name_y":"ELF1,2,4.p2"},{"count":1130,"motif_name":"MZF1.p2","total_genes_in_group":2668,"pval":0.0000215885,"divid":"c1ee4a79e8a24df33bd1869031ff4b4cff9cacbe","motif_gene_count":8515,"motif_name_y":"MZF1.p2"},{"count":173,"motif_name":"ZBTB6.p2","total_genes_in_group":2668,"pval":0.0000268197,"divid":"a27b347c38c9234792271caf3c3ca585339e0f01","motif_gene_count":1063,"motif_name_y":"ZBTB6.p2"},{"count":88,"motif_name":"E2F1..5.p2","total_genes_in_group":2668,"pval":0.0000452713,"divid":"b769e2ae818dc3dafb0306286eaecda3bb5ef5f8","motif_gene_count":480,"motif_name_y":"E2F1..5.p2"},{"count":414,"motif_name":"NFY{A,B,C}.p2","total_genes_in_group":2668,"pval":0.0000490125,"divid":"97b976fbd5b48aefe554c45d2ce85f96b1bbad98","motif_gene_count":2875,"motif_name_y":"NFY{A,B,C}.p2"},{"count":187,"motif_name":"SREBF1,2.p2","total_genes_in_group":2668,"pval":0.0000734257,"divid":"bf2e4264b29e1a7fd52a0a8ba02b3b4e17f5c06e","motif_gene_count":1184,"motif_name_y":"SREBF1,2.p2"},{"count":917,"motif_name":"GTF2I.p2","total_genes_in_group":2668,"pval":0.0001223656,"divid":"6db448bcbc4578889f4fcdf9b7fd2d85e1434209","motif_gene_count":6874,"motif_name_y":"GTF2I.p2"},{"count":365,"motif_name":"bHLH_family.p2","total_genes_in_group":2668,"pval":0.0001225529,"divid":"501d9e9a79ea81b51b10eb59b7f8e150213fbd90","motif_gene_count":2529,"motif_name_y":"bHLH_family.p2"},{"count":219,"motif_name":"HES1.p2","total_genes_in_group":2668,"pval":0.0003749059,"divid":"051e4fc9c0063b8c896394fd6d76332e44fa12b7","motif_gene_count":1458,"motif_name_y":"HES1.p2"},{"count":201,"motif_name":"ARNT_ARNT2_BHLHB2_MAX_MYC_USF1.p2","total_genes_in_group":2668,"pval":0.001255113,"divid":"04e6d7d1d1287d7a3695c45dd343f7d6927e969b","motif_gene_count":1356,"motif_name_y":"ARNT_ARNT2_BHLHB2_MAX_MYC_USF1.p2"},{"count":103,"motif_name":"SOX5.p2","total_genes_in_group":2668,"pval":0.0016634255,"divid":"c4f5185eff9f6f717c1d726d7933a58b3362f2bc","motif_gene_count":641,"motif_name_y":"SOX5.p2"},{"count":215,"motif_name":"SOX17.p2","total_genes_in_group":2668,"pval":0.0025918551,"divid":"4647009f03716c81f9faadfb0910b9d3ca243bd3","motif_gene_count":1483,"motif_name_y":"SOX17.p2"},{"count":414,"motif_name":"EHF.p2","total_genes_in_group":2668,"pval":0.0028040693,"divid":"a032e82c43ae2b8b5dded406c0044f5dbd254e7d","motif_gene_count":3024,"motif_name_y":"EHF.p2"},{"count":317,"motif_name":"ZEB1.p2","total_genes_in_group":2668,"pval":0.0032565541,"divid":"fcdd43b0c567d7f8c4135c8c340712a7cdf51aa1","motif_gene_count":2274,"motif_name_y":"ZEB1.p2"},{"count":131,"motif_name":"TFEB.p2","total_genes_in_group":2668,"pval":0.0034312448,"divid":"80aa66cd9d1af0e65280d5a938a5b079a4fa92e5","motif_gene_count":861,"motif_name_y":"TFEB.p2"},{"count":75,"motif_name":"FOX{D1,D2}.p2","total_genes_in_group":2668,"pval":0.003667805,"divid":"ca69340fa49939b89e475f68b0667fa58ce55bc4","motif_gene_count":456,"motif_name_y":"FOX{D1,D2}.p2"},{"count":258,"motif_name":"GFI1.p2","total_genes_in_group":2668,"pval":0.0047005238,"divid":"ba7f3d5909634a89e922861dd6e2f1453f550236","motif_gene_count":1832,"motif_name_y":"GFI1.p2"},{"count":60,"motif_name":"ESR1.p2","total_genes_in_group":2668,"pval":0.0051149253,"divid":"9451f0adb9953c1fa4bc89d40b971432296f0027","motif_gene_count":356,"motif_name_y":"ESR1.p2"},{"count":124,"motif_name":"HIF1A.p2","total_genes_in_group":2668,"pval":0.0055159032,"divid":"6e61463bbcff852726e972c8217ecbf0b2fcc41e","motif_gene_count":821,"motif_name_y":"HIF1A.p2"},{"count":134,"motif_name":"TFAP4.p2","total_genes_in_group":2668,"pval":0.0056593024,"divid":"2a01170eb39d9fa26324b32eb6f03119bb3385d5","motif_gene_count":896,"motif_name_y":"TFAP4.p2"},{"count":246,"motif_name":"SPZ1.p2","total_genes_in_group":2668,"pval":0.0062358857,"divid":"0b2aedc778d193e573339c8a15208c5bca9c474c","motif_gene_count":1750,"motif_name_y":"SPZ1.p2"},{"count":87,"motif_name":"HMX1.p2","total_genes_in_group":2668,"pval":0.0116548827,"divid":"8ea00eaf2a867568a7e4e2685e54ac5ef9a09a0f","motif_gene_count":566,"motif_name_y":"HMX1.p2"},{"count":23,"motif_name":"TP53.p2","total_genes_in_group":2668,"pval":0.0127717181,"divid":"457303e30735b2320b74fd5139328d2e93f9273b","motif_gene_count":117,"motif_name_y":"TP53.p2"},{"count":236,"motif_name":"LMO2.p2","total_genes_in_group":2668,"pval":0.0129611208,"divid":"85fa3a74ebadb0d7a630c19e74069fa2c7d1568a","motif_gene_count":1701,"motif_name_y":"LMO2.p2"},{"count":245,"motif_name":"TFCP2.p2","total_genes_in_group":2668,"pval":0.0150373392,"divid":"6266b04a8ab330208d1861adc3f0d1d7f1ea928f","motif_gene_count":1777,"motif_name_y":"TFCP2.p2"},{"count":233,"motif_name":"PAX2.p2","total_genes_in_group":2668,"pval":0.0174779373,"divid":"8aa9d3a23ad6b96062627b26c86c198bbb00d4de","motif_gene_count":1690,"motif_name_y":"PAX2.p2"},{"count":614,"motif_name":"TCF4_dimer.p2","total_genes_in_group":2668,"pval":0.0187321478,"divid":"ff2c960ed6e80cbdb47d771d9f0c3da14a480350","motif_gene_count":4716,"motif_name_y":"TCF4_dimer.p2"},{"count":702,"motif_name":"YY1.p2","total_genes_in_group":2668,"pval":0.0288880004,"divid":"f24f263cb81658dc1b88fcf5a5397032e67796de","motif_gene_count":5456,"motif_name_y":"YY1.p2"},{"count":151,"motif_name":"SOX{8,9,10}.p2","total_genes_in_group":2668,"pval":0.0302445163,"divid":"8a7d3f55a50d83eb1707c5c65c091ec1f7afe081","motif_gene_count":1077,"motif_name_y":"SOX{8,9,10}.p2"},{"count":82,"motif_name":"ZNF384.p2","total_genes_in_group":2668,"pval":0.0321175194,"divid":"3c58ab633029f08e0c9e1415e7724b6980b2987b","motif_gene_count":554,"motif_name_y":"ZNF384.p2"},{"count":189,"motif_name":"SOX2.p2","total_genes_in_group":2668,"pval":0.0357441839,"divid":"5f6db1cd1eaa3f2e920743ebfd0f7f29c9ad9653","motif_gene_count":1378,"motif_name_y":"SOX2.p2"},{"count":352,"motif_name":"MYFfamily.p2","total_genes_in_group":2668,"pval":0.0423091998,"divid":"da5a9fb8fcdfb2670f3505b260a872e618b03905","motif_gene_count":2672,"motif_name_y":"MYFfamily.p2"},{"count":24,"motif_name":"XBP1.p3","total_genes_in_group":2668,"pval":0.0466546001,"divid":"f2f129d35eacf9bfff9d2364dec7079cf3362390","motif_gene_count":139,"motif_name_y":"XBP1.p3"},{"count":120,"motif_name":"ATF6.p2","total_genes_in_group":2668,"pval":0.0576131659,"divid":"16bca9218ccf3a58d28f20ed73cb123feff71fc2","motif_gene_count":862,"motif_name_y":"ATF6.p2"},{"count":81,"motif_name":"DBP.p2","total_genes_in_group":2668,"pval":0.0593598287,"divid":"030662e25273c079bd8802152f27008701b9c217","motif_gene_count":564,"motif_name_y":"DBP.p2"},{"count":707,"motif_name":"SPI1.p2","total_genes_in_group":2668,"pval":0.0597886997,"divid":"fec7614f9beeef571dbf97f6960e0aa254795ab2","motif_gene_count":5555,"motif_name_y":"SPI1.p2"},{"count":47,"motif_name":"FOXN1.p2","total_genes_in_group":2668,"pval":0.0598836268,"divid":"1a6197c6a52350d1b5d4899720377f322b32083e","motif_gene_count":309,"motif_name_y":"FOXN1.p2"},{"count":101,"motif_name":"MYB.p2","total_genes_in_group":2668,"pval":0.0650770167,"divid":"90849cc285926c100c6667a56a4bdc6246750dd0","motif_gene_count":720,"motif_name_y":"MYB.p2"},{"count":57,"motif_name":"ESRRA.p2","total_genes_in_group":2668,"pval":0.0692090123,"divid":"7b78837f22e4be2c74398bf512f71352444d759a","motif_gene_count":387,"motif_name_y":"ESRRA.p2"},{"count":225,"motif_name":"HBP1_HMGB_SSRP1_UBTF.p2","total_genes_in_group":2668,"pval":0.0737346628,"divid":"ca508d0227f34186f9a1868374cbdf5a6e440f51","motif_gene_count":1696,"motif_name_y":"HBP1_HMGB_SSRP1_UBTF.p2"},{"count":35,"motif_name":"RBPJ.p2","total_genes_in_group":2668,"pval":0.0926557034,"divid":"f5833487750fd001f1e0432075ee507a10720fb2","motif_gene_count":230,"motif_name_y":"RBPJ.p2"},{"count":118,"motif_name":"RXR{A,B,G}.p2","total_genes_in_group":2668,"pval":0.0939789263,"divid":"695aae986b656ffb338f1ea137e79e37af199b92","motif_gene_count":866,"motif_name_y":"RXR{A,B,G}.p2"},{"count":73,"motif_name":"NFKB1_REL_RELA.p2","total_genes_in_group":2668,"pval":0.1239891679,"divid":"3d128ec9ef13125d0802f1ca9541fef3cc59f5ec","motif_gene_count":527,"motif_name_y":"NFKB1_REL_RELA.p2"},{"count":12,"motif_name":"HAND1,2.p2","total_genes_in_group":2668,"pval":0.1257390684,"divid":"d048fe1b07b8c4102801f19d0ebe763dfdc8e39e","motif_gene_count":69,"motif_name_y":"HAND1,2.p2"},{"count":111,"motif_name":"NKX3-2.p2","total_genes_in_group":2668,"pval":0.1343979301,"divid":"de71dd87cc09f1bda20a91b6f6183744cb60c8af","motif_gene_count":827,"motif_name_y":"NKX3-2.p2"},{"count":20,"motif_name":"RXRG_dimer.p3","total_genes_in_group":2668,"pval":0.1408093752,"divid":"be758fb5890719927d7c41fd91f0639ef4948f82","motif_gene_count":128,"motif_name_y":"RXRG_dimer.p3"},{"count":17,"motif_name":"STAT5{A,B}.p2","total_genes_in_group":2668,"pval":0.1480024253,"divid":"6f2bfb2c7beb33be5cd1567f871e09cfe4489896","motif_gene_count":107,"motif_name_y":"STAT5{A,B}.p2"},{"count":105,"motif_name":"RFX1..5_RFXANK_RFXAP.p2","total_genes_in_group":2668,"pval":0.173920123,"divid":"fdb8fa4226bbb24c50d837035ba81b5550fd60dd","motif_gene_count":792,"motif_name_y":"RFX1..5_RFXANK_RFXAP.p2"},{"count":492,"motif_name":"SNAI1..3.p2","total_genes_in_group":2668,"pval":0.1937890229,"divid":"89ef9c9bb5f85c0c697046a315157f309fff2532","motif_gene_count":3921,"motif_name_y":"SNAI1..3.p2"}];
-    
-motif_columns = ["count", "motif_name", "motif_description", "total_genes_in_group", "pval"];
-
-tf_intx = [{"tf1":"HOXA2","tf2":"MEIS1"},{"tf1":"HOXB4","tf2":"MEIS1"},{"tf1":"HOXD13","tf2":"MEIS1"},{"tf1":"AHR","tf2":"ARNT"},{"tf1":"CTNNB1","tf2":"TCF7L2"},{"tf1":"MEIS1","tf2":"PBX1"},{"tf1":"GATA4","tf2":"JARID2"},{"tf1":"JARID2","tf2":"NKX2-5"},{"tf1":"GATA4","tf2":"NKX2-5"},{"tf1":"NR3C1","tf2":"JUN"},{"tf1":"EED","tf2":"EZH2"},{"tf1":"DACH1","tf2":"SIN3A"},{"tf1":"JUN","tf2":"JUN"},{"tf1":"BACH1","tf2":"BACH1"},{"tf1":"CTNNB1","tf2":"CTNNB1"},{"tf1":"EGR1","tf2":"EGR1"},{"tf1":"ERG","tf2":"SOX2"},{"tf1":"GATA1","tf2":"SFPI1"},{"tf1":"JUN","tf2":"STAT3"},{"tf1":"SMAD3","tf2":"VDR"},{"tf1":"SMAD4","tf2":"FOXP1"},{"tf1":"MITF","tf2":"PAX6"},{"tf1":"PAX6","tf2":"SOX2"},{"tf1":"PBX1","tf2":"TCF21"},{"tf1":"STAT1","tf2":"STAT3"},{"tf1":"STAT3","tf2":"STAT3"},{"tf1":"STAT6","tf2":"STAT6"},{"tf1":"ETS1","tf2":"ETS1"},{"tf1":"FOXP1","tf2":"FOXP1"}];
-
-tf_to_motif = [{"tf_name":"AHR","motif_divid":"f0406435df18c7d301bca2e5d89c8947af5dfb8f"},{"tf_name":"AR","motif_divid":"45429b5d34734b0319fb488e9f7be43c9a3f42b7"},{"tf_name":"ARNT","motif_divid":"f0406435df18c7d301bca2e5d89c8947af5dfb8f"},{"tf_name":"ARNT","motif_divid":"04e6d7d1d1287d7a3695c45dd343f7d6927e969b"},{"tf_name":"CDX2","motif_divid":"3f8043d477560585bdb110f1cac3c3b4de5f5dad"},{"tf_name":"CEBPA","motif_divid":"e13a2d4222d81c7352a1ac3efbe3c9eeb08d3d8c"},{"tf_name":"CEBPB","motif_divid":"e13a2d4222d81c7352a1ac3efbe3c9eeb08d3d8c"},{"tf_name":"CLOCK","motif_divid":"501d9e9a79ea81b51b10eb59b7f8e150213fbd90"},{"tf_name":"CREB1","motif_divid":"5b52f0c8d4f6049f2fb688ac3f2ce3d70daec958"},{"tf_name":"CRX","motif_divid":"3fbfa2044264e9ccf82a30060fc63d3abdbfc14b"},{"tf_name":"CTCF","motif_divid":"41bd14733b830ee0aa5bc3d84c54f40c172ab999"},{"tf_name":"E2F1","motif_divid":"b769e2ae818dc3dafb0306286eaecda3bb5ef5f8"},{"tf_name":"E2F4","motif_divid":"b769e2ae818dc3dafb0306286eaecda3bb5ef5f8"},{"tf_name":"EGR1","motif_divid":"9958bbfc8cdcd51440dc5ba1da57a35e9d7fbb3e"},{"tf_name":"ELF1","motif_divid":"c7a3aea598d7600c7e9ee1026116aa4959da6fe2"},{"tf_name":"ELK1","motif_divid":"968883fa4192cea8cbc06bf984e3847dd5124970"},{"tf_name":"EOMES","motif_divid":"c2e7f22a10301ed6b49a42aa654f395f03ba9851"},{"tf_name":"EP300","motif_divid":"d17cc66f5616ace8a568df306a033c34defb2dd5"},{"tf_name":"ESR1","motif_divid":"9451f0adb9953c1fa4bc89d40b971432296f0027"},{"tf_name":"ETS1","motif_divid":"f4b09718957b25b695a01b7bd4400362738ad9d3"},{"tf_name":"ETS2","motif_divid":"f4b09718957b25b695a01b7bd4400362738ad9d3"},{"tf_name":"FLI1","motif_divid":"734e889f4ed5bf77aae25f15361152b40b37faef"},{"tf_name":"FOXA2","motif_divid":"c3e2a84a3831bd5a7ac8a548649ef431f48ac517"},{"tf_name":"FOXO1","motif_divid":"f46c7d9c3d90ef1f26b70426dc50f51b9bfad471"},{"tf_name":"FOXO3","motif_divid":"f46c7d9c3d90ef1f26b70426dc50f51b9bfad471"},{"tf_name":"FOXP3","motif_divid":"96a5f305998927acda9825ef3a1002412d7556cd"},{"tf_name":"GATA1","motif_divid":"2c4e3b3c55aa3f7c4a25641a71d452acb2d0de54"},{"tf_name":"GATA2","motif_divid":"2c4e3b3c55aa3f7c4a25641a71d452acb2d0de54"},{"tf_name":"GATA3","motif_divid":"2c4e3b3c55aa3f7c4a25641a71d452acb2d0de54"},{"tf_name":"GFI1B","motif_divid":"377bab498b481ad14f0253e85ce806c861ed64f3"},{"tf_name":"GLI1","motif_divid":"a51ba4a2d1320589c7e9eeb68a79593159b9f0ed"},{"tf_name":"HIF1A","motif_divid":"6e61463bbcff852726e972c8217ecbf0b2fcc41e"},{"tf_name":"HNF4A","motif_divid":"f39dc7c5dbb9f765ed6dbeb92e9dd5f2a7954bd8"},{"tf_name":"HSF1","motif_divid":"f599630b7dc9187386a61e44f5b2315812dadda2"},{"tf_name":"IKZF1","motif_divid":"c5a470b32aac34adc0a443630c491952640cd10c"},{"tf_name":"IRF1","motif_divid":"97ebe6efdc265027a5a604e682b611c0db1d51d4"},{"tf_name":"JUN","motif_divid":"638ecce999e4b38dca7103955d88116e735bb3a2"},{"tf_name":"KLF4","motif_divid":"56b700ce67674aba4cc94e12f075868975703894"},{"tf_name":"LMO2","motif_divid":"85fa3a74ebadb0d7a630c19e74069fa2c7d1568a"},{"tf_name":"MECOM","motif_divid":"5b84d5ea53951d0800d80a645c409a70c766b3f3"},{"tf_name":"MEF2A","motif_divid":"ee03940e4fc25ef009a3a64416c8a5a9411ce6ed"},{"tf_name":"MEIS1","motif_divid":"f2f4aa18f4e50ca4f17ad9e721f98566ec374bcb"},{"tf_name":"MITF","motif_divid":"501d9e9a79ea81b51b10eb59b7f8e150213fbd90"},{"tf_name":"MYB","motif_divid":"90849cc285926c100c6667a56a4bdc6246750dd0"},{"tf_name":"MYBL2","motif_divid":"eb3e17c3d28c026c4184e89bdf243ba5fead834b"},{"tf_name":"MYC","motif_divid":"04e6d7d1d1287d7a3695c45dd343f7d6927e969b"},{"tf_name":"NANOG","motif_divid":"424f64f157c9f5353c3967a9ef6c99108e69f530"},{"tf_name":"NFE2L2","motif_divid":"89e88a7536fa09c13136c43de90003218fc40195"},{"tf_name":"NKX2-5","motif_divid":"a37931cb0e4b105447b208fad6c9d77ba4ddc0f1"},{"tf_name":"NR3C1","motif_divid":"9494b37e450b89830ca4df4740caa2df4e397a89"},{"tf_name":"OLIG2","motif_divid":"501d9e9a79ea81b51b10eb59b7f8e150213fbd90"},{"tf_name":"PAX6","motif_divid":"89c04ff4bcfa836701399355ef41a91787eb0d5f"},{"tf_name":"PBX1","motif_divid":"8ac7a51c8d57f936be23f1818ac9de7704877bd3"},{"tf_name":"POU3F2","motif_divid":"cc064bfe36c3b2604e3c0900b6d1f4e709084092"},{"tf_name":"POU5F1","motif_divid":"e123c32f055a74f702eee698e162dbb3fea2404c"},{"tf_name":"POU5F1","motif_divid":"5fd459fdb12c756a40e4d8b35e88913b5a3fa007"},{"tf_name":"PPARG","motif_divid":"6cab45c9d11ad794a0157cd14d915e4c965458ad"},{"tf_name":"PPARG","motif_divid":"be758fb5890719927d7c41fd91f0639ef4948f82"},{"tf_name":"RBPJ","motif_divid":"f5833487750fd001f1e0432075ee507a10720fb2"},{"tf_name":"REST","motif_divid":"06864e06465320e15f0220ccbde84a94c6198df1"},{"tf_name":"RUNX1","motif_divid":"bf2917a955bc339df4233a0d5703abacbefbb03a"},{"tf_name":"RUNX2","motif_divid":"bf2917a955bc339df4233a0d5703abacbefbb03a"},{"tf_name":"SFPI1","motif_divid":"fec7614f9beeef571dbf97f6960e0aa254795ab2"},{"tf_name":"SMAD1","motif_divid":"8a00826a01d6888dca7f09756e2e588d5bd2d741"},{"tf_name":"SMAD2","motif_divid":"8a00826a01d6888dca7f09756e2e588d5bd2d741"},{"tf_name":"SMAD3","motif_divid":"8a00826a01d6888dca7f09756e2e588d5bd2d741"},{"tf_name":"SMAD4","motif_divid":"8a00826a01d6888dca7f09756e2e588d5bd2d741"},{"tf_name":"SOX17","motif_divid":"4647009f03716c81f9faadfb0910b9d3ca243bd3"},{"tf_name":"SOX2","motif_divid":"5fd459fdb12c756a40e4d8b35e88913b5a3fa007"},{"tf_name":"SOX2","motif_divid":"5f6db1cd1eaa3f2e920743ebfd0f7f29c9ad9653"},{"tf_name":"SOX9","motif_divid":"8a7d3f55a50d83eb1707c5c65c091ec1f7afe081"},{"tf_name":"SRF","motif_divid":"f5be111ed0583288db1948a91f9e6b5a938db804"},{"tf_name":"SRY","motif_divid":"aa37de6a566e64c2c1957b4295a501f3567cc656"},{"tf_name":"STAT1","motif_divid":"554598e621c0207bc9b2eef4e8dd8e6178fa9c30"},{"tf_name":"STAT3","motif_divid":"554598e621c0207bc9b2eef4e8dd8e6178fa9c30"},{"tf_name":"STAT4","motif_divid":"35bee74717d6186112003bada45b4175596ff21c"},{"tf_name":"STAT6","motif_divid":"35bee74717d6186112003bada45b4175596ff21c"},{"tf_name":"TAL1","motif_divid":"b49f3c882d5378bd23db06993db10e5f918ee608"},{"tf_name":"TBP","motif_divid":"2cba5430a25b9a03c283882915e5e9f1b4bac296"},{"tf_name":"TBX5","motif_divid":"74d966e3886a5710e3c84ecdfd7c0d9a1a772aec"},{"tf_name":"TCF3","motif_divid":"b49f3c882d5378bd23db06993db10e5f918ee608"},{"tf_name":"TCF4","motif_divid":"b49f3c882d5378bd23db06993db10e5f918ee608"},{"tf_name":"TCF4","motif_divid":"ff2c960ed6e80cbdb47d771d9f0c3da14a480350"},{"tf_name":"TCF7","motif_divid":"6f05c6a5ddfe28b89c7e1d8e1faa048f23b65f8e"},{"tf_name":"TCF7L2","motif_divid":"6f05c6a5ddfe28b89c7e1d8e1faa048f23b65f8e"},{"tf_name":"TCFAP2C","motif_divid":"76cbd18392e4ebf432c70331372dc46a76686476"},{"tf_name":"TEAD4","motif_divid":"a758e8651ac27c0b03b259022a89e6b382779e62"},{"tf_name":"VDR","motif_divid":"bdd895a01004f13dcf75ebedd5e045a0d6689a55"},{"tf_name":"YY1","motif_divid":"f24f263cb81658dc1b88fcf5a5397032e67796de"},{"tf_name":"ZIC3","motif_divid":"0cd13d5207bd87dfe62ee170738a4b9f0179c629"}];
-
-$(document).ready( function() {
+<%def name="docReady()">
 
 jsPlumb.Defaults.Container = $("#hit_tables");
 
+connection_graphs = [];
+
+function highlightConnections(item) {
+
+  $(item).addClass('highlight').siblings().removeClass('highlight'); 
+  $(item).siblings().removeClass('connected_same');
+         
+  $("tr").not( $(item).siblings() ).removeClass("connected_across");
+         
+  connection_graphs.forEach( function(connections, i, x) {
+         connections["connections"].forEach( function(intx, i, tf_intx) { 
+            if ( ( $("#" + intx["source_id"]).length > 0) && ( $("#" + intx["target_id"]).length > 0) 
+                        && item.id === intx["source_id"] &&  intx["source_id"] != intx["target_id"])  {
+                $("#" + intx["target_id"]).addClass(connections["connector_class"]);            
+            }
+
+            if ( ( $("#" + intx["source_id"]).length > 0) && ( $("#" + intx["target_id"]).length > 0) 
+                        && item.id === intx["target_id"]  &&  intx["source_id"] != intx["target_id"] )  {
+                $("#" + intx["source_id"]).addClass(connections["connector_class"]);            
+            }
+
+         
+         });
+ 
+	});
+
+}
+
 function renderTable(target, tablename, data, columns, keycol) {
 
+	$(target).html("");
     var tf_table = d3.select(target).append("table"),
     thead = tf_table.append("thead"),
     tbody = tf_table.append("tbody");
@@ -64,60 +83,7 @@ function renderTable(target, tablename, data, columns, keycol) {
     .append("tr")
     .attr("id", function(d, i) { return d[keycol]; })
     .on('click', function(d, i) {
-    
-         $(this).addClass('highlight').siblings().removeClass('highlight'); 
-         $(this).siblings().removeClass('connected_same');
-
-
-         
-         $("tr").not( $(this).siblings() ).removeClass("connected_across");
-         
-         tf_intx.forEach( function(intx, i, tf_intx) {
-            
-            if ( ( $("#" + intx["tf1"]).length > 0) && ( $("#" + intx["tf2"]).length > 0) 
-                        && d[keycol] === intx["tf1"] &&  intx["tf1"] != intx["tf2"])  {
-                $("#" + intx["tf2"]).addClass("connected_same");            
-            }
-
-            if ( ( $("#" + intx["tf1"]).length > 0) && ( $("#" + intx["tf2"]).length > 0) 
-                        && d[keycol] === intx["tf2"]  &&  intx["tf1"] != intx["tf2"] )  {
-                $("#" + intx["tf1"]).addClass("connected_same");            
-            }
-
-         
-         });
- 
- 
- 
-       tf_to_motif.forEach( function(tf_motif, i, dataset) {
-
-        if ( ( $("#" + tf_motif["tf_name"]).length > 0) && ( $("#" + tf_motif["motif_divid"]).length > 0)  
-         &&  ( d[keycol] == tf_motif["motif_divid"])
-        ) {
-  
-        $("#" + tf_motif["tf_name"]).addClass("connected_across");
-    
-
-        }
-
-
-        if ( ( $("#" + tf_motif["tf_name"]).length > 0) && ( $("#" + tf_motif["motif_divid"]).length > 0)  
-         &&  ( d[keycol] == tf_motif["tf_name"])
-        ) {
-  
-        $("#" + tf_motif["motif_divid"]).addClass("connected_across");
-    
-
-        }
-
-
-        });
-
- 
- 
- 
-         
-         
+		 highlightConnections(this);    
          });
 
     thead.append("tr")
@@ -127,81 +93,33 @@ function renderTable(target, tablename, data, columns, keycol) {
         .append("th")
             .text(function(column) { return column; });
 
+		function isFloat(n){
+			return n != "" && !isNaN(n) && Math.round(n) != n;
+		}
 
     var cells = rows.selectAll("td")
         .data(function(row) {
             return columns.map(function(column) {
-                return {column: column, value: row[column]};
+                return { column: column, value: row[column] };
             });
         })
         .enter()
         .append("td")
-            .text(function(d) { return d.value; });
+            .text(function(d) { 
+					if (isFloat(d.value)) {
+					 return d.value.toExponential(3).toString();
+					} else {
+					return d.value; 
+					}
+					});
 
 }
 
-renderTable("#tftable", "tftable", top_tfs, tf_columns, "tf_name");
-renderTable("#motiftable", "motiftable", top_motifs, motif_columns, "divid");
-
-
-
-
-tf_intx.forEach( function(intx, i, tf_intx) {
-
-if ( ( $("#" + intx["tf1"]).length > 0) && ( $("#" + intx["tf2"]).length > 0)  ) {
-
-jsPlumb.connect({
-    source: intx["tf1"],
-    target: intx["tf2"],
-    anchors: ["Left", "Left"],
-    connector:[ "Bezier", { curviness: 50 } ],
-    paintStyle:{lineWidth:1.5,strokeStyle:'rgba(243,40,18,0.5)'},
-    endpoint: [ "Rectangle", { width:5, height:5 } ],
-});
-
-}
-
-});
-
-
-
-
-tf_to_motif.forEach( function(tf_motif, i, d) {
-
-if ( ( $("#" + tf_motif["tf_name"]).length > 0) && ( $("#" + tf_motif["motif_divid"]).length > 0)  ) {
-
-jsPlumb.connect({
-    source: tf_motif["tf_name"],
-    target: tf_motif["motif_divid"],
-    anchors: ["Right", "Left"],
-    connector:[ "Bezier", { curviness: 50 } ],
-    paintStyle:{lineWidth:1.5,strokeStyle:'rgba(243,140,18,0.5)'},
-    endpoint: [ "Rectangle", { width:5, height:5 } ],
-});
-
-}
-});
-
-
-
-
-
-//$('#tftable').on('click', 'tbody tr', function(event) {
-//    $(this).addClass('highlight').siblings().removeClass('highlight');
-//});
-
-
-
-});
-
-// jsPlumb.bind("ready", function() {
-
-
-// });
 
   $(window).resize(function(){
       jsPlumb.repaintEverything();
   });
+
 
 
 var zoomListeners = [jsPlumb.repaintEverything];
@@ -224,30 +142,177 @@ var zoomListeners = [jsPlumb.repaintEverything];
 
 
 
-</script>
+function loadTable(target, table_name, query) {
+
+// var query_object =  { 
+//	dataset : dataset,
+//	selection : selection
+// };
+
+ var req = $.ajax({
+        url:"/gzdata",
+        type:"POST",
+        data: $.toJSON(query),
+        contentType:"application/json; charset=utf-8",
+        dataType:"json",
+        success: function(result){
+          if (result["success"] == true) {
+             renderTable(target, table_name, result["data"], result["columns"], result["idcol"]);
+				// drawHeatmapTable("#chart", result["data"]);
+          }  else {
+             alert("error!");
+          }
+        }
+     }); 
+
+ return req;
+
+}
+
+function loadConnections(dataset, selection) {
+  var query_object = {
+	dataset : dataset,
+ 	selection : selection
+  };
 
 
-<div id="hit_tables" style="float: left; height: 800px; overflow: auto; position: relative">
+ var req = $.ajax({
+	url : "/gzdata",
+	type : "POST", 
+	data: $.toJSON(query_object),
+	contentType: "application/json; charset=utf-8",
+	dataType: "json", 
+	success: function(result) {
+		if (result["success"] == true) {
+		  var connections = result["connections"];
+		  var connector_locations = result["connector_locations"];
+		  var connector_color = result["connector_color"];
+		  connection_graphs.push( result );
 
-<div style='float: left; padding: 50px' >
-   <div id="tftable"></div>
+		  connections.forEach( function(connection, i, connections) {
+			if ( ( $("#" + connection["source_id"]).length > 0) && ( $("#" + connection["target_id"]).length > 0) ) {
+				jsPlumb.connect({
+					source: connection["source_id"],
+					target: connection["target_id"],
+					anchors: connector_locations,
+					connector:[ "Bezier", { curviness: 50 } ],
+					paintStyle:{lineWidth:1.5,strokeStyle: connector_color },
+					endpoint: [ "Rectangle", { width:6, height:6 } ],
+				});
+			}
+
+		  });
+
+		} else {
+			alert("error");
+		}
+	}
+
+ });
+
+}
+
+function loadData(k) {
+
+	$.when( loadTable("#tftable", "tftable", { "dataset" : "tfs", "selection" : k } ),
+			loadTable("#motiftable", "motiftable", { "dataset": "motifs", "selection" : k} ) )
+	 .done(function() {
+			connections = [];
+			loadConnections("tf_tf_physical", k );
+			loadConnections("tf_motif_associations", k );
+
+			d3.selectAll("#tftable tr").on('click.targets', function(d, i) {
+				loadTable("#tf_targets", "tftargets", { dataset : "tf_targets", group : k, tf : d["tf_name"] });
+
+			});
+
+
+			d3.selectAll("#motiftable tr").on('click.targets', function(d, i) {
+				loadTable("#motif_targets", "motiftargets", { dataset : "motif_targets", group : k, motif_key : d["divid"] });
+			});
+
+
+	  });
+
+}
+
+
+var groups_json = '[{"name": "[[\\"cmp\\", [\\"6-OHDA, acuteHigh\\", \\"6-OHDA, acuteSaline\\"]], [\\"ct\\", \\"cp73\\"], [\\"dir\\", \\"any\\"]]", "key": "dd5bbfa3f7ffe81f8379fdc864bbd20232e03e6d"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, acuteHigh\\", \\"6-OHDA, acuteSaline\\"]], [\\"ct\\", \\"cp73\\"], [\\"dir\\", \\"down\\"]]", "key": "e6eb74f59d429a9c1c118e16c947d00bb64475cc"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, acuteHigh\\", \\"6-OHDA, acuteSaline\\"]], [\\"ct\\", \\"cp73\\"], [\\"dir\\", \\"up\\"]]", "key": "3fbae51dc0306afa054da83b6a9d6af259bf12b0"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicHigh\\", \\"6-OHDA, acuteHigh\\"]], [\\"ct\\", \\"cp73\\"], [\\"dir\\", \\"any\\"]]", "key": "64ee49c60b1007e186e2f024fa8a3848785d1e90"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicHigh\\", \\"6-OHDA, acuteHigh\\"]], [\\"ct\\", \\"cp73\\"], [\\"dir\\", \\"down\\"]]", "key": "4485e18fcdb31e9a347c1a1500c6b206d1422405"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicHigh\\", \\"6-OHDA, acuteHigh\\"]], [\\"ct\\", \\"cp73\\"], [\\"dir\\", \\"up\\"]]", "key": "95259830a9287c27c40e733ba092424f1d768ddb"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicHigh\\", \\"6-OHDA, chronicLow\\"]], [\\"ct\\", \\"cp101\\"], [\\"dir\\", \\"any\\"]]", "key": "c85b8f23f14458b308255d4626fed51f90e6d40e"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicHigh\\", \\"6-OHDA, chronicLow\\"]], [\\"ct\\", \\"cp101\\"], [\\"dir\\", \\"down\\"]]", "key": "47cc0dc290edfab8f0f3a502dc522be9760d3e20"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicHigh\\", \\"6-OHDA, chronicLow\\"]], [\\"ct\\", \\"cp101\\"], [\\"dir\\", \\"up\\"]]", "key": "03069fdab940bda139d46e6428cb34fcc59c40c1"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicHigh\\", \\"6-OHDA, chronicLow\\"]], [\\"ct\\", \\"cp73\\"], [\\"dir\\", \\"any\\"]]", "key": "9d1d892d755b744be7d7b1b6d2fa93bbeaf246ba"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicHigh\\", \\"6-OHDA, chronicLow\\"]], [\\"ct\\", \\"cp73\\"], [\\"dir\\", \\"down\\"]]", "key": "636643001a188b4fdd20c3ef0ccc5fc8b4c571a1"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicHigh\\", \\"6-OHDA, chronicLow\\"]], [\\"ct\\", \\"cp73\\"], [\\"dir\\", \\"up\\"]]", "key": "d7c2396b2da88ac2cabc2ea49365c25b3e6e6025"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicHigh\\", \\"6-OHDA, chronicSaline\\"]], [\\"ct\\", \\"cp101\\"], [\\"dir\\", \\"any\\"]]", "key": "421858f5fbded295f3ca7a126b335e8f34cb72f8"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicHigh\\", \\"6-OHDA, chronicSaline\\"]], [\\"ct\\", \\"cp101\\"], [\\"dir\\", \\"down\\"]]", "key": "248174d091913bb53f3e2e4c139ae3c992f5b7df"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicHigh\\", \\"6-OHDA, chronicSaline\\"]], [\\"ct\\", \\"cp101\\"], [\\"dir\\", \\"up\\"]]", "key": "e5d0e4118ceb36c05f5f13a6e46c0b7c2b5deca5"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicHigh\\", \\"6-OHDA, chronicSaline\\"]], [\\"ct\\", \\"cp73\\"], [\\"dir\\", \\"any\\"]]", "key": "e95ac14852ee65273f251c5db8bfb05c865c4f56"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicHigh\\", \\"6-OHDA, chronicSaline\\"]], [\\"ct\\", \\"cp73\\"], [\\"dir\\", \\"down\\"]]", "key": "b0e2376b78be199770eb72a400dff9c825d36fa6"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicHigh\\", \\"6-OHDA, chronicSaline\\"]], [\\"ct\\", \\"cp73\\"], [\\"dir\\", \\"up\\"]]", "key": "86c07380fe2c29c36b9d1a3ab8fdba5d4c46e877"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicLow\\", \\"6-OHDA, chronicSaline\\"]], [\\"ct\\", \\"cp101\\"], [\\"dir\\", \\"any\\"]]", "key": "681654ad1ec1b6c04f6e925cf341301095835fc3"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicLow\\", \\"6-OHDA, chronicSaline\\"]], [\\"ct\\", \\"cp101\\"], [\\"dir\\", \\"down\\"]]", "key": "c6d61359c3501fd6f87fff36381c8674cd22be1c"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicLow\\", \\"6-OHDA, chronicSaline\\"]], [\\"ct\\", \\"cp101\\"], [\\"dir\\", \\"up\\"]]", "key": "13723aeec05f18c506f8686ff3ee41dd7850f738"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicLow\\", \\"6-OHDA, chronicSaline\\"]], [\\"ct\\", \\"cp73\\"], [\\"dir\\", \\"any\\"]]", "key": "02cf688ca4521c97b05019ccccdd77c67c4da584"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicLow\\", \\"6-OHDA, chronicSaline\\"]], [\\"ct\\", \\"cp73\\"], [\\"dir\\", \\"down\\"]]", "key": "f1d724b9b6d689b83626bc471d1f888e5e39d370"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicLow\\", \\"6-OHDA, chronicSaline\\"]], [\\"ct\\", \\"cp73\\"], [\\"dir\\", \\"up\\"]]", "key": "dc7bf775b29f84c3a69018a265976aa7a7cb8d8b"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicSaline\\", \\"Ascorbate, chronicSaline\\"]], [\\"ct\\", \\"cp101\\"], [\\"dir\\", \\"any\\"]]", "key": "9d6d3cd456949707b4d369ecbecd3c4151aef8ee"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicSaline\\", \\"Ascorbate, chronicSaline\\"]], [\\"ct\\", \\"cp101\\"], [\\"dir\\", \\"down\\"]]", "key": "6d015358a155b62b63b044762d5cef7a7f17ad72"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicSaline\\", \\"Ascorbate, chronicSaline\\"]], [\\"ct\\", \\"cp101\\"], [\\"dir\\", \\"up\\"]]", "key": "67fe71de15e707652749270cf5d93759e20b630a"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicSaline\\", \\"Ascorbate, chronicSaline\\"]], [\\"ct\\", \\"cp73\\"], [\\"dir\\", \\"any\\"]]", "key": "76a08435dea7049b1aebeae8a95adb80a2c85b64"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicSaline\\", \\"Ascorbate, chronicSaline\\"]], [\\"ct\\", \\"cp73\\"], [\\"dir\\", \\"down\\"]]", "key": "a5bc3f26b03bdc8ca3dc2ac1d6d7dd1b3630fd63"}, {"name": "[[\\"cmp\\", [\\"6-OHDA, chronicSaline\\", \\"Ascorbate, chronicSaline\\"]], [\\"ct\\", \\"cp73\\"], [\\"dir\\", \\"up\\"]]", "key": "bd276159f1636851522222b5a94db6408206334b"}]';
+var groups = jQuery.parseJSON(groups_json);
+
+renderTable("#group_list", "groups", groups, ["name"], "key");
+
+var groupItems = d3.selectAll("#group_list tr");
+
+groupItems.on('click', function(d, i) {
+ 		 jsPlumb.deleteEveryEndpoint();
+		 connection_graphs = [];
+		 $(this).addClass('highlight').siblings().removeClass('highlight'); 
+		 $("#tftable").html("");
+		 $("#motiftable").html("");
+		 loadData(d["key"]);   
+         });
+
+
+
+
+
+</%def>
+
+
+
+<div style="overflow: auto; width: 100%">
+
+
+<table>
+<tr>
+<td colspan=1>
+<h4> response groups </h4>
+<div style="padding: 10px; height: 200px; overflow: auto" id="group_list">
+
 </div>
+</td>
+
+<td></td>
+
+</tr>
+
+<tr style="vertical-align: top;">
+<td>
+	<div id="hit_tables" style="float: left; position: relative; height: 800px; overflow: auto">
+		<table style="height: 800px; overflow: auto;">
+			<tr style="vertical-align: top;  height: 800px; overflow: auto;">
+			<td>
+			<div style='float: left; padding: 50px;' >
+		  	<div id="tftable"></div>
+			</div>
+			</td>
+
+			<td>
+			<div style='padding: 50px; float: right; '>
+				<div id="motiftable"'></div>
+			</div>
+			</td>	
+			</tr>
+		</table>
+	</div>
+</td>
+
+<td>
+	<div style='padding: 10px'>
+		<div style="border: 1px solid grey; height: 400px; width: 800px; overflow: auto" id="tf_targets"></div>
+		<div style="border: 1px solid grey; height: 400px; width: 800px;  overflow: auto" id="motif_targets"></div>
+		<div style="border: 1px solid grey; height: 400px; width: 800px; overflow: auto" id="intersecting_targets"></div>
+	</div>
+</td>
+
+</tr>
+</table>
 
 
-<div style='float: left; padding: 50px'>
-    <div id="motiftable"'></div>
+
+
 </div>
-
-</div>
-
-<div style='float: left; padding: 50px'>
-    <div style="border: 1px solid grey; height: 400px; width: 400px;" id="tf_tagets"></div>
-    <div style="border: 1px solid grey; height: 400px; width: 400px; " id="motif_tagets"></div>
-    <div style="border: 1px solid grey; height: 400px; width: 400px; " id="intersecting_tagets"></div>
-
-
-</div>
-
 
 </html>
 

@@ -82,10 +82,6 @@ n = wr.runFlow()
 
 # <codecell>
 
-def portAdaptor(
-
-# <codecell>
-
 reload(gz)
 reload(tf)
 
@@ -95,7 +91,7 @@ w = gz.GZWorkFlow()
 calcTFTargetCounts = tf.CalcTFTargetCounts()
 calcMotifGeneCounts = tf.CalcMotifGeneCounts()
 loadCheaTable = tf.LoadCheaTable() 
-loadGeneMotifs = tf.LoadGeneMotifs()
+loadGeneMotifs = tf.LoadGeneMotifsFlexible()
 loadMatTFGraph = tf.LoadMatTFGraph()
 wideLoad = tf.WideLoad()
 getFactorTypes = tf.GetFactorTypes() 
@@ -115,10 +111,20 @@ w.addWorkNodes( [calcTFTargetCounts, calcMotifGeneCounts, loadCheaTable, loadGen
 
 # <codecell>
 
+upstreamDistance = gz.GZConst(5000)
+downstreamDistance = gz.GZConst(2000)
+
+w.addWorkNodes( [ upstreamDistance, downstreamDistance ] )
+
+# <codecell>
+
 w.plug( [(loadCheaTable.o.chea, calcTFTargetCounts.i.chea) ] )
 
 w.plug( [(wideLoad.o.cp_both_wide_info, getEnrichedTFs.i.cp_both_wide_info),
          (loadCheaTable.o.chea, getEnrichedTFs.i.chea) ] )
+
+w.plug( [(upstreamDistance.o.value, loadGeneMotifs.i.upstreamDistance),
+         (downstreamDistance.o.value, loadGeneMotifs.i.downstreamDistance)] )
 
 w.plug( [(wideLoad.o.cp_both_wide_info, getFactorTypes.i.cp_both_wide_info)])
 
@@ -149,11 +155,11 @@ g = gz.GZWorkRunner(w).worknode_graph()
 
 # <codecell>
 
-c = gz.GZWorkRunner(w).runFlow()
+c.results[('LoadGeneMotifsFlexible', 1)]["mm9_gene_motifs"][0:10]
 
 # <codecell>
 
-c.results[("AddEnrichedTFStats",1)]
+c = gz.GZWorkRunner(w).runFlow()
 
 # <codecell>
 
@@ -171,6 +177,14 @@ chea_binding = c.results[ ("AddEnrichedTFStats", 1) ]["tf_enrichment_stats"]
 # <codecell>
 
 contrastPatterns = c.results[ ("GetContrastPatterns",1)]["contrastPatterns"]
+
+# <codecell>
+
+mm9_motif_gene_counts[0:10]
+
+# <codecell>
+
+mm9_motif_gene_counts[0:10]
 
 # <codecell>
 
@@ -395,6 +409,10 @@ motif_tf = c.results[ ('LoadMatTFGraph', 1)]
 # <codecell>
 
 motif_tf
+
+# <codecell>
+
+cPickle.dump(open("/data/adrian/motif_tf_graph", "w"))
 
 # <codecell>
 
@@ -1164,7 +1182,23 @@ tfppi[["tf1", "tf2"]].select( lambda x: tfppi.ix[x, "tf1"] in set( top_tfs[k].tf
 
 # <codecell>
 
+tfppi
+
+# <codecell>
+
+tf_tf = tfppi[["tf1", "tf2"]]
+
+# <codecell>
+
 set( top_tfs[k].tf_name )
+
+# <codecell>
+
+tf_tf.columns = ["source_id", "target_id"]
+
+# <codecell>
+
+cPickle.dump( tf_tf, open("/data/adrian/c_tf_tf.pickle", "w"))
 
 # <codecell>
 
@@ -1214,6 +1248,10 @@ top_tfs[k].ix[ top_tfs[k].index[ rowZ['leaves'] ], : ].drop("tf_associations", a
 
 # <codecell>
 
+log2(1.5)
+
+# <codecell>
+
 tf_target_counts.merge( loadCheaTable.o.chea.val, left_on="tf", right_on="target")[0:10]
 
 # <codecell>
@@ -1247,6 +1285,34 @@ cPickle.dump( mm9_motif_gene_counts, open("/data/adrian/c_mm9_motif_gene_counts.
 # <codecell>
 
 cPickle.dump( tf_target_counts, open("/data/adrian/c_tf_target_counts", "w"), protocol=2)
+
+# <codecell>
+
+cPickle.dump( motif_tf["mat_tf_graph"], open("/data/adrian/c_motif_tf_graph.pickle", "w"))
+
+# <codecell>
+
+import json
+
+# <codecell>
+
+motif_keys = motifs.keys()
+
+# <codecell>
+
+motif_keys.sort()
+
+# <codecell>
+
+motif_keys
+
+# <codecell>
+
+json.dumps( map(dict, [zip(["name", "key"] , (k, hashlib.new('sha1', k).hexdigest())) for k in motif_keys]) )
+
+# <codecell>
+
+motifs[k].motif_occurrences[0]
 
 # <codecell>
 

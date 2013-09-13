@@ -284,12 +284,14 @@ groupItems.on('click', function(d, i) {
 			<tr style="vertical-align: top;  height: 800px; overflow: auto;">
 			<td>
 			<div style='float: left; padding: 50px;' >
+			<h5>enriched tf binding associations from CHEA</h5>
 		  	<div id="tftable"></div>
 			</div>
 			</td>
 
 			<td>
 			<div style='padding: 50px; float: right; '>
+				<h5>enriched motifs from SwissRegulon</h5>				
 				<div id="motiftable"'></div>
 			</div>
 			</td>	
@@ -300,8 +302,12 @@ groupItems.on('click', function(d, i) {
 
 <td>
 	<div style='padding: 10px'>
+		<h5>tf binding targets</h5>
 		<div style="border: 1px solid grey; height: 400px; width: 800px; overflow: auto" id="tf_targets"></div>
+		<h5>motif occurrences</h5>
 		<div style="border: 1px solid grey; height: 400px; width: 800px;  overflow: auto" id="motif_targets"></div>
+		
+		<h5>intersection of binding targets and motif occurrences</h5>
 		<div style="border: 1px solid grey; height: 400px; width: 800px; overflow: auto" id="intersecting_targets"></div>
 	</div>
 </td>

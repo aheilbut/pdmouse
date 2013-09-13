@@ -526,12 +526,12 @@ import networkx as nx
 
 # <codecell>
 
-figsize(13, 13)
-nx.draw_graphviz(g, 'dot')
+figsize(15, 15)
+nx.draw_graphviz(g, 'dot', node_shape="s", node_size=500)
 
 # <codecell>
 
-nx.topological_sort(g)[0]
+|nx.topological_sort(g)[0]
 
 # <codecell>
 
@@ -591,7 +591,7 @@ patternGroups = c.results[("GetContrastPatterns",1)]["patternGroups"]
 
 alib.plots.clusterHeatmap( pd.DataFrame( patternGroups.groups.keys(), columns=activePatterns.columns), 
                           "", None, None, width=6, height=15,
-                          cluster_rows= True, cluster_columns=True, distmethod='jaccard')
+                          cluster_rows= True, cluster_columns=True, distmethod='correlation')
 
 # <codecell>
 
@@ -1313,6 +1313,271 @@ json.dumps( map(dict, [zip(["name", "key"] , (k, hashlib.new('sha1', k).hexdiges
 # <codecell>
 
 motifs[k].motif_occurrences[0]
+
+# <codecell>
+
+
+# <codecell>
+
+group_a = cPickle.load( open("/data/adrian/group_a.pickle") )
+group_b = cPickle.load( open("/data/adrian/group_b.pickle") )
+group_c = cPickle.load( open("/data/adrian/group_c.pickle") )
+group_d = cPickle.load( open("/data/adrian/group_d.pickle") )
+
+# <codecell>
+
+chea = loadCheaTable.o.chea.val
+
+# <codecell>
+
+import pd_analysis as pda
+
+# <codecell>
+
+specific_groups_enrichment = {}
+
+# <codecell>
+
+specific_groups_motifs = {}
+
+# <codecell>
+
+def getMotifMatches( genegroup ):
+    cz= mm9_gene_motifs.merge(genegroup, left_on="genename", right_on="symbol") 
+    
+    total_genes_in_group = len( pda.uniqueSym(genegroup.symbol) )
+    
+    print(len(cz.index))
+    
+    result = []
+    for k, z in cz.groupby("motif_name"):
+        result.append( { "motif_name"  : k,
+                         "count" : len(pda.uniqueSym(z.symbol)),
+                         "total_genes_in_group" : total_genes_in_group,
+                         "motif_occurrences": z
+                        }  )
+        
+    result = pd.DataFrame(result)
+    result.index = result.motif_name
+    return result
+
+# <codecell>
+
+mm9_gene_motifs = loadGeneMotifs.o.mm9_gene_motifs.val
+
+# <codecell>
+
+group_d.symbol.unique()
+
+# <codecell>
+
+getMotifMatches( group_d ).sort_index(by="count", ascending=False).drop("motif_occurrences",axis=1)[0:10]
+
+# <codecell>
+
+for (group_name, g) in [("group A; table 22", group_a),  
+                        ("group B; table 23", group_b),  
+                        ("group C; table 24", group_c),
+                        ("group D; table 25", group_d)]:
+    specific_groups_enrichment[group_name] = getTFMatches(g).sort_index( by="count", ascending=False )
+
+# <codecell>
+
+for (group_name, g) in [("group A; table 22", group_a),  
+                        ("group B; table 23", group_b),  
+                        ("group C; table 24", group_c),
+                        ("group D; table 25", group_d)]:
+    a = specific_groups_enrichment[group_name].tf_associations
+    specific_groups_enrichment[group_name]["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
+    specific_groups_enrichment[group_name] = ( specific_groups_enrichment[group_name]
+      .merge( tf_target_counts, left_on="tf_name", right_on="tf")
+    )
+
+# <codecell>
+
+cp_73_chronic_high_vs_low = cPickle.load( open("/data/adrian/aim_correlated_table13.pickle") )
+
+# <codecell>
+
+cn_cp73_chronicHigh_vs_Low_foldchange = pda.tm.e([  ("cmp", ["6-OHDA, chronicHigh", "6-OHDA, chronicLow"]),
+            ("ct", "cp73"),
+            ("st", "fc_medians"),
+        ])
+
+# <codecell>
+
+t13_motifs = {}
+t13_tfs = {}
+
+t13_up = cp_73_chronic_high_vs_low.select( lambda x: cp_73_chronic_high_vs_low.ix[x, cn_cp73_chronicHigh_vs_Low_foldchange] > 0 )
+t13_down = cp_73_chronic_high_vs_low.select( lambda x: cp_73_chronic_high_vs_low.ix[x, cn_cp73_chronicHigh_vs_Low_foldchange] < 0 )
+
+t13_motifs[ "aim_corr_table13 - UP"] = getMotifMatches(t13_up)
+t13_motifs[ "aim_corr_table13 - DOWN"] = getMotifMatches(t13_down)
+t13_motifs[ "aim_corr_table13 - ALL"] = getMotifMatches(cp_73_chronic_high_vs_low)
+
+
+t13_tfs[ "aim_corr_table13 - UP"] = getTFMatches(t13_up) 
+t13_tfs[ "aim_corr_table13 - DOWN"] = getTFMatches(t13_down) 
+t13_tfs[ "aim_corr_table13 - ALL"] = getTFMatches(cp_73_chronic_high_vs_low) 
+
+# <codecell>
+
+t13_tfs
+
+# <codecell>
+
+for k in t13_tfs.keys():
+    a = t13_tfs[k].tf_associations
+    t13_tfs[k]["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
+    t13_tfs[k] = t13_tfs[k].merge( tf_target_counts, left_on="tf_name", right_on="tf")
+
+# <codecell>
+
+t13_motifs
+
+# <codecell>
+
+for k in t13_motifs.keys():    
+    a = t13_motifs[k].motif_occurrences
+    t13_motifs[k]["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
+    t13_motifs[k] = t13_motifs[k].merge( mm9_motif_gene_counts, left_on="motif_name", right_on="motif_name")
+
+# <codecell>
+
+mm9_motif_gene_counts
+
+# <codecell>
+
+for (group_name, g) in [("group A; table 22", group_a),  
+                        ("group B; table 23", group_b),  
+                        ("group C; table 24", group_c),
+                        ("group D; table 25", group_d)]:
+    specific_groups_motifs[group_name] = getMotifMatches(g).sort_index( by="count", ascending=False )
+
+# <codecell>
+
+for (group_name, g) in [("group A; table 22", group_a),  
+                        ("group B; table 23", group_b),  
+                        ("group C; table 24", group_c),
+                        ("group D; table 25", group_d)]:
+    a = specific_groups_motifs[group_name].motif_occurrences
+    specific_groups_motifs[group_name]["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
+    specific_groups_motifs[group_name] = ( specific_groups_motifs[group_name]
+      .merge( mm9_motif_gene_counts, left_on="motif_name", right_on="motif_name")
+     )
+
+# <codecell>
+
+specific_groups_enrichment["group A; table 22"].merge( tf_target_counts, left_on="tf_name", right_index=True )
+
+# <codecell>
+
+addEnrichedTFStats.i.top_tfs.val = t13_tfs
+addEnrichedTFStats.run()
+
+# <codecell>
+
+addEnrichedMotifStats.i.mm9_motif_gene_counts.val
+
+# <codecell>
+
+addEnrichedMotifStats.i.top_motifs.val = t13_motifs
+addEnrichedMotifStats.run()
+
+# <codecell>
+
+e = pd.ExcelWriter("/data/adrian/specific_groups_transcripReg_09122013.xls")
+
+# <codecell>
+
+b = a[0]
+
+# <codecell>
+
+b.to_excel(
+
+# <codecell>
+
+e.save()
+
+# <codecell>
+
+for k in specific_groups_enrichment.keys():
+#    print k
+    specific_groups_enrichment[k].drop("tf_associations", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; chea")
+    specific_groups_motifs[k].drop("motif_occurrences", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k +"; motifs")
+
+# <codecell>
+
+specific_groups_motifs['group D; table 25'].drop("motif_occurrences", axis=1).sort_index(by="pval")[0:30]
+
+# <codecell>
+
+calcMotifGeneCounts
+
+# <codecell>
+
+mm9_motif_gene_counts
+
+# <codecell>
+
+tf_target_counts
+
+# <codecell>
+
+tf_target_counts
+
+# <codecell>
+
+a = specific_groups_enrichment['group D; table 25'].tf_associations
+
+# <codecell>
+
+specific_groups_enrichment['group D; table 25']["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
+
+# <codecell>
+
+( specific_groups_enrichment['group D; table 25']
+  .merge( tf_target_counts, left_on="tf_name", right_on="tf")
+  .drop("tf_associations", axis=1)
+  .sort_index(by="pval"))
+
+# <codecell>
+
+specific_groups_motifs['group C; table 24'].drop("motif_occurrences", axis=1).sort_index(by="pval")
+
+# <codecell>
+
+specific_groups_enrichment['group C; table 24'].drop("tf_associations", axis=1).sort_index(by="pval")[0:10]
+
+# <codecell>
+
+def getTFMatches( genegroup, combination_size=1):
+    genegroup["upper_sym"] = [a.upper() if isinstance(a, str) else "-" for a in genegroup.symbol ]
+    cz = chea.merge( genegroup, left_on="target", right_on="upper_sym")
+    
+    total_genes_in_group = len( pda.uniqueSym(genegroup.symbol) )
+    
+    print(len(cz.index))
+    result = []
+    for k, z in cz.groupby("tf"):
+        result.append( { "tf_name" : k,
+                         "count" : len(pda.uniqueSym(z.symbol)),
+                         "total_genes_in_group" : total_genes_in_group,
+                         "tf_associations" : z
+                         })
+    result = pd.DataFrame(result)
+    result.index = result.tf_name
+    return result    
+
+# <codecell>
+
+e = pd.ExcelWriter("/data/adrian/aim_correlated_transcriptReg.xls")
+for k in t13_tfs.keys():
+    t13_tfs[k].drop("tf_associations", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; chea")
+    t13_motifs[k].drop("motif_occurrences", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k +"; motifs")
+e.save()
 
 # <codecell>
 

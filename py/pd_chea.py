@@ -1434,10 +1434,6 @@ for k in t13_tfs.keys():
 
 # <codecell>
 
-t13_motifs
-
-# <codecell>
-
 for k in t13_motifs.keys():    
     a = t13_motifs[k].motif_occurrences
     t13_motifs[k]["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
@@ -1581,4 +1577,179 @@ e.save()
 
 # <codecell>
 
+hd_data = pd.read_table("/data/adrian/Dropbox/Projects/Broad/HD_mouse/HD_file_archive/2013_09/R62 14 week P0.1, FC1.2 BHcorr.txt", 
+                        sep="\t", comment="#",
+                        header=0)
+
+# <codecell>
+
+hd_data["symbol"] = hd_data["Gene Symbol"]
+
+# <codecell>
+
+hd_sym = [s.split("///")[0] for s in pda.uniqueSym( hd_data["Gene Symbol"] )]
+
+# <codecell>
+
+hd_motifs = { "hd_set" : getMotifMatches( hd_data ) }
+
+# <codecell>
+
+hd_tfs = { "hd_set" : getTFMatches( hd_data ) }
+
+# <codecell>
+
+addEnrichedTFStats.i.top_tfs.val = hd_tfs
+addEnrichedTFStats.run()
+
+# <codecell>
+
+addEnrichedMotifStats.i.top_motifs.val = hd_motifs
+addEnrichedMotifStats.run()
+
+# <codecell>
+
+hd_tfs
+
+# <codecell>
+
+hd_motifs.drop("motif_occurrences", axis=1).sort_index(by="count", ascending=False)[0:50]
+
+# <codecell>
+
+for k in hd_motifs.keys():
+    a = hd_motifs[k].motif_occurrences
+    hd_motifs[k]["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
+    hd_motifs[k] = hd_motifs[k].merge( mm9_motif_gene_counts, left_on="motif_name", right_on="motif_name")
+
+# <codecell>
+
+for k in hd_tfs.keys():
+    a = hd_tfs[k].tf_associations
+    hd_tfs[k]["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
+    hd_tfs[k] = hd_tfs[k].merge( tf_target_counts, left_on="tf_name", right_on="tf")
+
+# <codecell>
+
+hd_tfs["hd_set"].sort_index(by="pval").drop("tf_associations", axis=1)[0:20]
+
+# <codecell>
+
+hd_motifs["hd_set"].drop("motif_occurrences", axis=1).sort_index(by="pval")[0:10]
+
+# <codecell>
+
+e = pd.ExcelWriter("/data/adrian/Dropbox/hd_r62_14wk_transcriptReg.xls")
+for k in hd_motifs.keys():
+    hd_tfs[k].drop("tf_associations", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; chea")
+    hd_motifs[k].drop("motif_occurrences", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k +"; motifs")
+e.save()
+
+# <codecell>
+
+hd_human = pd.read_excel("/data/adrian/Dropbox/Projects/Broad/HD_mouse/2013_09_18/Hodges_2006_TableS2.xls",
+                         "Table S3", 
+                         skiprows=1)
+
+# <codecell>
+
+hd_human
+
+# <codecell>
+
+hg133a_symbols = pd.DataFrame.from_csv("/data/adrian/Dropbox/Projects/Broad/HD_mouse/2013_09_18/hgu133a_symbols.tab", sep="\t")
+
+# <codecell>
+
+hg133a_symbols
+
+# <codecell>
+
+hg133b_symbols = pd.DataFrame.from_csv("/data/adrian/Dropbox/Projects/Broad/HD_mouse/2013_09_18/hgu133b_symbols.tab", sep="\t")
+
+# <codecell>
+
+hg133b_symbols
+
+# <codecell>
+
+hg133a_probesets = set(hg133a_symbols.index)
+hg133b_nonredund = hg133b_symbols.select( lambda x : x not in hg133a_probesets )
+
+# <codecell>
+
+hg133_all_symbols = pd.concat([hg133a_symbols, hg133b_nonredund])
+
+# <codecell>
+
+hd_human.select(lambda x: hd_human.ix[x, "direction"] == "Increased" )
+
+# <codecell>
+
+len(hg133_all_symbols.index)
+
+# <codecell>
+
+hd_human.columns=["probeset_id", "overlap", "direction"]
+
+# <codecell>
+
+hd_human_sym = hd_human.merge( hg133_all_symbols, left_on="probeset_id", right_index=True )
+
+# <codecell>
+
+hd_human_sym.select(lambda x: hd_human_sym.ix[x, "direction"] == "Decreased")
+
+# <codecell>
+
+hd_human_groups = {}
+hd_human_groups["all; Any dir"] = hd_human_sym
+hd_human_groups["all; UP"] = hd_human_sym.select(lambda x: hd_human_sym.ix[x, "direction"] == "Increased")
+hd_human_groups["all; DOWN"] = hd_human_sym.select(lambda x: hd_human_sym.ix[x, "direction"] == "Decreased")
+hd_human_groups["ol caudate; Any dir"] = hd_human_sym.select(lambda x: hd_human_sym.ix[x, "overlap"] == "*" )
+hd_human_groups["ol caudate; UP"] = hd_human_sym.select(lambda x: hd_human_sym.ix[x, "direction"] == "Increased" 
+                                                                          and hd_human_sym.ix[x, "overlap"] == "*" )
+hd_human_groups["ol caudate; DOWN"]  = hd_human_sym.select(lambda x: hd_human_sym.ix[x, "direction"] == "Decreased" 
+                                                                          and hd_human_sym.ix[x, "overlap"] == "*" )
+
+
+# <codecell>
+
+hd_human_groups.keys()
+
+# <codecell>
+
+a
+
+# <codecell>
+
+addEnrichedTFStats.i.tf_target_counts.val
+
+# <codecell>
+
+hd_human_tfs = {}
+for g in hd_human_groups.keys():
+    t = getTFMatches( hd_human_groups[g] )
+    hd_human_tfs[g] = t
+addEnrichedTFStats.i.top_tfs.val = hd_human_tfs 
+addEnrichedTFStats.run()
+
+# <codecell>
+
+for k in hd_human_tfs.keys():
+    a = hd_human_tfs[k].tf_associations
+    hd_human_tfs[k]["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
+    hd_human_tfs[k] = hd_human_tfs[k].merge( tf_target_counts, left_on="tf_name", right_on="tf")
+
+# <codecell>
+
+e = pd.ExcelWriter("/data/adrian/Dropbox/hd_human_hodges_chea.xls")
+for k in hd_human_tfs.keys():
+    hd_human_tfs[k].drop("tf_associations", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; chea")
+#    hd_motifs[k].drop("motif_occurrences", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k +"; motifs")
+e.save()
+
+# <codecell>
+
+hd_tfs = { "hd_set" : getTFMatches( hd_data  }
 

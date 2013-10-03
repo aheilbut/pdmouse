@@ -589,6 +589,156 @@ patternGroups = c.results[("GetContrastPatterns",1)]["patternGroups"]
 
 # <codecell>
 
+activePatterns
+
+# <codecell>
+
+activeSorted = activePatterns.sort_index( by=[activePatterns.columns[3], 
+                                              activePatterns.columns[4], 
+                                              activePatterns.columns[0],
+                                              activePatterns.columns[5],                                              
+                                              activePatterns.columns[6],                                              
+                                              activePatterns.columns[7],                                              
+                                              activePatterns.columns[8],                                              
+                                              activePatterns.columns[9],                                              
+                                              activePatterns.columns[2],                                              
+                                              activePatterns.columns[1]                                          
+                                              ])
+
+# <codecell>
+
+import pd_analysis as pda
+
+# <codecell>
+
+gene_reps = []
+for symbol, g in pda.mo430symbol.groupby("symbol").groups.items():
+    gene_reps.append(  { "symbol" : symbol, "probe_id" : g[0] } )
+gene_reps = pd.DataFrame( gene_reps )
+
+# <codecell>
+
+activeSorted = activeSorted.merge(gene_reps, left_index=True, right_on="probe_id")
+
+# <codecell>
+
+activeSorted = activeSorted.drop( "probe_id", axis=1)
+activeSorted = activeSorted.drop( "symbol", axis=1)
+
+# <codecell>
+
+sign( activeSorted[0:5].as_matrix()[0:5,0:5] )  [
+
+# <codecell>
+
+import scipy.cluster
+
+# <codecell>
+
+activeSorted["b"] = 3
+
+# <codecell>
+
+activeSorted
+
+# <codecell>
+
+activeSorted.as_matrix() * [5, 2, 2, 5, 5, 2, 2, 2, 2, 2, 0]
+
+# <codecell>
+
+distances = scipy.cluster.hierarchy.distance.pdist( activeSorted.as_matrix() * [1, -1, 3, 5, -4, 6, -3, 4, 1, 1, 0], 
+                                                   metric="cosine")
+
+# <codecell>
+
+import sys
+sys.setrecursionlimit(10000)
+
+# <codecell>
+
+rowY = fastcluster.linkage(distances)
+
+# <codecell>
+
+rowZ = scipy.cluster.hierarchy.dendrogram(rowY, orientation='right', no_plot=True)
+
+# <codecell>
+
+col_distances = scipy.cluster.hierarchy.distance.pdist( activeSorted.as_matrix().transpose() )
+col_rowY = fastcluster.linkage(col_distances)
+col_rowZ = scipy.cluster.hierarchy.dendrogram(col_rowY, orientation='right', no_plot=True)
+
+# <codecell>
+
+col_rowZ['leaves']
+
+# <codecell>
+
+for c in enumerate(activePatterns.columns[[9, 7, 5, 0, 3, 4, 6, 8, 2, 1]]):
+    print c
+
+# <codecell>
+
+import alib
+
+# <codecell>
+
+for c in activePatterns.columns[[9, 7, 5, 0, 3, 1, 4, 6, 8]]:
+     print c
+
+# <codecell>
+
+figsize(30, 10)
+plotData =  activeSorted.as_matrix()[rowZ['leaves'], :]
+plotData = plotData[:, [9, 7, 5, 0, 3, 1, 4, 6, 8] ]
+imshow( plotData.transpose(), 
+           interpolation='nearest', aspect=200, 
+           cmap=alib.plots.my_cmap, vmin=-1, vmax=1)
+yticks([0, 1, 2, 3, 4, 5, 6, 7, 8], 
+       ["Dop. Depletion - dSPN ", "Chronic Low vs. Saline - dSPN ", 
+        "Chronic High vs. Saline - dSPN ", "Acute High vs. Saline - dSPN ",
+        "Chronic High vs. Chronic Low - dSPN", "Acute vs Chronic - dSPN ",
+        "Chronic High vs. Saline - iSPN ", "Chronic Low vs. Saline - iSPN ", 
+        "Dop Depletion - iSPN "], fontsize=16)
+xticks(arange(0, 13000, 500))
+grid(which="both", ls='solid', color='lightgray', alpha=0.3 )
+tight_layout()
+#savefig("/data/adrian/Dropbox/Projects/Broad/PD_mouse/Manuscript/figures_0929/contrast_barcode.pdf")
+
+# <codecell>
+
+figsize(30, 10)
+plotData =  activeSorted.as_matrix()[rowZ['leaves'], :][0:1000, :]
+plotData = plotData[:, [9, 7, 5, 0, 3, 1, 4, 6, 8] ]
+imshow( plotData.transpose(), 
+           interpolation='nearest', aspect=20, 
+           cmap=alib.plots.my_cmap, vmin=-1, vmax=1)
+yticks([0, 1, 2, 3, 4, 5, 6, 7, 8], 
+       ["Dop. Depletion - dSPN ", "Chronic Low vs. Saline - dSPN ", 
+        "Chronic High vs. Saline - dSPN ", "Acute High vs. Saline - dSPN ",
+        "Chronic High vs. Chronic Low - dSPN", "Acute vs Chronic - dSPN ",
+        "Chronic High vs. Saline - iSPN ", "Chronic Low vs. Saline - iSPN ", 
+        "Dop Depletion - iSPN "], fontsize=16)
+#xticks(arange(0, 13000, 500))
+grid(which="both", ls='solid', color='lightgray', alpha=0.3 )
+tight_layout()
+
+# <codecell>
+
+matplotlib.__version__
+
+# <codecell>
+
+activeSorted[0:10]
+
+# <codecell>
+
+alib.plots.clusterHeatmap( activeSorted[0:1000],"", None, None, 
+                              cluster_rows=False, cluster_columns=False, width=6, height=15)
+
+# <codecell>
+
 alib.plots.clusterHeatmap( pd.DataFrame( patternGroups.groups.keys(), columns=activePatterns.columns), 
                           "", None, None, width=6, height=15,
                           cluster_rows= True, cluster_columns=True, distmethod='correlation')
@@ -1371,7 +1521,11 @@ group_d.symbol.unique()
 
 # <codecell>
 
-getMotifMatches( group_d ).sort_index(by="count", ascending=False).drop("motif_occurrences",axis=1)[0:10]
+group_d
+
+# <codecell>
+
+getMotifMatches( group_d ).sort_index(by="count", ascending=False).drop("motif_occurrences",axis=1)[0:10]Duckworth spent a number of years toying with the idea of starting her own charter school, but eventually concluded that the model didn’t hold much promise for changing the circumstances of children from disadvantaged backgrounds, those whom the education system was failing most tragically. Instead, she decided to pursue a PhD program at Penn. In her application essay, she shared how profoundly the experience of working in schools had changed her view of school reform and wrote:
 
 # <codecell>
 
@@ -1550,22 +1704,27 @@ specific_groups_enrichment['group C; table 24'].drop("tf_associations", axis=1).
 # <codecell>
 
 def getTFMatches( genegroup, combination_size=1):
-    genegroup["upper_sym"] = [a.upper() if isinstance(a, str) else "-" for a in genegroup.symbol ]
+    #genegroup["upper_sym"] = [a.upper() if isinstance(a, str) else "-" for a in genegroup.symbol ]
+    genegroup["upper_sym"] = [str(a).upper() if isinstance(a, float) is not True else "-" for a in genegroup.symbol ]
+
     cz = chea.merge( genegroup, left_on="target", right_on="upper_sym")
     
     total_genes_in_group = len( pda.uniqueSym(genegroup.symbol) )
     
     print(len(cz.index))
-    result = []
-    for k, z in cz.groupby("tf"):
-        result.append( { "tf_name" : k,
-                         "count" : len(pda.uniqueSym(z.symbol)),
-                         "total_genes_in_group" : total_genes_in_group,
-                         "tf_associations" : z
-                         })
-    result = pd.DataFrame(result)
-    result.index = result.tf_name
-    return result    
+    if len(cz.index) > 0:
+        result = []
+        for k, z in cz.groupby("tf"):
+            result.append( { "tf_name" : k,
+                             "count" : len(pda.uniqueSym(z.symbol)),
+                             "total_genes_in_group" : total_genes_in_group,
+                             "tf_associations" : z
+                             })
+        result = pd.DataFrame(result)
+        result.index = result.tf_name
+        return result  
+    else:
+        return None
 
 # <codecell>
 
@@ -1580,6 +1739,109 @@ e.save()
 hd_data = pd.read_table("/data/adrian/Dropbox/Projects/Broad/HD_mouse/HD_file_archive/2013_09/R62 14 week P0.1, FC1.2 BHcorr.txt", 
                         sep="\t", comment="#",
                         header=0)
+
+# <codecell>
+
+doyle_data_top_d1_enriched = pd.read_excel("/data/adrian/Dropbox/Projects/Broad/PD_mouse/extra_data/doyle_cell_specific.xlsx", 
+                                           "Top D1 enriched", header=None)
+doyle_data_top_d1_enriched.columns = ["probeset_id", "symbol"]
+
+doyle_data_top_d2_enriched = pd.read_excel("/data/adrian/Dropbox/Projects/Broad/PD_mouse/extra_data/doyle_cell_specific.xlsx", 
+                                           "Top D2 enriched", header=None,  )
+doyle_data_top_d2_enriched.columns = ["probeset_id", "symbol"]
+
+doyle_data_d1_enriched = pd.read_excel("/data/adrian/Dropbox/Projects/Broad/PD_mouse/extra_data/doyle_cell_specific.xlsx", 
+                                           "D1 enriched", header=None)
+doyle_data_d1_enriched.columns = ["probeset_id", "symbol"]
+
+doyle_data_d2_enriched = pd.read_excel("/data/adrian/Dropbox/Projects/Broad/PD_mouse/extra_data/doyle_cell_specific.xlsx", 
+                                           "D2 enriched", header=None)
+doyle_data_d2_enriched.columns = ["probeset_id", "symbol"]
+
+doyle_data_striatal_enriched = pd.read_excel("/data/adrian/Dropbox/Projects/Broad/PD_mouse/extra_data/doyle_cell_specific.xlsx", 
+                                           "Striatal enriched", header=None)
+doyle_data_striatal_enriched.columns = ["probeset_id", "symbol"]
+
+doyle_data_purkinje_enriched = pd.read_excel("/data/adrian/Dropbox/Projects/Broad/PD_mouse/extra_data/doyle_cell_specific.xlsx", 
+                                           "Purkinjie cell enriched", header=None)
+doyle_data_purkinje_enriched.columns = ["probeset_id", "symbol"]
+
+doyle_data_brainstem_motorneuron_enriched = pd.read_excel("/data/adrian/Dropbox/Projects/Broad/PD_mouse/extra_data/doyle_cell_specific.xlsx", 
+                                           "Brain stem motor neuron", header=None)
+doyle_data_brainstem_motorneuron_enriched.columns = ["probeset_id", "symbol"]
+
+
+doyle_motifs= {
+               "top D1" : getMotifMatches( doyle_data_top_d1_enriched ),
+               "top D2" : getMotifMatches( doyle_data_top_d2_enriched ),
+               "D1" : getMotifMatches( doyle_data_d1_enriched ),
+               "D2" : getMotifMatches( doyle_data_d2_enriched ),
+               "Striatal" : getMotifMatches( doyle_data_striatal_enriched ),
+               "purkinje" : getMotifMatches( doyle_data_purkinje_enriched ),
+               "brainstem motorneuron" : getMotifMatches( doyle_data_brainstem_motorneuron_enriched)
+               }
+
+# <codecell>
+
+doyle_tf = {
+               "top D1" : getTFMatches( doyle_data_top_d1_enriched ),
+               "top D2" : getTFMatches( doyle_data_top_d2_enriched ),
+               "D1" : getTFMatches( doyle_data_d1_enriched ),
+               "D2" : getTFMatches( doyle_data_d2_enriched ),
+               "Striatal" : getTFMatches( doyle_data_striatal_enriched ),
+               "purkinje" : getTFMatches( doyle_data_purkinje_enriched ),
+               "brainstem motorneuron" : getTFMatches( doyle_data_brainstem_motorneuron_enriched)
+               }
+
+# <codecell>
+
+doyle_data_top_d1_enriched.symbol.dtype = np.str
+
+# <codecell>
+
+
+# <codecell>
+
+addEnrichedMotifStats.i.top_motifs.val = doyle_motifs
+addEnrichedMotifStats.run()
+
+# <codecell>
+
+addEnrichedTFStats.i.top_tfs.val = doyle_tf
+addEnrichedTFStats.run()
+
+# <codecell>
+
+for k in doyle_motifs.keys():
+    a = doyle_motifs[k].motif_occurrences
+    doyle_motifs[k]["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
+    doyle_motifs[k] = doyle_motifs[k].merge( mm9_motif_gene_counts, left_on="motif_name", right_on="motif_name")
+
+# <codecell>
+
+for k in doyle_tf.keys():
+    a = doyle_tf[k].tf_associations
+    doyle_tf[k]["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
+    doyle_tf[k] = doyle_tf[k].merge( tf_target_counts, left_on="tf_name", right_on="tf")
+
+# <codecell>
+
+
+# <codecell>
+
+doyle_tf["D1"].drop("tf_associations", axis=1).sort_index(by="count", ascending=False)[0:50]
+
+# <codecell>
+
+doyle_motifs["D1"].drop("motif_occurrences", axis=1).sort_index(by="count", ascending=False)[0:50]
+
+# <codecell>
+
+dd_motifs = getMotifMatches( doyle_data_top_d1_enriched )
+
+# <codecell>
+
+dd_motifs.drop("motif_occurrences", axis=1)
 
 # <codecell>
 
@@ -1601,6 +1863,9 @@ hd_tfs = { "hd_set" : getTFMatches( hd_data ) }
 
 addEnrichedTFStats.i.top_tfs.val = hd_tfs
 addEnrichedTFStats.run()
+
+# <codecell>
+
 
 # <codecell>
 
@@ -1643,6 +1908,14 @@ e = pd.ExcelWriter("/data/adrian/Dropbox/hd_r62_14wk_transcriptReg.xls")
 for k in hd_motifs.keys():
     hd_tfs[k].drop("tf_associations", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; chea")
     hd_motifs[k].drop("motif_occurrences", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k +"; motifs")
+e.save()
+
+# <codecell>
+
+e = pd.ExcelWriter("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/2013_09_26/doyle_enriched_transcriptReg.xls")
+for k in doyle_motifs.keys():
+    doyle_tf[k].drop("tf_associations", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; chea")
+    doyle_motifs[k].drop("motif_occurrences", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k +"; motifs")
 e.save()
 
 # <codecell>

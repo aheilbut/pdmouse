@@ -32,6 +32,18 @@ swissreg_sites["motif_name"] = swissreg_sites.apply( lambda x: urllib2.unquote( 
 
 # <codecell>
 
+swissreg_sites_hg19 = pd.read_table("/data/adrian/Dropbox/Data/swissregulon/hg19_sites.gff", 
+                                    sep="\t",
+                                    skiprows=1,
+                                    names=["chrom", "alg", "motif_type", 
+                                      "start", "end", "score", "strand", "frame", "data"])
+
+# <codecell>
+
+swissreg_sites_hg19["motif_name"] = swissreg_sites_hg19.apply( lambda x: urllib2.unquote( dict([a.split("=") for a in x["data"].split(";")])["Motif"] ), axis=1 )
+
+# <codecell>
+
 r = dict([a.split("=") for a in swissreg_sites.data[0].split(";")])["Motif"]
 
 # <codecell>
@@ -53,6 +65,10 @@ IPython.display.HTML( swissreg_sites[0:10].to_html() )
 # <codecell>
 
 swissreg_sites.to_csv("/data/adrian/Dropbox/Data/swissregulon/mm9_sites.tab", sep="\t", index=False)
+
+# <codecell>
+
+swissreg_sites_hg19.to_csv("/data/adrian/Dropbox/Data/swissregulon/hg19_sites.tab", sep="\t", index=False)
 
 # <codecell>
 

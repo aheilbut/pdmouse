@@ -57,6 +57,10 @@ w.plug( [ (loadWideTable.o.cp_both_wide_info, getFactorTypes.i.cp_both_wide_info
 
 # <codecell>
 
+chea
+
+# <codecell>
+
 loadWideTable.o.resultdict()
 
 # <codecell>
@@ -96,7 +100,9 @@ loadMatTFGraph = tf.LoadMatTFGraph()
 wideLoad = tf.WideLoad()
 getFactorTypes = tf.GetFactorTypes() 
 getEnrichedTFs = tf.GetEnrichedTFs() 
-getEnrichedSRMotifs = tf.GetEnrichedSRMotifs() 
+getEnrichedSRMotifs = tf.GetEnrichedSRMotifs()
+
+
 
 addEnrichedTFStats = tf.AddEnrichedTFStats() 
 addEnrichedMotifStats = tf.AddEnrichedMotifStats() 
@@ -104,10 +110,12 @@ getContrastPatterns = tf.GetContrastPatterns()
 fc_t = gz.GZConst(1.5)
 total_genes = gz.GZConst(22000)
 
+species_genome = gz.GZConst("hg19")
+
 w.addWorkNodes( [calcTFTargetCounts, calcMotifGeneCounts, loadCheaTable, loadGeneMotifs,
                  loadMatTFGraph, wideLoad, getFactorTypes, getEnrichedTFs, getEnrichedSRMotifs, 
                  addEnrichedMotifStats, addEnrichedTFStats, getContrastPatterns,
-                 fc_t, total_genes ] ) 
+                 fc_t, total_genes, species_genome ] ) 
 
 # <codecell>
 
@@ -151,11 +159,15 @@ w.plug( [(loadGeneMotifs.o.mm9_gene_motifs, calcMotifGeneCounts.i.mm9_gene_motif
 
 # <codecell>
 
+w.plug( [(species_genome.o.value, loadGeneMotifs.i.species_genome)] )
+
+# <codecell>
+
 g = gz.GZWorkRunner(w).worknode_graph()
 
 # <codecell>
 
-c.results[('LoadGeneMotifsFlexible', 1)]["mm9_gene_motifs"][0:10]
+hs_motifs = c.results[('LoadGeneMotifsFlexible', 1)]["mm9_gene_motifs"]
 
 # <codecell>
 
@@ -185,6 +197,10 @@ mm9_motif_gene_counts[0:10]
 # <codecell>
 
 mm9_motif_gene_counts[0:10]
+
+# <codecell>
+
+hg19_motif_gene_counts = c.results[("CalcMotifGeneCounts",1)]["mm9_motif_gene_counts"]
 
 # <codecell>
 
@@ -526,8 +542,8 @@ import networkx as nx
 
 # <codecell>
 
-figsize(15, 15)
-nx.draw_graphviz(g, 'dot', node_shape="s", node_size=500)
+figsize(20, 20)
+nx.draw_graphviz(g, 'dot', node_shape="s", node_color='lightblue', node_size=500)
 
 # <codecell>
 
@@ -1480,6 +1496,10 @@ chea = loadCheaTable.o.chea.val
 
 # <codecell>
 
+chea.
+
+# <codecell>
+
 import pd_analysis as pda
 
 # <codecell>
@@ -1494,6 +1514,31 @@ specific_groups_motifs = {}
 
 def getMotifMatches( genegroup ):
     cz= mm9_gene_motifs.merge(genegroup, left_on="genename", right_on="symbol") 
+    
+    total_genes_in_group = len( pda.uniqueSym(genegroup.symbol) )
+    
+    print(len(cz.index))
+    
+    result = []
+    for k, z in cz.groupby("motif_name"):
+        result.append( { "motif_name"  : k,
+                         "count" : len(pda.uniqueSym(z.symbol)),
+                         "total_genes_in_group" : total_genes_in_group,
+                         "motif_occurrences": z
+                        }  )
+        
+    result = pd.DataFrame(result)
+    result.index = result.motif_name
+    return result
+
+# <codecell>
+
+hs_motifs
+
+# <codecell>
+
+def getHumanMotifMatches( genegroup ):
+    cz= hs_motifs.merge(genegroup, left_on="genename", right_on="symbol") 
     
     total_genes_in_group = len( pda.uniqueSym(genegroup.symbol) )
     
@@ -1926,23 +1971,11 @@ hd_human = pd.read_excel("/data/adrian/Dropbox/Projects/Broad/HD_mouse/2013_09_1
 
 # <codecell>
 
-hd_human
-
-# <codecell>
-
 hg133a_symbols = pd.DataFrame.from_csv("/data/adrian/Dropbox/Projects/Broad/HD_mouse/2013_09_18/hgu133a_symbols.tab", sep="\t")
 
 # <codecell>
 
-hg133a_symbols
-
-# <codecell>
-
 hg133b_symbols = pd.DataFrame.from_csv("/data/adrian/Dropbox/Projects/Broad/HD_mouse/2013_09_18/hgu133b_symbols.tab", sep="\t")
-
-# <codecell>
-
-hg133b_symbols
 
 # <codecell>
 
@@ -1952,10 +1985,6 @@ hg133b_nonredund = hg133b_symbols.select( lambda x : x not in hg133a_probesets )
 # <codecell>
 
 hg133_all_symbols = pd.concat([hg133a_symbols, hg133b_nonredund])
-
-# <codecell>
-
-hd_human.select(lambda x: hd_human.ix[x, "direction"] == "Increased" )
 
 # <codecell>
 
@@ -1992,11 +2021,28 @@ hd_human_groups.keys()
 
 # <codecell>
 
-a
+addEnrichedTFStats.i.tf_target_counts.val
 
 # <codecell>
 
-addEnrichedTFStats.i.tf_target_counts.val
+hd_human_motifs = {}
+for g in hd_human_groups.keys():
+    t = getHumanMotifMatches( hd_human_groups[g] )
+    hd_human_motifs[g] = t
+addEnrichedMotifStats.i.top_motifs.val = hd_human_motifs 
+addEnrichedMotifStats.run()
+
+# <codecell>
+
+hd_human_motifs['ol caudate; UP'].drop("motif_occurrences", axis=1)
+
+# <codecell>
+
+hd_human_motifs['ol caudate; UP'].drop("motif_occurrences", axis=1).sort_index(by="pval")[0:20]
+
+# <codecell>
+
+getHumanMotifMatches(hd_human_groups["all; UP"]).drop("motif_occurrences", axis=1).sort_index(by="count",ascending=False)[0:10]
 
 # <codecell>
 
@@ -2009,6 +2055,17 @@ addEnrichedTFStats.run()
 
 # <codecell>
 
+mm9_motif_gene_counts
+
+# <codecell>
+
+for k in hd_human_motifs.keys():
+    a = hd_human_motifs[k].motif_occurrences
+    hd_human_motifs[k]["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
+    hd_human_motifs[k] = hd_human_motifs[k].merge( hg19_motif_gene_counts, left_on="motif_name", right_index=True)
+
+# <codecell>
+
 for k in hd_human_tfs.keys():
     a = hd_human_tfs[k].tf_associations
     hd_human_tfs[k]["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
@@ -2016,9 +2073,21 @@ for k in hd_human_tfs.keys():
 
 # <codecell>
 
+hg19_motif_gene_counts[0:10]
+
+# <codecell>
+
 e = pd.ExcelWriter("/data/adrian/Dropbox/hd_human_hodges_chea.xls")
 for k in hd_human_tfs.keys():
     hd_human_tfs[k].drop("tf_associations", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; chea")
+#    hd_motifs[k].drop("motif_occurrences", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k +"; motifs")
+e.save()
+
+# <codecell>
+
+e = pd.ExcelWriter("/data/adrian/Dropbox/hd_human_hodges_sr_motifs.xls")
+for k in hd_human_motifs.keys():
+    hd_human_motifs[k].drop("motif_occurrences", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; motifs")
 #    hd_motifs[k].drop("motif_occurrences", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k +"; motifs")
 e.save()
 

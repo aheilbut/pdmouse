@@ -110,7 +110,7 @@ getContrastPatterns = tf.GetContrastPatterns()
 fc_t = gz.GZConst(1.5)
 total_genes = gz.GZConst(22000)
 
-species_genome = gz.GZConst("hg19")
+species_genome = gz.GZConst("mm9")
 
 w.addWorkNodes( [calcTFTargetCounts, calcMotifGeneCounts, loadCheaTable, loadGeneMotifs,
                  loadMatTFGraph, wideLoad, getFactorTypes, getEnrichedTFs, getEnrichedSRMotifs, 
@@ -179,7 +179,44 @@ c.results.keys()
 
 # <codecell>
 
-c.results[ ('AddEnrichedTFStats', 1)]
+pd_tf_enrich = c.results[ ('AddEnrichedTFStats', 1)]["tf_enrichment_stats"]
+
+# <codecell>
+
+c.results[ ('AddEnrichedMotifStats', 1)].keys()
+
+# <codecell>
+
+pd_motif_enrich = c.results[ ('AddEnrichedMotifStats', 1)]["enriched_motifs"]
+
+# <codecell>
+
+pd_motif_enrich
+
+# <codecell>
+
+for k in pd_motif_enrich.keys():
+    if pd_motif_enrich[k] is not None:
+        a = pd_motif_enrich[k].motif_occurrences
+        pd_motif_enrich[k]["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
+        pd_motif_enrich[k] = pd_motif_enrich[k].merge( mm9_motif_gene_counts, left_on="motif_name", right_on="motif_name")
+
+# <codecell>
+
+pd_motif_enrich['[["cmp", ["6-OHDA, chronicSaline", "Ascorbate, chronicSaline"]], ["ct", "cp73"], ["dir", "up"]]'].sort
+
+# <codecell>
+
+import statsmodels.sandbox.stats.multicomp
+
+# <codecell>
+
+for k in pd_motif_enrich.keys():
+    if pd_motif_enrich[k] is not None:
+        pd_motif_enrich[k]["bh pval"] = statsmodels.sandbox.stats.multicomp.multipletests(  pd_motif_enrich[k].pval )[1]
+        
+#statsmodels.sandbox.stats.multicomp.multipletests( 
+#    pd_motif_enrich['[["cmp", ["6-OHDA, chronicSaline", "Ascorbate, chronicSaline"]], ["ct", "cp73"], ["dir", "up"]]'].pval )[1]
 
 # <codecell>
 
@@ -1690,7 +1727,11 @@ b = a[0]
 
 # <codecell>
 
-b.to_excel(
+pd_tf_enrich.keys()
+
+# <codecell>
+
+pd_tf_enrich['[["cmp", ["6-OHDA, chronicSaline", "Ascorbate, chronicSaline"]], ["ct", "cp73"], ["dir", "down"]]']
 
 # <codecell>
 
@@ -1698,10 +1739,96 @@ e.save()
 
 # <codecell>
 
-for k in specific_groups_enrichment.keys():
+pd_motif_enrich.keys()
+
+# <codecell>
+
+pd_motif_enrich[k]
+
+# <codecell>
+
+e = pd.ExcelWriter("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/2013_10_11/supptables/pd_heiman2013_supptable_01B.xls")
+for (n, k) in [("all", '[["cmp", ["6-OHDA, chronicSaline", "Ascorbate, chronicSaline"]], ["ct", "cp73"], ["dir", "any"]]'),
+          ("up", '[["cmp", ["6-OHDA, chronicSaline", "Ascorbate, chronicSaline"]], ["ct", "cp73"], ["dir", "up"]]'),
+          ("down", '[["cmp", ["6-OHDA, chronicSaline", "Ascorbate, chronicSaline"]], ["ct", "cp73"], ["dir", "down"]]')]:
 #    print k
-    specific_groups_enrichment[k].drop("tf_associations", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; chea")
-    specific_groups_motifs[k].drop("motif_occurrences", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k +"; motifs")
+#    specific_groups_enrichment[k].drop("tf_associations", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; chea")
+    pd_motif_enrich[k].drop("motif_occurrences", axis=1).sort_index(by="pval").to_excel( e, sheet_name=n +"; motifs")
+e.save()
+
+# <codecell>
+
+e = pd.ExcelWriter("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/2013_10_11/supptables/pd_heiman2013_supptable_02B.xls")
+for (n, k) in [("all", '[["cmp", ["6-OHDA, chronicSaline", "Ascorbate, chronicSaline"]], ["ct", "cp101"], ["dir", "any"]]'),
+          ("up", '[["cmp", ["6-OHDA, chronicSaline", "Ascorbate, chronicSaline"]], ["ct", "cp101"], ["dir", "up"]]'),
+          ("down", '[["cmp", ["6-OHDA, chronicSaline", "Ascorbate, chronicSaline"]], ["ct", "cp101"], ["dir", "down"]]')]:
+#    print k
+#    specific_groups_enrichment[k].drop("tf_associations", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; chea")
+    pd_motif_enrich[k].drop("motif_occurrences", axis=1).sort_index(by="pval").to_excel( e, sheet_name=n +"; motifs")
+e.save()
+
+# <codecell>
+
+for (n, k) in [("all", '[["cmp", ["6-OHDA, chronicSaline", "Ascorbate, chronicSaline"]], ["ct", "cp101"], ["dir", "any"]]'),
+          ("up", '[["cmp", ["6-OHDA, chronicSaline", "Ascorbate, chronicSaline"]], ["ct", "cp101"], ["dir", "up"]]'),
+          ("down", '[["cmp", ["6-OHDA, chronicSaline", "Ascorbate, chronicSaline"]], ["ct", "cp101"], ["dir", "down"]]')]:
+#    print k
+#    specific_groups_enrichment[k].drop("tf_associations", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; chea")
+    (pd_motif_enrich[k]
+     .drop("motif_occurrences", axis=1)
+     .sort_index(by="pval")
+     .to_csv("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/2013_10_11/supptables/pd_heiman2013_supptable_02B_" + n + ".tab"))
+
+# <codecell>
+
+pd_motif_enrich[k]
+
+# <codecell>
+
+e = pd.ExcelWriter("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/2013_10_11/supptables/pd_heiman2013_supptable_07C.xls")
+for (n, k) in [("all", '[["cmp", ["6-OHDA, chronicHigh", "6-OHDA, chronicSaline"]], ["ct", "cp73"], ["dir", "any"]]'),
+          ("up", '[["cmp", ["6-OHDA, chronicHigh", "6-OHDA, chronicSaline"]], ["ct", "cp73"], ["dir", "up"]]'),
+          ("down", '[["cmp", ["6-OHDA, chronicHigh", "6-OHDA, chronicSaline"]], ["ct", "cp73"], ["dir", "down"]]')]:
+#    print k
+#    specific_groups_enrichment[k].drop("tf_associations", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; chea")
+    pd_motif_enrich[k].drop("motif_occurrences", axis=1).drop("targets",axis=1).sort_index(by="pval").to_excel( e, sheet_name=n +"; motifs")
+e.save()
+
+# <codecell>
+
+for (n, k) in [("all", '[["cmp", ["6-OHDA, chronicHigh", "6-OHDA, chronicSaline"]], ["ct", "cp73"], ["dir", "any"]]'),
+          ("up", '[["cmp", ["6-OHDA, chronicHigh", "6-OHDA, chronicSaline"]], ["ct", "cp73"], ["dir", "up"]]'),
+          ("down", '[["cmp", ["6-OHDA, chronicHigh", "6-OHDA, chronicSaline"]], ["ct", "cp73"], ["dir", "down"]]')]:
+#    print k
+#    specific_groups_enrichment[k].drop("tf_associations", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; chea")
+    (pd_motif_enrich[k].drop("motif_occurrences", axis=1)
+    .drop("targets",axis=1)
+    .sort_index(by="pval")
+    .to_csv("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/2013_10_11/supptables/pd_heiman2013_supptable_07C_" + n + ".tab"))
+
+# <codecell>
+
+e = pd.ExcelWriter("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/2013_10_11/supptables/pd_heiman2013_supptable_16.xls")
+for (n, k) in [("all", '[["cmp", ["6-OHDA, chronicHigh", "6-OHDA, chronicLow"]], ["ct", "cp73"], ["dir", "any"]]'),
+          ("up", '[["cmp", ["6-OHDA, chronicHigh", "6-OHDA, chronicLow"]], ["ct", "cp73"], ["dir", "up"]]'),
+          ("down", '[["cmp", ["6-OHDA, chronicHigh", "6-OHDA, chronicLow"]], ["ct", "cp73"], ["dir", "down"]]')]:
+#    print k
+#    specific_groups_enrichment[k].drop("tf_associations", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; chea")
+    pd_motif_enrich[k].drop("motif_occurrences", axis=1).drop("targets",axis=1).sort_index(by="pval").to_excel( e, sheet_name=n +"; motifs")
+e.save()
+
+# <codecell>
+
+for (n, k) in [("all", '[["cmp", ["6-OHDA, chronicHigh", "6-OHDA, chronicLow"]], ["ct", "cp73"], ["dir", "any"]]'),
+          ("up", '[["cmp", ["6-OHDA, chronicHigh", "6-OHDA, chronicLow"]], ["ct", "cp73"], ["dir", "up"]]'),
+          ("down", '[["cmp", ["6-OHDA, chronicHigh", "6-OHDA, chronicLow"]], ["ct", "cp73"], ["dir", "down"]]')]:
+#    print k
+#    specific_groups_enrichment[k].drop("tf_associations", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; chea")
+    (pd_motif_enrich[k]
+     .drop("motif_occurrences", axis=1)
+     .drop("targets",axis=1)
+     .sort_index(by="pval")
+     .to_csv("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/2013_10_11/supptables/pd_heiman2013_supptable_16_" + n + ".tab"))
 
 # <codecell>
 

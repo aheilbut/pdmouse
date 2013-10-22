@@ -30,7 +30,33 @@ venn.plot <- draw.quad.venn(
 #  cat.pos= 0 
 )
 
+# without acute data
+venn.plot <- draw.triple.venn(
+  area1=220,
+  area2=2980,
+  area3=4511,
+  n12=123,
+  n13=142,
+  n23=2610,
+  n123=113,
+  title="blah",
+  category = c("dopamine\n depleted (220)", "chronic low\nL-DOPA (2980)", "chronic high\nL-DOPA\n(4511)"),
+  col = c("darkorange", "red", "blue"),
+  fontfamily = "sansserif",
+  cat.fontfamily = "sansserif",
+  lwd = 8, 
+  lty = "solid",
+  cex = 5.0,
+  alpha = 0.05, 
+  cat.cex = 3.25,
+  fill = c("orange", "red", "blue" ),
+  cat.dist= 0.12
+  #  cat.pos= 0 
+)
 
+dev.copy(device=cairo_pdf, file="~/Dropbox/Projects/Broad/PD_mouse/Manuscript/2013_10_16/Drd1a_byTreatment.pdf", width=20, height=20 )
+dev.off()
+dev.off()
 
 # Drd2 differentially expressed genes by treatment group
 venn.plot <- draw.triple.venn(
@@ -41,19 +67,24 @@ venn.plot <- draw.triple.venn(
        n23=53,
        n13=38,
        n123=7,
-       category = c("dopamine\ndepleted (154)", "chronic low\n l-dopa (76)", "chronic high\nl-dopa (408)"),
+       category = c("dopamine\ndepleted (154)", "chronic low\n l-DOPA (76)", "chronic high\nl-DOPA (408)"),
        cat.fontfamily = rep("sansserif", 3),
        fontfamily = "sanserif",
-       col = c("yellow", "red", "blue"),
+       col = c("darkorange", "darkred", "darkblue"),
        lwd = 8,
        lty = "solid",
        cex = 5.0,
        alpha = 0.05,
-       cat.cex = 2.8,
-       fill = c("yellow", "red", "blue"),
-       cat.dist = 0.15,
-       margin = 0.05
+       cat.cex = 3.25,
+       fill = c("orange", "red", "blue"),
+       cat.dist = 0.12,
+#       margin = 0.05
 );
+
+
+dev.copy(device=cairo_pdf, file="~/Dropbox/Projects/Broad/PD_mouse/Manuscript/2013_10_16/Drd2_byTreatment.pdf", width=20, height=20 )
+dev.off()
+dev.off()
   
 # dop depleted, up-regulated
 venn.plot <- draw.pairwise.venn(

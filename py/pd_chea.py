@@ -631,9 +631,13 @@ class EnrichmentFlow(GZWorkFlow):
     connect(LoadCheaTable.chea, GetEnrichedTFs.chea)
     connect(WideLoad.cp_both_wide_info, GetFactorTypes.cp_both_wide_info)
     connect(GetFactorTypes.factortypes, GetEnrichedTFs.factortypes)
-    connect(Constant(1.5), GetEnrichedTFs.fc_threshold)
+    connect(Constant(1. 5), GetEnrichedTFs.fc_threshold)
 
   """
+
+# <codecell>
+
+contrastPatterns = c.results[("GetContrastPatterns",1)]["contrastPatterns"]
 
 # <codecell>
 
@@ -642,7 +646,17 @@ patternGroups = c.results[("GetContrastPatterns",1)]["patternGroups"]
 
 # <codecell>
 
-activePatterns
+contrastPatterns.drop(contrastPatterns.columns[0:2], axis=1)
+
+# <codecell>
+
+contrastPat_noAcute = contrastPatterns.drop(contrastPatterns.columns[0:2], axis=1)
+activePatterns = contrastPat_noAcute.select( lambda x: contrastPat_noAcute.ix[x, :].abs().sum() > 0 ) 
+
+# <codecell>
+
+for i, c in enumerate(activePatterns.columns):
+    print i, c
 
 # <codecell>
 
@@ -652,11 +666,11 @@ activeSorted = activePatterns.sort_index( by=[activePatterns.columns[3],
                                               activePatterns.columns[5],                                              
                                               activePatterns.columns[6],                                              
                                               activePatterns.columns[7],                                              
-                                              activePatterns.columns[8],                                              
-                                              activePatterns.columns[9],                                              
+#                                              activePatterns.columns[8],                                              
+#                                              activePatterns.columns[9],                                              
                                               activePatterns.columns[2],                                              
                                               activePatterns.columns[1]                                          
-                                              ])
+                                              ]) #.drop([activePatterns.columns[0], activePatterns.columns[1]], axis=1)
 
 # <codecell>
 
@@ -675,12 +689,16 @@ activeSorted = activeSorted.merge(gene_reps, left_index=True, right_on="probe_id
 
 # <codecell>
 
+activeSorted.index= activeSorted.probe_id
+
+# <codecell>
+
 activeSorted = activeSorted.drop( "probe_id", axis=1)
 activeSorted = activeSorted.drop( "symbol", axis=1)
 
 # <codecell>
 
-sign( activeSorted[0:5].as_matrix()[0:5,0:5] )  [
+sign( activeSorted[0:5].as_matrix()[0:5,0:5] )  
 
 # <codecell>
 
@@ -688,11 +706,11 @@ import scipy.cluster
 
 # <codecell>
 
-activeSorted["b"] = 3
+activePatterns["b"] = 3
 
 # <codecell>
 
-activeSorted
+activeSorted["b"] = 3
 
 # <codecell>
 
@@ -700,7 +718,7 @@ activeSorted.as_matrix() * [5, 2, 2, 5, 5, 2, 2, 2, 2, 2, 0]
 
 # <codecell>
 
-distances = scipy.cluster.hierarchy.distance.pdist( activeSorted.as_matrix() * [1, -1, 3, 5, -4, 6, -3, 4, 1, 1, 0], 
+distances = scipy.cluster.hierarchy.distance.pdist( activeSorted.as_matrix(), # * [3, 5, -4, 6, -3, 4, 1, 1, 1], 
                                                    metric="cosine")
 
 # <codecell>
@@ -724,16 +742,7 @@ col_rowZ = scipy.cluster.hierarchy.dendrogram(col_rowY, orientation='right', no_
 
 # <codecell>
 
-col_rowZ['leaves']
-
-# <codecell>
-
-for c in enumerate(activePatterns.columns[[9, 7, 5, 0, 3, 4, 6, 8, 2, 1]]):
-    print c
-
-# <codecell>
-
-import alib
+sum( abs(activeSorted[ activeSorted.columns[0:-1] ].sum(axis=1)) > 0 )
 
 # <codecell>
 
@@ -742,22 +751,28 @@ for c in activePatterns.columns[[9, 7, 5, 0, 3, 1, 4, 6, 8]]:
 
 # <codecell>
 
-figsize(30, 10)
+activeSorted
+
+# <codecell>
+
+figsize(40, 8)
 plotData =  activeSorted.as_matrix()[rowZ['leaves'], :]
-plotData = plotData[:, [9, 7, 5, 0, 3, 1, 4, 6, 8] ]
+plotData = plotData[:, [7, 5, 3, 1, 2, 4, 6] ] #[9, 7, 5, 0, 3, 1, 4, 6, 8]
 imshow( plotData.transpose(), 
-           interpolation='nearest', aspect=200, 
-           cmap=alib.plots.my_cmap, vmin=-1, vmax=1)
-yticks([0, 1, 2, 3, 4, 5, 6, 7, 8], 
-       ["Dop. Depletion - dSPN ", "Chronic Low vs. Saline - dSPN ", 
-        "Chronic High vs. Saline - dSPN ", "Acute High vs. Saline - dSPN ",
-        "Chronic High vs. Chronic Low - dSPN", "Acute vs Chronic - dSPN ",
-        "Chronic High vs. Saline - iSPN ", "Chronic Low vs. Saline - iSPN ", 
-        "Dop Depletion - iSPN "], fontsize=16)
-xticks(arange(0, 13000, 500))
-grid(which="both", ls='solid', color='lightgray', alpha=0.3 )
+           interpolation='nearest', aspect=80, 
+           cmap=alib.plots.my_cmap, vmin=-2, vmax=2)
+yticks([0, 1, 2, 3, 4, 5, 6], 
+       ["Dop. Depletion - dSPN ", 
+        "Chronic Low vs. Saline - dSPN ", 
+        "Chronic High vs. Saline - dSPN ", # "Acute High vs. Saline - dSPN ",
+        "Chronic High vs. Chronic Low - dSPN", # "Acute vs Chronic - dSPN ",
+        "Chronic High vs. Saline - iSPN ", 
+        "Chronic Low vs. Saline - iSPN ", 
+        "Dop Depletion - iSPN "], fontsize=16) 
+#xticks(arange(0, 8000, 500))
+grid(which="both", ls='solid', color='lightgray', alpha=0.5 )
 tight_layout()
-#savefig("/data/adrian/Dropbox/Projects/Broad/PD_mouse/Manuscript/figures_0929/contrast_barcode.pdf")
+savefig("/data/adrian/Dropbox/Projects/Broad/PD_mouse/Manuscript/2013_10_16/contrast_barcode_geneRep.pdf")
 
 # <codecell>
 

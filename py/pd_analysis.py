@@ -16,6 +16,8 @@ import scipy.stats as st
 import statsmodels.sandbox.stats.multicomp
 import pd_locals
 import json
+import xlrd, xlwt, xlutils
+import math
 
 mo430symbol = pandas.read_table(pd_locals.datadir +  "/2012_10_29/mo4302symbols.tab")
 mo430symbol.index = mo430symbol.probe_id
@@ -461,3 +463,37 @@ def outlierSelect(o, foldchange_cutoff, zscore_cutoff):
                 .merge(mo430info, left_index=True, right_index=True)
                 .sort_index(by="zscore"))                         
             }
+
+
+
+def writeToExcel(df, outputFileName, df_sheetName="sheet1", table_name="", description="", notes="", colNameFormatter=None):
+    xlFile = xlwt.Workbook()
+    data_sheet = xlFile.add_sheet(df_sheetName)
+    data_sheet.write(0, 0, table_name)
+    data_sheet.write(1, 0, description)
+    data_sheet.write(2, 0, "Heiman et al., 2013")
+    # write column names
+    for (colnum, colName) in enumerate(df.columns):
+        data_sheet.write(3, colnum + 1, colNameFormatter(colName), xlwt.Style.easyxf("font: bold True; alignment: wrap True;"))
+        data_sheet.row(3).height_mismatch = 1
+        data_sheet.row(3).height = int(math.ceil( data_sheet.row(3).height * 1.6 ))
+    data_sheet.col(0).width = 256 * 15
+    data_sheet.col(1).width = 256 * 15
+    data_sheet.col(2).width = 256 * 15
+    data_sheet.col(3).width = 256 * 35
+    data_sheet.col(4).width = 256 * 20
+    data_sheet.col(5).width = 256 * 20
+    
+    for (rownum, df_row_index) in enumerate(df.index):
+        data_sheet.write(rownum + 4, 0, df_row_index)                
+        for (colnum, df_col) in enumerate(df.columns):
+            if isinstance( df.ix[df_row_index, df_col], float):
+                if not np.isnan( df.ix[df_row_index, df_col] ):
+                    data_sheet.write(rownum + 4, colnum + 1, df.ix[df_row_index, df_col])
+                else:
+                    data_sheet.write(rownum + 4, colnum + 1, "")
+                    
+            else:
+                data_sheet.write(rownum + 4, colnum + 1, df.ix[df_row_index, df_col])
+    xlFile.save(outputFileName)
+    

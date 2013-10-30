@@ -39,30 +39,30 @@ import cPickle
 import alib.wikipath
 
 
-mo430symbol = pandas.read_table(pd_locals.datadir +  "/Oct29/mo4302symbols.tab")
+mo430symbol = pandas.read_table(pd_locals.datadir +  "/2012_10_29/mo4302symbols.tab")
 mo430symbol.index = mo430symbol.probe_id
 
-mo430names = pandas.read_table(pd_locals.datadir + "/Oct29/mo4302genenames.tab")
+mo430names = pandas.read_table(pd_locals.datadir + "/2012_10_29/mo4302genenames.tab")
 mo430names.index =  mo430names.probe_id
 
 mo430info = mo430symbol.merge(mo430names)
 mo430info.index = mo430info.probe_id
 
 # load pd data
-pd_all = pandas.read_table(pd_locals.datadir + "/Oct29/PD_arraydata.tab")
-pd_covar = pandas.read_table(pd_locals.datadir + "/Oct29/pd.covar.tab")
+pd_all = pandas.read_table(pd_locals.datadir + "/2012_10_29/PD_arraydata.tab")
+pd_covar = pandas.read_table(pd_locals.datadir + "/2012_10_29/pd.covar.tab")
 
-dim_descriptions = dict([map(str.rstrip, a.split("\t")) for a in open(pd_locals.datadir + "/feb25/dim_description.txt").readlines()])
+dim_descriptions = dict([map(str.rstrip, a.split("\t")) for a in open(pd_locals.datadir + "/2013_02_12/dim_description.txt").readlines()])
 
 
 cp73_wide_info = cPickle.load(open(pd_locals.datadir + "/jan30/cp73_m.pandas.pickle"))
 cp101_wide_info = cPickle.load(open(pd_locals.datadir + "/jan30/cp101_m.pandas.pickle"))
 
-t2_up = cPickle.load(open(pd_locals.datadir + "/feb25/t2_up.pickle"))
-t2_down = cPickle.load(open(pd_locals.datadir + "/feb25/t2_down.pickle"))
+t2_up = cPickle.load(open(pd_locals.datadir + "/2013_02_12/t2_up.pickle"))
+t2_down = cPickle.load(open(pd_locals.datadir + "/2013_02_12/t2_down.pickle"))
 
-cp73_modelcomp = cPickle.load(open(pd_locals.datadir + "/apr3/cp73_model_comp_stats.pickle"))
-cp101_modelcomp = cPickle.load(open(pd_locals.datadir + "/apr3/cp101_model_comp_stats.pickle"))
+cp73_modelcomp = cPickle.load(open(pd_locals.datadir + "/2013_04_03/cp73_model_comp_stats.pickle"))
+cp101_modelcomp = cPickle.load(open(pd_locals.datadir + "/2013_04_03/cp101_model_comp_stats.pickle"))
 
 
 # define subsets

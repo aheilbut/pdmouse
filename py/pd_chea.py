@@ -16,23 +16,25 @@ gz.GZConst(1.5).run()
 # <codecell>
 
 import pdgz as gz
+import pd_tfmotif_workflow as tf
+import networkx as nx
+import statsmodels.sandbox.stats.multicomp
+import IPython
 
 # <codecell>
 
-import pd_tfmotif_workflow as tf
+import scipy.cluster
+import fastcluster
+
+# <codecell>
+
+import alib.plots
 
 # <codecell>
 
 reload(gz)
-
-# <codecell>
-
 reload(tf)
 reload(tf.pda)
-
-# <codecell>
-
-import networkx as nx
 
 # <codecell>
 
@@ -57,14 +59,6 @@ w.plug( [ (loadWideTable.o.cp_both_wide_info, getFactorTypes.i.cp_both_wide_info
 
 # <codecell>
 
-chea
-
-# <codecell>
-
-loadWideTable.o.resultdict()
-
-# <codecell>
-
 loadWideTable.o.resultdict()
 
 # <codecell>
@@ -86,11 +80,6 @@ n = wr.runFlow()
 
 # <codecell>
 
-reload(gz)
-reload(tf)
-
-# <codecell>
-
 w = gz.GZWorkFlow()
 calcTFTargetCounts = tf.CalcTFTargetCounts()
 calcMotifGeneCounts = tf.CalcMotifGeneCounts()
@@ -101,8 +90,6 @@ wideLoad = tf.WideLoad()
 getFactorTypes = tf.GetFactorTypes() 
 getEnrichedTFs = tf.GetEnrichedTFs() 
 getEnrichedSRMotifs = tf.GetEnrichedSRMotifs()
-
-
 
 addEnrichedTFStats = tf.AddEnrichedTFStats() 
 addEnrichedMotifStats = tf.AddEnrichedMotifStats() 
@@ -157,8 +144,6 @@ w.plug( [(calcTFTargetCounts.o.tf_target_counts, addEnrichedTFStats.i.tf_target_
 
 w.plug( [(loadGeneMotifs.o.mm9_gene_motifs, calcMotifGeneCounts.i.mm9_gene_motifs)])
 
-# <codecell>
-
 w.plug( [(species_genome.o.value, loadGeneMotifs.i.species_genome)] )
 
 # <codecell>
@@ -191,10 +176,6 @@ pd_motif_enrich = c.results[ ('AddEnrichedMotifStats', 1)]["enriched_motifs"]
 
 # <codecell>
 
-pd_motif_enrich
-
-# <codecell>
-
 for k in pd_motif_enrich.keys():
     if pd_motif_enrich[k] is not None:
         a = pd_motif_enrich[k].motif_occurrences
@@ -204,10 +185,6 @@ for k in pd_motif_enrich.keys():
 # <codecell>
 
 pd_motif_enrich['[["cmp", ["6-OHDA, chronicSaline", "Ascorbate, chronicSaline"]], ["ct", "cp73"], ["dir", "up"]]'].sort
-
-# <codecell>
-
-import statsmodels.sandbox.stats.multicomp
 
 # <codecell>
 
@@ -261,10 +238,6 @@ motifs[motifs.keys()[0]].merge(mm9_motif_gene_counts, left_index=True, right_ind
 
 # <codecell>
 
-import IPython
-
-# <codecell>
-
 k = chea_binding.keys()[0]
 
 # <codecell>
@@ -274,10 +247,6 @@ k
 # <codecell>
 
 a = motifs[k]
-
-# <codecell>
-
-a.merge(how='outer'
 
 # <codecell>
 
@@ -531,10 +500,6 @@ td = t.select(lambda x: t.ix[x, "target"] == "DRD1A")
 
 # <codecell>
 
-td
-
-# <codecell>
-
 (m.select( lambda x: m.ix[x, "genename"] == "Drd1a" )
  .merge( motif_tf["mat_tf_graph"], left_on="motif_name", right_on="motif_name" ))
 
@@ -572,10 +537,6 @@ t = T({"a" : "B"})
 
 for (k, v) in c.results.items():
     print k, v.keys()
-
-# <codecell>
-
-import networkx as nx
 
 # <codecell>
 
@@ -638,9 +599,6 @@ class EnrichmentFlow(GZWorkFlow):
 # <codecell>
 
 contrastPatterns = c.results[("GetContrastPatterns",1)]["contrastPatterns"]
-
-# <codecell>
-
 activePatterns = c.results[("GetContrastPatterns",1)]["activePatterns"]
 patternGroups = c.results[("GetContrastPatterns",1)]["patternGroups"]
 
@@ -675,6 +633,7 @@ activeSorted = activePatterns.sort_index( by=[activePatterns.columns[3],
 # <codecell>
 
 import pd_analysis as pda
+import pandas as pd
 
 # <codecell>
 
@@ -699,10 +658,6 @@ activeSorted = activeSorted.drop( "symbol", axis=1)
 # <codecell>
 
 sign( activeSorted[0:5].as_matrix()[0:5,0:5] )  
-
-# <codecell>
-
-import scipy.cluster
 
 # <codecell>
 
@@ -759,7 +714,7 @@ figsize(40, 8)
 plotData =  activeSorted.as_matrix()[rowZ['leaves'], :]
 plotData = plotData[:, [7, 5, 3, 1, 2, 4, 6] ] #[9, 7, 5, 0, 3, 1, 4, 6, 8]
 imshow( plotData.transpose(), 
-           interpolation='nearest', aspect=80, 
+           interpolation='nearest', aspect=200, 
            cmap=alib.plots.my_cmap, vmin=-2, vmax=2)
 yticks([0, 1, 2, 3, 4, 5, 6], 
        ["Dop. Depletion - dSPN ", 
@@ -769,10 +724,10 @@ yticks([0, 1, 2, 3, 4, 5, 6],
         "Chronic High vs. Saline - iSPN ", 
         "Chronic Low vs. Saline - iSPN ", 
         "Dop Depletion - iSPN "], fontsize=16) 
-#xticks(arange(0, 8000, 500))
+xticks(arange(0, 9000, 500))
 grid(which="both", ls='solid', color='lightgray', alpha=0.5 )
 tight_layout()
-savefig("/data/adrian/Dropbox/Projects/Broad/PD_mouse/Manuscript/2013_10_16/contrast_barcode_geneRep.pdf")
+savefig("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/2013_10_25/figures/contrast_barcode_geneRep.pdf")
 
 # <codecell>
 

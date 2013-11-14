@@ -1,0 +1,120 @@
+<%inherit file="base.html"/>
+
+<style>
+
+.netfig {
+    width: 100%;
+    height: 1340px;
+    min-height: 1300px;
+    border: 1px solid black;
+}
+
+.figheader {
+    height: 100px;
+    padding: 10px;
+}
+
+#figtitle {
+    font-size: 16pt;
+    font-family: Arial;
+    font-weight: bold;
+
+}
+
+.compartment {
+    width: 100%;
+    border: 1px solid #d9d9d9;
+}
+
+.node {
+    width: 60px;
+    height: 25px;
+    padding: 3px;
+    background: lightblue;
+    font-weight: bold;
+    border: 1px solid black;
+    position: relative;
+}
+
+.selectionWindow {
+    width: 200px;
+    height: 200px; 
+    position: absolute;
+    background: blue;
+}
+
+</style>
+
+<%def name="scriptFiles()">
+  <script type="text/javascript" src="/static/js/netfig.js"></script>
+</%def>
+
+<%def name="docReady()">
+
+  $(window).resize(function(){
+      jsPlumb.repaintEverything();
+  });
+
+
+
+jsPlumb.bind("ready", function() {
+
+    jsPlumb.Defaults.Container = "netfig";
+
+    jsPlumb.connect( { source : "a",  target : "b" });
+
+    jsPlumb.draggable($("#a"), { containment:"parent" } );
+    jsPlumb.draggable($("#b"), { containment:"parent" });
+
+});
+
+ f = new NetFigure();
+ f.set("id",1);
+ var p = f.fetch();
+
+ p.done( function() {
+  fv = new NetFigureView({ model : f });
+ fv.render();
+ });
+
+</%def>
+
+
+
+<div class="container-fluid" style="margin-top: 60px; height: 100%">
+
+
+<div class="row-fluid">
+
+<div class="span3" style="border: 1px solid gray; height: 1240px">
+</div>
+
+ <div class="span9">
+  <div class="netfig" id="netfig">
+    <div class="figheader">
+       <div id="figtitle"></div>
+       <div id="figdescription"></div>
+    </div>
+
+
+   <div id="extracellular" class="compartment" style="height: 200px; background: white"></div>
+   <div id="surfmem" class="compartment" style="height: 20px; background: lightyellow"></div>
+   <div id="cytoplasm" class="compartment" style="height: 500px">
+
+   <div id="a" class="node" style="position: relative; left: 30px; top: 30px; "></div>
+   <div id="b" class="node" style="position: relative; left: 130px; top: 130px;"></div>
+  </div>
+ 
+  <div id="nucmem" class="compartment" style="height: 20px; background: lightgreen"></div>
+  <div id="nucleus" class="compartment" style="height: 200px"></div>
+  <div id="genome" class="compartment" style="height: 300px; background: #fefefe"></div>
+ </div>
+
+ </div>
+ 
+</div>
+
+</div>
+
+
+</div>

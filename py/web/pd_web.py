@@ -11,9 +11,12 @@ import mako
 import sqlalchemy
 from sqlalchemy.sql.expression import *
 
+from lib.sa.saplugin import SAEnginePlugin
+from lib.sa.satool import SATool
+from sqlalchemy import and_
+
 import glob
 import re
-import sha
 import sys
 
 import urllib
@@ -26,6 +29,8 @@ import pd_analysis as pda
 import pd_locals
 import pandas
 
+import netfigdb
+
 import numpy as np
 
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
@@ -36,7 +41,9 @@ import StringIO
 
 import cPickle
 
-import alib.wikipath
+import define_sample_subsets as ss
+
+#import alib.wikipath
 
 
 mo430symbol = pandas.read_table(pd_locals.datadir +  "/2012_10_29/mo4302symbols.tab")
@@ -49,6 +56,7 @@ mo430info = mo430symbol.merge(mo430names)
 mo430info.index = mo430info.probe_id
 
 # load pd data
+print "load pd data..."
 pd_all = pandas.read_table(pd_locals.datadir + "/2012_10_29/PD_arraydata.tab")
 pd_covar = pandas.read_table(pd_locals.datadir + "/2012_10_29/pd.covar.tab")
 
@@ -64,81 +72,7 @@ t2_down = cPickle.load(open(pd_locals.datadir + "/2013_02_12/t2_down.pickle"))
 cp73_modelcomp = cPickle.load(open(pd_locals.datadir + "/2013_04_03/cp73_model_comp_stats.pickle"))
 cp101_modelcomp = cPickle.load(open(pd_locals.datadir + "/2013_04_03/cp101_model_comp_stats.pickle"))
 
-
-# define subsets
-ss_cp73_chronicHigh = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
-                                                 and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                 and pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa"))
-
-ss_cp73_chronicLow = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
-                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                and pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa"))
-
-ss_cp101_chronicHigh = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
-                                                  and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                  and pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")) 
-
-ss_cp101_chronicLow = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
-                                                 and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                 and pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" 
-                                                 and pd_covar.ix[x, "MouseID"] != 1343)) 
-
-ss_cp101_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
-                                                 and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                 and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" 
-                                                      or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")
-                                                 and pd_covar.ix[x, "MouseID"] != 1343)) 
-
-ss_cp101_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
-                                                 and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                 and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" 
-                                                      or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa") 
-                                                 and pd_covar.ix[x, "MouseID"] != 1343)) 
-
-
-ss_cp73_allchronic = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
-                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                and (pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa" \
-                                                     or pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa")
-                                                and pd_covar.ix[x, "MouseID"] != 1343)) 
-
-
-ss_cp73_allChronic_LDOPA = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
-                                                      and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                      and (pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa" 
-                                                           or pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")))
-
-ss_cp101_allChronic_LDOPA = pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP101" 
-                                                       and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                       and pd_covar.ix[x, "MouseID"] != 1343
-                                                       and (pd_covar.ix[x, "DrugTreat"] == "Chronic high levodopa" 
-                                                            or pd_covar.ix[x, "DrugTreat"] == "Chronic low levodopa")))
-
-
-cp73_chronic_saline = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP73" 
-                                      and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                      and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")
-cp101_chronic_saline = pd_covar.select(lambda x: pd_covar.ix[x, "MouseType"] == "CP101" 
-                                       and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                       and pd_covar.ix[x, "DrugTreat"] == "Chronic saline")
-
-ss_cp73_ascorbate_saline = pd_covar.select( lambda x: pd_covar.ix[x, "MouseType"] == "CP73" 
-                                                    and pd_covar.ix[x, "DrugTreat"] == "Chronic saline" 
-                                                    and pd_covar.ix[x, "LesionType"] == "Ascorbate"  )
-
-ss_cp101_ascorbate_saline = pd_covar.select( lambda x: pd_covar.ix[x, "MouseType"] == "CP101" 
-                                                    and pd_covar.ix[x, "DrugTreat"] == "Chronic saline" 
-                                                    and pd_covar.ix[x, "LesionType"] == "Ascorbate"  )
-
-
-ss_cp73_acuteHigh =  pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
-                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                and pd_covar.ix[x, "DrugTreat"] == "Acute high levodopa"))
-
-ss_cp73_acuteSaline =  pd_covar.select(lambda x: (pd_covar.ix[x, "MouseType"] == "CP73" 
-                                                and pd_covar.ix[x, "LesionType"] == "6-OHDA" 
-                                                and pd_covar.ix[x, "DrugTreat"] == "Acute saline"))
-
+print "load motifs..."
 motifs = cPickle.load(open(pd_locals.datadir + "/2013_sep_8/c_motifs.pickle"))
 toptfs = cPickle.load(open(pd_locals.datadir + "/2013_sep_8/c_toptfs.pickle"))
 motif_tf_graph = cPickle.load(open(pd_locals.datadir + "/2013_sep_8/c_motif_tf_graph.pickle"))
@@ -150,7 +84,7 @@ tl = TemplateLookup(directories=["templates"],
                     output_encoding="utf-8")
 
 
-wp = alib.wikipath.WikiPathSets()
+wp = 0 #alib.wikipath.WikiPathSets()
 
 class PDC():
     def __init__(self):
@@ -163,8 +97,8 @@ class PDC():
 
     def probeset_report(self, probeset):
 
-        cp73_modelComp = pda.compareModels(ss_cp73_allchronic, pd_all, probeset)
-        cp101_modelComp = pda.compareModels(ss_cp101_allchronic, pd_all, probeset)
+        cp73_modelComp = pda.compareModels(ss.ss_cp73_allchronic, pd_all, probeset)
+        cp101_modelComp = pda.compareModels(ss.ss_cp101_allchronic, pd_all, probeset)
 
         try:
             (gene_symbol, gene_name) = mo430info.ix[ probeset, ["symbol", "gene_name"]]
@@ -212,18 +146,18 @@ class PDC():
             ax_cp73 = fig.add_subplot(121)
             ax_cp101 = fig.add_subplot(122)
             
-            cp73_groups = [("ASC / chronic saline", ss_cp73_ascorbate_saline.filenames),
-                           ("OHDA / chronic saline", cp73_chronic_saline.filenames),
-                           ("OHDA / acute saline", ss_cp73_acuteSaline.filenames),
-                           ("OHDA / acute High L-DOPA", ss_cp73_acuteHigh.filenames),
-                           ("OHDA / chronic Low L-DOPA", ss_cp73_chronicLow.filenames),
-                           ("OHDA / chronic High L-DOPA", ss_cp73_chronicHigh.filenames)
+            cp73_groups = [("ASC / chronic saline", ss.ss_cp73_ascorbate_saline.filenames),
+                           ("OHDA / chronic saline", ss.cp73_chronic_saline.filenames),
+                           ("OHDA / acute saline", ss.ss_cp73_acuteSaline.filenames),
+                           ("OHDA / acute High L-DOPA", ss.ss_cp73_acuteHigh.filenames),
+                           ("OHDA / chronic Low L-DOPA", ss.ss_cp73_chronicLow.filenames),
+                           ("OHDA / chronic High L-DOPA", ss.ss_cp73_chronicHigh.filenames)
                            ]
             
-            cp101_groups = [("ASC / chronic saline", ss_cp101_ascorbate_saline.filenames),
-                           ("OHDA / chronic saline", cp101_chronic_saline.filenames),
-                           ("OHDA / chronic Low L-DOPA", ss_cp101_chronicLow.filenames),
-                           ("OHDA / chronic High L-DOPA", ss_cp101_chronicHigh.filenames)
+            cp101_groups = [("ASC / chronic saline", ss.ss_cp101_ascorbate_saline.filenames),
+                           ("OHDA / chronic saline", ss.cp101_chronic_saline.filenames),
+                           ("OHDA / chronic Low L-DOPA", ss.ss_cp101_chronicLow.filenames),
+                           ("OHDA / chronic High L-DOPA", ss.ss_cp101_chronicHigh.filenames)
                            ]
         
             pda.probe_boxPlots(probeset, pd_all, cp73_groups, "CP73", ax_cp73)
@@ -614,7 +548,26 @@ class PDC():
         return result
         
     
+class NetView():
+    def __init__(self):
+        pass
+        
+    def netView_app(self):
+        t = tl.get_template("netfig.template.html")
+        
+        return t.render_unicode()
+
+    @cherrypy.tools.json_out()
+    def netView_netfig(self, netfig_id):
+        s = cherrypy.request.db
+
+        network_fig = s.query( netfigdb.Netfig ).filter( netfigdb.Netfig.netfig_id == int(netfig_id)).one()
+
+        return network_fig.toDict()
+
+
 pdc = PDC()
+netview = NetView()
 
 def setup_routes():
     dispatch = cherrypy.dispatch.RoutesDispatcher()
@@ -682,7 +635,6 @@ def setup_routes():
                      route = "/cube_select", 
                      controller = pdc,
                      action = 'cube_select')
-    
 
     dispatch.connect(name = "cube_info",
                      route = "/cube_info/{dataid}",
@@ -699,6 +651,18 @@ def setup_routes():
                      controller = pdc, 
                      action = "trm")
     
+    
+    dispatch.connect(name = "network", 
+                     route = "/network",
+                     controller = netview,
+                     action = "netView_app")
+
+
+    dispatch.connect(name = "network_figure",
+                     route= "/network/figure/{netfig_id}",
+                     controller = netview,
+                     action = "netView_netfig")
+
 
     return dispatch
 
@@ -710,7 +674,9 @@ def start(config=None):
     conf = {
         '/' : {
             'request.dispatch' : setup_routes(),
-            'tools.staticdir.root' : pd_locals.staticdir
+            'tools.staticdir.root' : pd_locals.staticdir,
+            'tools.gzip.on' : True,
+            'tools.db.on' : True
             },
 
         '/static' : { 'tools.staticdir.on' : True, 
@@ -722,6 +688,9 @@ def start(config=None):
 
 #    SATool.SAEnginePlugin(cherrypy.engine).subscribe()
 #    cherrypy.tools.db = SATool.SATool()
+
+    SAEnginePlugin(cherrypy.engine, pd_locals.dbstring).subscribe()
+    cherrypy.tools.db = SATool()
 
     cherrypy.server.socket_host = "0.0.0.0"
     cherrypy.server.socket_port = pd_locals.web_port 

@@ -23,7 +23,7 @@
  
 <script type="text/javascript" src="/static/jsPlumb/js/jquery.jsPlumb-1.4.0-all-min.js"></script>
 <script type="text/javascript" src="/static/js/tablednd.js"></script>
-<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="/static/d3/d3.min.js" charset="utf-8"></script>
 
   
    
@@ -41,12 +41,13 @@
    
    <link rel="stylesheet" href="/static/fancybox/jquery.fancybox.css?v=2.1.4" type="text/css" media="screen" />
    <script type="text/javascript" src="/static/fancybox/jquery.fancybox.pack.js?v=2.1.4"></script>
-   
+
+   ${self.scriptFiles()}
  
 <script type="text/javascript"> 
 	
  $(document).ready( function() {	
-   $(".fancybox").fancybox({ autoSize: false, fitToView : false, type: 'image' });
+  // $(".fancybox").fancybox({ autoSize: false, fitToView : false, type: 'image' });
  
   ${self.docReady()} 
  
@@ -95,4 +96,5 @@
  </body>
 
  
- <%def name="docReady()"></%def>
+<%def name="docReady()"></%def>
+<%def name="scriptFiles()"></%def>

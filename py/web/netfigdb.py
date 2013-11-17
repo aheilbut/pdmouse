@@ -53,8 +53,8 @@ class Netfig(Base):
         d = {
             "netfig_id" : self.netfig_id,
             "creator_id" : self.creator_id,
-            "create_time" : self.create_time,
-            "last_edit" : self.last_edit,
+            "create_time" : str(self.create_time),
+            "last_edit" : str(self.last_edit),
             "title" : self.title,
             "description" : self.description,
             "nodes" : [n.toDict() for n in self.nodes],
@@ -111,7 +111,7 @@ class NetfigNode(Base):
 
             "node_compartment" : self.node_compartment,
             "node_creator" : self.node_creator,
-            "node_create_time" : self.node_create_time,
+            "node_create_time" : str(self.node_create_time),
         }
 
         return d
@@ -164,6 +164,7 @@ class NetfigEdge(Base):
         d = {
             "netfig_edge_id" : self.netfig_edge_id,
             "netfig_id" : self.netfig_id,
+
             "edge_type" : self.edge_type,
 
             "edge_source" : self.edge_source,

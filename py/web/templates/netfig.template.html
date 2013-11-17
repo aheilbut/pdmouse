@@ -86,10 +86,23 @@ jsPlumb.bind("ready", function() {
 
 <div class="row-fluid">
 
-<div class="span3" style="border: 1px solid gray; height: 1240px">
+<div class="span4" style="border: 1px solid gray; height: 1240px">
+
+    <h6>Color by expression fold change (avg over probesets) in experimental contrast:</h6>
+    <select size="5" style="font-size: 8pt; width: 100%">
+        <option>Drd1a; Dop dep vs asc; Saline</option>
+        <option>Drd1a; Dop dep; Chronic low L-DOPA vs saline</option>
+        <option>Drd1a; Dop dep vs asc; Chronic high L-DOPA vs saline</option>
+
+        <option>Drd2; Dop dep vs asc; Saline</option>
+        <option>Drd2; Dop dep; Chronic low L-DOPA vs saline</option>
+        <option>Drd2; Dop dep vs asc; Chronic high L-DOPA vs saline</option>
+    </select>
+
+
 </div>
 
- <div class="span9">
+ <div class="span8">
   <div class="netfig" id="netfig">
     <div class="figheader">
        <div id="figtitle"></div>

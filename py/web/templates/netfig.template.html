@@ -61,12 +61,22 @@ jsPlumb.bind("ready", function() {
 
     jsPlumb.Defaults.Container = "netfig";
 
-    jsPlumb.connect( { source : "a",  target : "b" });
-
-    jsPlumb.draggable($("#a"), { containment:"parent" } );
-    jsPlumb.draggable($("#b"), { containment:"parent" });
+    jsPlumb.Defaults.Connector = [ "Bezier", { curviness:40 } ];
+//    jsPlumb.connect( { source : "a",  target : "b" });
+//    jsPlumb.draggable($("#a"), { containment:"parent" } );
+//    jsPlumb.draggable($("#b"), { containment:"parent" });
 
 });
+
+ figlist = new NetFigureMetadataList();
+ figlist.fetch().complete( function() {
+    figlistView = new NetFigureMetadataListView( { collection : figlist, el: $("#figlist") });
+    figlistView.render();
+ });
+
+
+
+
 
  f = new NetFigure();
  f.set("id",1);
@@ -83,13 +93,18 @@ jsPlumb.bind("ready", function() {
 
 <div class="container-fluid" style="margin-top: 60px; height: 100%">
 
+<div class="row-fluid">
+  <div class="span12">
+    Choose Figure: <select id="figlist"></select>
+  </div>
+</div>
 
 <div class="row-fluid">
 
 <div class="span4" style="border: 1px solid gray; height: 1240px">
 
     <h6>Color by expression fold change (avg over probesets) in experimental contrast:</h6>
-    <select size="5" style="font-size: 8pt; width: 100%">
+    <select size="6" style="font-size: 8pt; width: 100%">
         <option>Drd1a; Dop dep vs asc; Saline</option>
         <option>Drd1a; Dop dep; Chronic low L-DOPA vs saline</option>
         <option>Drd1a; Dop dep vs asc; Chronic high L-DOPA vs saline</option>
@@ -114,8 +129,6 @@ jsPlumb.bind("ready", function() {
    <div id="surfmem" class="compartment" style="height: 20px; background: lightyellow"></div>
    <div id="cytoplasm" class="compartment" style="height: 500px">
 
-   <div id="a" class="node" style="position: relative; left: 30px; top: 30px; "></div>
-   <div id="b" class="node" style="position: relative; left: 130px; top: 130px;"></div>
   </div>
  
   <div id="nucmem" class="compartment" style="height: 20px; background: lightgreen"></div>

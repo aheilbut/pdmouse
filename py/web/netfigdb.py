@@ -3,6 +3,8 @@ from sqlalchemy import create_engine
 from sqlalchemy import Table, Column, Integer, String, Date, BigInteger, DateTime, Boolean, MetaData, ForeignKey, UniqueConstraint, ForeignKeyConstraint
 from sqlalchemy.orm import mapper, sessionmaker, relationship, backref
 
+import datetime
+
 import pd_locals
 
 metadata = MetaData()
@@ -10,6 +12,7 @@ metadata = MetaData()
 engine = create_engine(pd_locals.dbstring)
 #engine = create_engine('sqlite:///:memory:', echo=True)
 Session = sessionmaker(engine)
+
 
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -49,6 +52,16 @@ class Netfig(Base):
     title = Column("title", String)
     description = Column("description", String)
 
+    creator = relationship("PDUser", backref="figures")
+#    def
+
+    def __init__(self, creator_id, title, description):
+        self.creator_id = creator_id,
+        self.create_time = datetime.datetime.now()
+        self.last_edit = datetime.datetime.now()
+        self.title = title
+        self.description = description
+
     def toDict(self):
         d = {
             "netfig_id" : self.netfig_id,
@@ -58,7 +71,7 @@ class Netfig(Base):
             "title" : self.title,
             "description" : self.description,
             "nodes" : [n.toDict() for n in self.nodes],
-            "edges" : [e.toDict() for n in self.edges]
+            "edges" : [e.toDict() for e in self.edges]
         }
 
         return d
@@ -178,7 +191,7 @@ class NetfigEdge(Base):
             "target_node_id" : self.target_node_id,
 
             "source_node_obj_idtype" : self.source_node_obj_idtype,
-            "source_node_obj_id" : self.source_node_objid,
+            "source_node_obj_id" : self.source_node_obj_id,
             "target_node_obj_idtype" : self.target_node_obj_idtype,
             "target_node_obj_id" : self.target_node_obj_id
 

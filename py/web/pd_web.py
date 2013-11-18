@@ -565,6 +565,12 @@ class NetView():
 
         return network_fig.toDict()
 
+    @cherrypy.tools.json_out()
+    def netView_netfigList(self):
+        s = cherrypy.request.db
+        figlist = [{ "netfig_id" :f.netfig_id, "creator" : f.creator_id, "title" : f.title, "description" : f.description} for f in s.query(netfigdb.Netfig).all()]
+        return figlist
+
 
 pdc = PDC()
 netview = NetView()
@@ -651,7 +657,12 @@ def setup_routes():
                      controller = pdc, 
                      action = "trm")
     
-    
+
+    dispatch.connect(name = "network_figure_list",
+                     route = "/network/figures",
+                     controller = netview,
+                     action = "netView_netfigList")
+
     dispatch.connect(name = "network", 
                      route = "/network",
                      controller = netview,
@@ -662,7 +673,6 @@ def setup_routes():
                      route= "/network/figure/{netfig_id}",
                      controller = netview,
                      action = "netView_netfig")
-
 
     return dispatch
 

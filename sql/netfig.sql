@@ -40,12 +40,21 @@ CREATE TABLE netfig_obj_idtypes (
     netfig_obj_idtype_description VARCHAR NOT NULL
 );
 
-CREATE TABLE netfig_compartments (
-  compartment VARCHAR NOT NULL PRIMARY KEY
-);
-
 INSERT INTO netfig_obj_idtypes VALUES ('entrez_gene_id', 'Entrez Gene');
 INSERT INTO netfig_obj_idtypes VALUES ('entrez_gene_symbol', 'Gene Symbol');
+
+
+CREATE TABLE netfig_compartments (
+  compartment VARCHAR NOT NULL PRIMARY KEYm
+  compartment_name VARCHAR
+);
+
+INSERT INTO netfig_compartments VALUES ('extracellular', 'Extracellular');
+INSERT INTO netfig_compartments VALUES ('surfmem', 'Cell Surface Membrane');
+INSERT INTO netfig_compartments VALUES ('cytoplasm', 'Cytoplasm');
+INSERT INTO netfig_compartments VALUES ('nucmem', 'Nuclear Membrane');
+INSERT INTO netfig_compartments VALUES ('nucleus', 'Nucleus');
+INSERT INTO netfig_compartments VALUES ('genome', 'Genome');
 
 CREATE TABLE netfig_nodes (
     netfig_node_id SERIAL NOT NULL PRIMARY KEY,

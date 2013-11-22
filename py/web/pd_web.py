@@ -566,11 +566,45 @@ class NetView():
         return network_fig.toDict()
 
     @cherrypy.tools.json_out()
+    def netView_expressionchanges(self, netfig_id):
+        s = cherrypy.request.db
+        fig = s.query(netfigdb.Netfig).filter(netfigdb.Netfig.netfig_id == int(netfig_id)).one()
+        gene_symbols = [n.node_obj_id for n in fig.nodes if n.node_obj_idtype == "entrez_gene_symbol"]
+        expression_changes = dict([ (c.gene_symbol, c.to_dict())
+                                    for c in
+                                    s.query(netfigdb.NetfigMeanFoldChanges)
+                                    .filter(netfigdb.NetfigMeanFoldChanges.gene_symbol.in_(gene_symbols) )
+                                    .all()])
+        return expression_changes
+
+    @cherrypy.tools.json_out()
     def netView_netfigList(self):
         s = cherrypy.request.db
         figlist = [{ "netfig_id" :f.netfig_id, "creator" : f.creator_id, "title" : f.title, "description" : f.description} for f in s.query(netfigdb.Netfig).all()]
         return figlist
 
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
+    def netView_update_node(self, netfig_node_id):
+        try:
+            s = cherrypy.request.db
+            d = cherrypy.request.json
+            print d
+            netfig_node_id = int(netfig_node_id)
+            node = s.query(netfigdb.NetfigNode).filter(netfigdb.NetfigNode.netfig_node_id == netfig_node_id).one()
+
+            for k in d.keys():
+                if k is not None:
+                    setattr(node, k, d[k])
+            print node.node_pos_top
+            print node.node_pos_left
+            s.commit()
+            return node.toDict()
+
+        except:
+            s.rollback()
+            print sys.exc_info()
+            return "error"
 
 pdc = PDC()
 netview = NetView()
@@ -668,11 +702,20 @@ def setup_routes():
                      controller = netview,
                      action = "netView_app")
 
-
-    dispatch.connect(name = "network_figure",
-                     route= "/network/figure/{netfig_id}",
+    dispatch.connect(name = "network_expression",
+                     route = "/network/expression/{netfig_id}",
                      controller = netview,
-                     action = "netView_netfig")
+                     action = "netView_expressionchanges")
+
+    dispatch.connect(name="network_figure",
+                     route="/network/figure/{netfig_id}",
+                     controller=netview,
+                     action="netView_netfig")
+
+    dispatch.connect(name="network_node_update",
+                     route="/network/nodes/{netfig_node_id}",
+                     controller=netview,
+                     action="netView_update_node")
 
     return dispatch
 

@@ -68,6 +68,9 @@ CREATE TABLE netfig_nodes (
     node_title VARCHAR,
     node_description VARCHAR,
     node_data TEXT,
+
+    node_pos_top FLOAT,
+    node_pos_left FLOAT,
     
     node_compartment VARCHAR,
     
@@ -75,8 +78,8 @@ CREATE TABLE netfig_nodes (
     node_create_time TIMESTAMP
 );
 
-CREATE TABLE netfig_edge_sources (
-  netfig_edge_source VARCHAR NOT NULL PRIMARY KEY
+CREATE TABLE netfig_edge_origins (
+  netfig_edge_origin VARCHAR NOT NULL PRIMARY KEY
 );
 
 CREATE TABLE netfig_edges (
@@ -85,14 +88,56 @@ CREATE TABLE netfig_edges (
 
     directed BOOLEAN NOT NULL,
 
-    edge_source VARCHAR REFERENCES netfig_edge_sources(netfig_edge_source),
-    edge_source_id VARCHAR,
+    edge_origin VARCHAR REFERENCES netfig_edge_origins(netfig_edge_origin),
+    edge_origin_id VARCHAR,
 
-    edge_type VARCHAR,
-    edge_identifier VARCHAR,
+    edge_type VARCHAR REFERENCES netfig_edge_types(netfig_edge_type),
+
     edge_title VARCHAR,
     edge_description VARCHAR,
     edge_data TEXT,
+
+    source_node_id BIGINT NOT NULL REFERENCES netfig_nodes(netfig_node_id),
+    target_node_id BIGINT NOT NULL REFERENCES netfig_nodes(netfig_node_id),
+
+    edge_creator INTEGER REFERENCES pd_user(pd_user_id),
+    edge_create_time TIMESTAMP   
+);
+
+
+    source_node_id BIGINT REFERENCES netfig_nodes(netfig_node_id),
+    target_node_id BIGINT REFERENCES netfig_nodes(netfig_node_id),
+
+CREATE TABLE mean_fold_change (
+  gene_symbol VARCHAR PRIMARY KEY,
+  drd2_dopdepletion FLOAT,
+  drd2_chronic_low FLOAT,
+  drd2_chronic_high FLOAT,
+  drd1a_dopdepletion FLOAT,
+  drd1a_chronic_low FLOAT,
+  drd1a_chronic_high FLOAT
+);
+
+\copy mean_fold_change FROM '/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/2013_11_18/mean_fold_change.tab' WITH DELIMITER '       ' CSV HEADER
+
+
+CREATE TABLE netfig_edge_types (
+  netfig_edge_type VARCHAR NOT NULL PRIMARY KEY
+);
+
+INSERT INTO netfig_edge_types VALUES ('binds');
+INSERT INTO netfig_edge_types VALUES ('activates');
+INSERT INTO netfig_edge_types VALUES ('inhibits');
+INSERT INTO netfig_edge_types VALUES ('regulates');
+INSERT INTO netfig_edge_types VALUES ('in complex');
+INSERT INTO netfig_edge_types VALUES ('co-regulated');
+INSERT INTO netfig_edge_types VALUES ('co-occurs in literature');
+
+
+CREATE TABlE pd_log (
+    
+);
+
 
     source_node_type VARCHAR REFERENCES netfig_node_types(netfig_node_type),
     source_node_id VARCHAR NOT NULL,
@@ -105,16 +150,3 @@ CREATE TABLE netfig_edges (
 
     target_node_obj_idtype VARCHAR REFERENCES netfig_obj_idtypes(netfig_obj_idtype),
     target_node_obj_id VARCHAR,
-
-    edge_creator INTEGER REFERENCES pd_user(pd_user_id),
-    edge_create_time TIMESTAMP   
-);
-
-
-    source_node_id BIGINT REFERENCES netfig_nodes(netfig_node_id),
-    target_node_id BIGINT REFERENCES netfig_nodes(netfig_node_id),
-
-
-CREATE TABlE pd_log (
-    
-);

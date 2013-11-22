@@ -2,6 +2,34 @@
 
 <style>
 
+html, body {
+    height: 100%;
+}
+.container-fluid {
+    margin: 0 auto;
+    height: 100%;
+
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.columns {
+    background-color: #C9E6FF;
+    height: 100%;
+}
+
+.content-area, .article-tree{
+    background: #bada55;
+    overflow:auto;
+    height: 100%;
+}
+
+.footer {
+    background: red;
+    height: 20px;
+}
+
 .netfig {
     width: 100%;
     height: 1340px;
@@ -24,16 +52,17 @@
 .compartment {
     width: 100%;
     border: 1px solid #d9d9d9;
+    position: relative;
 }
 
 .node {
     width: 60px;
     height: 25px;
     padding: 3px;
-    background: lightblue;
+    background: white;
     font-weight: bold;
     border: 1px solid black;
-    position: relative;
+    position: absolute;
 }
 
 .selectionWindow {
@@ -41,6 +70,19 @@
     height: 200px; 
     position: absolute;
     background: blue;
+}
+
+.regionlabel {
+    padding: 2px;
+    font-size: 10px;
+    font-color: lightgray;
+    position: absolute;
+    z-index: 0;
+}
+
+a.nodelabel {
+    color: black;
+    text-align: center;
 }
 
 </style>
@@ -52,10 +94,12 @@
 <%def name="docReady()">
 
   $(window).resize(function(){
+      $('#maincontent').height($(window).height() - 250);
       jsPlumb.repaintEverything();
+
   });
 
-
+  $('#maincontent').height($(window).height() - 250);
 
 jsPlumb.bind("ready", function() {
 
@@ -75,6 +119,14 @@ jsPlumb.bind("ready", function() {
  });
 
 
+ d3.select("#colorbar").selectAll("td")
+        .data([-3, -2.5, -2.0, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3])
+        .enter().append("td")
+        .text(function(d) { return d.toString(); })
+        .attr("width", "15px").attr("height", "15px")
+        .style("font-size", "10px").style("text-align", "center")
+        .style("background", function(d) { return bluePinkColorscale(d); } );
+
 
 
 
@@ -90,57 +142,118 @@ jsPlumb.bind("ready", function() {
 </%def>
 
 
-
-<div class="container-fluid" style="margin-top: 60px; height: 100%">
+<div class="container-fluid fill" style="margin-top: 60px; ">
 
 <div class="row-fluid">
-  <div class="span12">
+  <div class="span2">
     Choose Figure: <select id="figlist"></select>
   </div>
-</div>
 
-<div class="row-fluid">
-
-<div class="span4" style="border: 1px solid gray; height: 1240px">
-
-    <h6>Color by expression fold change (avg over probesets) in experimental contrast:</h6>
-    <select size="6" style="font-size: 8pt; width: 100%">
-        <option>Drd1a; Dop dep vs asc; Saline</option>
-        <option>Drd1a; Dop dep; Chronic low L-DOPA vs saline</option>
-        <option>Drd1a; Dop dep vs asc; Chronic high L-DOPA vs saline</option>
-
-        <option>Drd2; Dop dep vs asc; Saline</option>
-        <option>Drd2; Dop dep; Chronic low L-DOPA vs saline</option>
-        <option>Drd2; Dop dep vs asc; Chronic high L-DOPA vs saline</option>
-    </select>
-
-
-</div>
-
- <div class="span8">
-  <div class="netfig" id="netfig">
+  <div class="span8 fill">
     <div class="figheader">
        <div id="figtitle"></div>
        <div id="figdescription"></div>
     </div>
-
-
-   <div id="extracellular" class="compartment" style="height: 200px; background: white"></div>
-   <div id="surfmem" class="compartment" style="height: 20px; background: lightyellow"></div>
-   <div id="cytoplasm" class="compartment" style="height: 500px">
-
   </div>
+
+  <div class="span2"></div>
+
+</div>
+
+<div class="row-fluid">
+
+    <div class="span2" style="border: 1px solid gray; height: 100%; padding: 4px">
+
+    <h6>Color by expression fold change (avg over probesets) in experimental contrast:</h6>
+    <select id="contrast_set" onchange="fv.setColors(this.value);" size="6" style="font-size: 8pt; width: 100%">
+        <option value="drd1a_dopdepletion">Drd1a; Dop dep vs asc; Saline</option>
+        <option value="drd1a_chronic_low">Drd1a; Dop dep; Chronic low L-DOPA vs saline</option>
+        <option value="drd1a_chronic_high">Drd1a; Dop dep vs asc; Chronic high L-DOPA vs saline</option>
+
+        <option value="drd2_dopdepletion">Drd2; Dop dep vs asc; Saline</option>
+        <option value="drd2_chronic_low">Drd2; Dop dep; Chronic low L-DOPA vs saline</option>
+        <option value="drd2_chronic_high">Drd2; Dop dep vs asc; Chronic high L-DOPA vs saline</option>
+    </select>
+
+    <div>
+
+       <h6>log2 fold change scale (mean over probesets for gene)</h6>
+       <table>
+           <tr id="colorbar">
+           </tr>
+       </table>
+
+    </div>
+
+
+
+    <div>
+        <h6>Edge Types</h6>
+        <table>
+         <tr>
+             <td><input type="checkbox" name="binds" value="binds"/></td>
+            <td> binds</td>
+         </tr>
+         <tr>
+             <td><input type="checkbox" name="binds" value="binds"/></td>
+            <td> activates</td>
+         </tr>
+         <tr>
+             <td><input type="checkbox" name="binds" value="binds"/></td>
+            <td> inhibits</td>
+         </tr>
+         <tr>
+             <td><input type="checkbox" name="binds" value="binds"/></td>
+            <td> regulates</td>
+         </tr>
+
+       </table>
+
+    </div>
+
+</div>
+
+ <div id="maincontent" class="span8 fill" style="overflow: auto; position: relative">
+  <div class="netfig" id="netfig" style="width: 1000px; height: 1000px;">
+
+   <div id="extracellular" class="compartment" style="height: 200px; background: white">
+       <div class="regionlabel">extracellular space</div>
+   </div>
+   <div id="surfmem" class="compartment" style="height: 20px; background: lightyellow;">
+       <div class="regionlabel">cell surface membrane</div>
+   </div>
+   <div id="cytoplasm" class="compartment" style="height: 300px;">
+       <div class="regionlabel">cytoplasm</div>
+   </div>
  
-  <div id="nucmem" class="compartment" style="height: 20px; background: lightgreen"></div>
-  <div id="nucleus" class="compartment" style="height: 200px"></div>
-  <div id="genome" class="compartment" style="height: 300px; background: #fefefe"></div>
+  <div id="nucmem" class="compartment" style="height: 20px; background: lightgreen">
+      <div class="regionlabel">nuclear membrane</div>
+  </div>
+  <div id="nucleus" class="compartment" style="height: 200px;">
+      <div class="regionlabel">nucleus</div>
+  </div>
+  <div id="genome" class="compartment" style="height: 300px; background: #fefefe">
+      <div class="regionlabel">genome</div>
+  </div>
  </div>
+
+
+ </div>
+
+    <div class="span2">
+        <h6>Node Data</h6>
+
+
+
+        <h6>Edge Data</h6>
+    </div>
 
  </div>
  
 </div>
 
 </div>
+
 
 
 </div>

@@ -1,12 +1,20 @@
+var bluePinkColorscale = d3.scale.linear()
+         .domain([-3, 0, 3])
+         .range(["blue", "white", "red"]);
+
 
 NetNodeModel = Backbone.Model.extend({
+   urlRoot : "/network/nodes",
+   idAttribute : "netfig_node_id"
 });
 
 NetNodeView = Backbone.View.extend({
     tagname : "div",
     className : "node",
     render : function() {
-        this.$el.html(this.model.get("node_obj_id"));
+        this.$el.html("<a class='nodelabel' target=_search href='/search?q=" + this.model.get("node_obj_id") + "'>" + this.model.get("node_obj_id") + "</a>");
+        this.$el.css("left", this.model.get("node_pos_left"));
+        this.$el.css("top", this.model.get("node_pos_top"));
         return this;
     }
 });
@@ -80,8 +88,8 @@ NetFigureMetadataListView = Backbone.View.extend({
 
     render : function() {
         var that = this;
-        $(this.el).find("#figtitle").text(this.model.get("title"));
-        $(this.el).find("#figdescription").text(this.model.get("description"));
+        $("#figtitle").text(this.model.get("title"));
+        $("#figdescription").text(this.model.get("description"));
 
         var endpointOptions = {
                     isSource:true,
@@ -99,9 +107,13 @@ NetFigureMetadataListView = Backbone.View.extend({
             jsPlumb.draggable(node_element, { containment:"parent",
                 stop :
                     function(event, ui) {
-                        var d = nv.model.get("data");
-                        d["position"]
-                        nv.model.set("data", { "position" : ui.position } ); }
+//                        var d = nv.model.get("data");
+//                        d["position"]
+                        nv.model.set("node_pos_left", ui.position.left);
+                        nv.model.set("node_pos_top", ui.position.top);
+                        nv.model.save();
+
+                    }
             } );
 
             var endpoint = jsPlumb.addEndpoint(node_element, endpointOptions);
@@ -110,7 +122,7 @@ NetFigureMetadataListView = Backbone.View.extend({
 
         that.child_nodeviews = {};
         this.model.nodes.each(function(node) {
-            that.child_nodeviews[node.get("node_id")] = newNodeView(node);
+            that.child_nodeviews[node.get("netfig_node_id")] = newNodeView(node);
         } , this);
 
         that.child_edgeviews = {};
@@ -144,6 +156,25 @@ NetFigureMetadataListView = Backbone.View.extend({
            );
 
         }, this);
+
+    },
+
+
+    setColors: function(contrastSet) {
+        // load expression data
+        var that = this;
+
+        $.getJSON("/network/expression/" + this.model.get("netfig_id").toString(),
+            function(data)  {
+                // iterate through nodes, setting color if it matches
+                _.each(that.child_nodeviews, function(node_view) {
+                    if (node_view.model.get("node_obj_idtype") === "entrez_gene_symbol") {
+                    var gene_symbol = node_view.model.get("node_obj_id");
+                    $(node_view.el).css("background", bluePinkColorscale( data[gene_symbol][contrastSet] ));
+                    }
+            });
+        }
+        );
 
     }
 });

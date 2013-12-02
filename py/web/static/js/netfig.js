@@ -12,7 +12,7 @@ NetNodeView = Backbone.View.extend({
     tagname : "div",
     className : "node",
     render : function() {
-        this.$el.html("<a class='nodelabel' target=_search href='/search?q=" + this.model.get("node_obj_id") + "'>" + this.model.get("node_obj_id") + "</a>");
+        this.$el.html("<div class='nodelabel'><a class='nodelabel' target=_search href='/search?q=" + this.model.get("node_obj_id") + "'>" + this.model.get("node_obj_id") + "</a></div>");
         this.$el.css("left", this.model.get("node_pos_left"));
         this.$el.css("top", this.model.get("node_pos_top"));
         return this;
@@ -142,7 +142,7 @@ NetFigureMetadataListView = Backbone.View.extend({
            }
            else {
                overlayType = [];
-               paintStyle = { strokeStyle:"#666", lineWidth:1 };
+               paintStyle = { strokeStyle:"#666", dashstyle: "2 2", lineWidth:1 };
            }
 
            jsPlumb.connect( {

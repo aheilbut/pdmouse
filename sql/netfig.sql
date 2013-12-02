@@ -113,12 +113,30 @@ CREATE TABLE mean_fold_change (
   drd2_dopdepletion FLOAT,
   drd2_chronic_low FLOAT,
   drd2_chronic_high FLOAT,
+  drd2_chronic_high_vs_low FLOAT,
   drd1a_dopdepletion FLOAT,
   drd1a_chronic_low FLOAT,
-  drd1a_chronic_high FLOAT
+  drd1a_chronic_high FLOAT,
+  drd1a_chronic_high_vs_low FLOAT
 );
 
-\copy mean_fold_change FROM '/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/2013_11_18/mean_fold_change.tab' WITH DELIMITER '       ' CSV HEADER
+\copy mean_fold_change FROM '/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/2013_11_23/gene_level/mean_fold_change.tab' WITH DELIMITER '       ' CSV HEADER
+
+
+CREATE TABLE max_fold_change (
+  gene_symbol VARCHAR PRIMARY KEY,
+  drd2_dopdepletion FLOAT,
+  drd2_chronic_low FLOAT,
+  drd2_chronic_high FLOAT,
+  drd2_chronic_high_vs_low FLOAT,
+  drd1a_dopdepletion FLOAT,
+  drd1a_chronic_low FLOAT,
+  drd1a_chronic_high FLOAT,
+  drd1a_chronic_high_vs_low FLOAT
+);
+
+\copy max_fold_change FROM '/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/2013_11_23/gene_level/max_fold_change.tab' WITH DELIMITER '       ' CSV HEADER
+
 
 
 CREATE TABLE netfig_edge_types (
@@ -150,3 +168,6 @@ CREATE TABlE pd_log (
 
     target_node_obj_idtype VARCHAR REFERENCES netfig_obj_idtypes(netfig_obj_idtype),
     target_node_obj_id VARCHAR,
+
+
+    create table bannon2011 (entrez_gene_sym VARCHAR, illumina_probe_id VARCHAR, transcript_acc VARCHAR, adj_pval FLOAT, E_C_fc FLOAT, G_C_fc FLOAT);

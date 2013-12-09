@@ -9,8 +9,9 @@ body {
 }
 
 th {
-    font-size: 8pt;
+    font-size: 7pt;
 }
+
 
 .rotate div {
     -webkit-transform: rotate(-90deg) translate(0, 0px);
@@ -28,7 +29,7 @@ th {
 
 .rowlabel {
     font-size: 7px;
-    font-family: "Arial Narrow";
+    font-family: "Arial";
 }
 
 .probesetLabel{
@@ -45,12 +46,14 @@ th {
 table {
     padding-top: 0px;
     margin-top: 0px;
+
 }
 
 .mapdiv {
-    border-right: 1px solid white;
-    border-left: 1px solid white;
+    margin-right: 20px;
+    border-right: 1px solid black;
     float: left;
+    width: 200px;
 
 }
 
@@ -90,13 +93,14 @@ $(document).ready(function() {
 
    var plotColumns = function(group, probeset, row) {
                   var cell = document.createElement("td");
-                  $(cell).css("width", "8px").css("height", "6px").css("border", "1px solid #CFCFCF");
+                  $(cell).css("width", "6px").css("height", "6px").css("border", "1px solid #CFCFCF");
                   $(cell).css("background", bluePinkColorscale(dataset[group][probeset]) );
                   $(row).append(cell);
     }
 
 
        var heatmapdiv = document.createElement("div");
+       $(heatmapdiv).attr("class","heatmapblock");
        var table = document.createElement("table");
 
        $(heatmapdiv).append("<h5>" + title + "</h5>");
@@ -113,11 +117,11 @@ $(document).ready(function() {
 
        d2Blocks.forEach(function(group) { plotColumns(group, probeset, row) });
 
-       $(row).append("<td style='background: none; border: none; width: 4px'></td>")
+       $(row).append("<td style='background: none; border: none; width: 3px'></td>")
 
        d1Blocks.forEach(function(group) { plotColumns(group, probeset, row) });
 
-       $(row).append("<td style='background: none; border: none; width: 4px'></td>")
+       $(row).append("<td style='background: none; border: none; width: 3px'></td>")
 
        highVsLowBlocks.forEach(function(group) { plotColumns(group, probeset, row) });
 
@@ -167,6 +171,7 @@ $(document).ready(function() {
     $("body").append( heatmapTable("ionotropic_glut", ionotropic_glut));
     $("body").append( heatmapTable("potassium", potassium));
     $("body").append( heatmapTable("scaffolding", scaffolding));
+    $("body").append( heatmapTable("rasraf", rasraf));
 
 
 });

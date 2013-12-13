@@ -201,9 +201,11 @@ class NetfigMeanFoldChanges(Base):
     drd2_dopdepletion = Column("drd2_dopdepletion", Float)
     drd2_chronic_low = Column("drd2_chronic_low", Float)
     drd2_chronic_high = Column("drd2_chronic_high", Float)
+    drd2_chronic_high_vs_low = Column("drd2_chronic_high_vs_low", Float)
     drd1a_dopdepletion = Column("drd1a_dopdepletion", Float)
     drd1a_chronic_low = Column("drd1a_chronic_low", Float)
     drd1a_chronic_high = Column("drd1a_chronic_high", Float)
+    drd1a_chronic_high_vs_low = Column("drd1a_chronic_high_vs_low", Float)
 
     def to_dict(self):
         return {
@@ -211,9 +213,11 @@ class NetfigMeanFoldChanges(Base):
             "drd2_dopdepletion": self.drd2_dopdepletion,
             "drd2_chronic_low": self.drd2_chronic_low,
             "drd2_chronic_high": self.drd2_chronic_high,
+            "drd2_chronic_high_vs_low" : self.drd2_chronic_high_vs_low,
             "drd1a_dopdepletion": self.drd1a_dopdepletion,
             "drd1a_chronic_low": self.drd1a_chronic_low,
-            "drd1a_chronic_high": self.drd1a_chronic_high
+            "drd1a_chronic_high": self.drd1a_chronic_high,
+            "drd1a_chronic_high_vs_low" : self.drd1a_chronic_high_vs_low
         }
 
 

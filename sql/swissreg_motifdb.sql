@@ -12,12 +12,38 @@ CREATE TABLE mm9_refFlat (
   exonEnds TEXT
 );
 
+
 create index i_cdsStart on mm9_refFlat(cdsStart);
 create index i_cdsEnd on mm9_refFlat(cdsEnd);
 create index i_geneName on mm9_refFlat(geneName);
 create index i_chrom on mm9_refFlat(chrom);
 
 \copy mm9_refFlat from '/data/adrian/Dropbox/Data/mouse_genome/refFlat.txt' with delimiter as '   ' csv header;
+
+
+CREATE TABLE mm10_refFlat (
+  geneName VARCHAR(255),
+  name VARCHAR(255),
+  chrom VARCHAR(255),
+  strand CHAR(1),
+  txStart BIGINT,
+  txEnd BIGINT,
+  cdsStart BIGINT,
+  cdsEnd BIGINT,
+  exonCount INTEGER,
+  exonStarts TEXT,
+  exonEnds TEXT
+);
+
+create index i_cdsStart_mm10 on mm10_refFlat(cdsStart);
+create index i_cdsEnd_mm10 on mm10_refFlat(cdsEnd);
+create index i_geneName_mm10 on mm10_refFlat(geneName);
+create index i_chrom_mm10 on mm10_refFlat(chrom);
+
+\copy mm10_refFlat from '/data/adrian/data/mmusculus/refFlat_mm10.txt' with delimiter as '   ' csv header;
+
+
+
 
 
 CREATE TABLE hg19_refFlat (
@@ -236,6 +262,51 @@ select geneName, hg19_refFlat.chrom, cdsStart, cdsEnd, txStart, txEnd, exonStart
   )
 
 
+create table nbre (
+  genome VARCHAR,
+  chr VARCHAR,
+  start_pos BIGINT,
+  end_pos BIGINT,
+  strand CHAR,
+  seq VARCHAR
+);
+
+create index i_nbre_start_pos ON nbre(chr, start_pos);
+
+select genename, txstart, nbre.* from nbre
+ INNER JOIN mm10_refflat ON
+  nbre.chr = mm10_refflat.chrom
+  and nbre.start_pos < mm10_refflat.txstart
+  nbre.start_pos > (mm10_refflat.txstart - 5000)
+  and chr = 'chr1'
+
+select genename, txstart, count(distinct nbre.start_pos) as c from nbre
+ INNER JOIN mm10_refflat ON
+  nbre.chr = mm10_refflat.chrom
+  and
+  ( (nbre.start_pos < mm10_refflat.txstart
+  and nbre.start_pos > (mm10_refflat.txstart - 2000)
+  and mm10_refflat.strand = '+')
+  or
+  (nbre.start_pos > mm10_refflat.txstart
+  and nbre.start_pos < (mm10_refflat.txstart + 2000)
+  and mm10_refflat.strand = '-') )
+  GROUP BY genename, txstart ORDER BY c desc;
 
 
+create table nbre_fwd (
+  genome VARCHAR,
+  chr VARCHAR,
+  start_pos BIGINT,
+  end_pos BIGINT,
+  seq VARCHAR
+)
+
+select genome, chr, start_pos, genename, txstart from nbre_fwd
+ INNER JOIN mm10_refflat on
+  nbre_fwd.chr = mm10_refflat.chrom
+  AND
+ ( ( mm10_refflat.strand = '+' AND  (nbre_fwd.start_pos > mm10_refflat.txstart - 10000) and  (nbre_fwd.start_pos < mm10_refflat.txstart) )
+ or
+  ( mm10_refflat.strand = '-' AND  (nbre_fwd.start_pos < mm10_refflat.txend + 10000) and  (nbre_fwd.start_pos > mm10_refflat.txend) )
 

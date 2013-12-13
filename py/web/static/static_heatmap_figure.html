@@ -1,0 +1,185 @@
+<html>
+
+
+<head>
+    <style type="text/css">
+
+body {
+ font-family: Arial;
+}
+
+th {
+    font-size: 7pt;
+}
+
+
+.rotate div {
+    -webkit-transform: rotate(-90deg) translate(0, 0px);
+    -moz-transform: rotate(-90deg)  translate(0, 10px);
+    writing-mode: bt-rl;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    overflow: auto;
+    width: 80px;
+    height: 80px;
+    font-size: 7pt;
+    text-align: left;
+}
+
+.rowlabel {
+    font-size: 7px;
+    font-family: "Arial";
+}
+
+.probesetLabel{
+    font-size: 5px;
+    font-family: "Arial Narrow";
+}
+
+
+.groupmap {
+    position: relative;
+    width: 400px;
+}
+
+table {
+    padding-top: 0px;
+    margin-top: 0px;
+
+}
+
+.mapdiv {
+    margin-right: 20px;
+    border-right: 1px solid black;
+    float: left;
+    width: 200px;
+
+}
+
+h5 {
+    padding-bottom: 0px;
+    margin: 0px;
+}
+
+th.rotate {padding-top: 0px; padding-bottom: 85px;}
+
+
+    </style>
+</head>
+ <script src="/static/jquery-ui/jquery-1.9.1.js"></script>
+ <script src="/static/js/d3/d3.min.js" charset="utf-8"></script>
+ <script type="text/javascript" src="/static/jquery-ui/ui/minified/jquery-ui.min.js"></script>
+ <script type="text/javascript" src="/static/summary_heatmaps.js"></script>
+
+<script>
+
+   bluePinkColorscale = d3.scale.linear()
+         .domain([-3, 0, 3])
+         .range(["blue", "white", "red"]);
+
+
+$(document).ready(function() {
+
+   var d2Blocks = ["drd2_dopdepletion", "drd2_low", "drd2_high"];
+   var d1Blocks = ["drd1a_dopdepletion", "drd1a_low", "drd1a_high"];
+   var highVsLowBlocks = ["drd1a_highVsLow"];
+
+   heatmapTable = function(id, databundle) {
+
+   var dataset = databundle["data"];
+   var dataset_index = databundle["index"];
+   var title = databundle["title"];
+
+   var plotColumns = function(group, probeset, row) {
+                  var cell = document.createElement("td");
+                  $(cell).css("width", "6px").css("height", "6px").css("border", "1px solid #CFCFCF");
+                  $(cell).css("background", bluePinkColorscale(dataset[group][probeset]) );
+                  $(row).append(cell);
+    }
+
+
+       var heatmapdiv = document.createElement("div");
+       $(heatmapdiv).attr("class","heatmapblock");
+       var table = document.createElement("table");
+
+       $(heatmapdiv).append("<h5>" + title + "</h5>");
+       $(heatmapdiv).append(table);
+       $(table).append("<tr> <th colspan='3'>Drd2</th> <th></th> <th colspan='5'>Drd1a</th> </tr>");
+       $(table).append('<tr><th>D</th><th>L</th><th>H</th><td></td><th>D</th><th>L</th><th>H</th><td></td><th>C</th></tr>');
+       $(table).attr("id", id);
+       $(table).css("table-layout", "fixed");
+
+
+
+   dataset_index.forEach(function(probeset) {
+       var row = document.createElement("tr")
+
+       d2Blocks.forEach(function(group) { plotColumns(group, probeset, row) });
+
+       $(row).append("<td style='background: none; border: none; width: 3px'></td>")
+
+       d1Blocks.forEach(function(group) { plotColumns(group, probeset, row) });
+
+       $(row).append("<td style='background: none; border: none; width: 3px'></td>")
+
+       highVsLowBlocks.forEach(function(group) { plotColumns(group, probeset, row) });
+
+
+       var cell = document.createElement("td");
+       $(cell).addClass("probesetLabel").html(probeset);
+       $(row).append(cell);
+
+       var cell = document.createElement("td");
+       var desc = dataset["symbol"][probeset]
+       if ("altnames" in databundle) {
+       if (dataset["symbol"][probeset] in databundle["altnames"]) {
+           desc = desc + " (" + databundle["altnames"][dataset["symbol"][probeset]] + ") ";
+       }
+        }
+       $(cell).addClass("rowlabel").html(desc);
+       $(row).append(cell);
+
+        $(table).append(row);
+
+   });
+
+       $(heatmapdiv).addClass("mapdiv");
+       $(heatmapdiv).draggable();
+       return heatmapdiv;
+
+   }
+
+//   heatmapTable(dusp_data, dusps, "#dusps");
+//   heatmapTable(nr4_data, nr4s, "#nr4s");
+//   heatmapTable(crebs_data, list_creb, "#creb");
+//   heatmapTable(rgs_data, list_rgs, "#rgs");
+
+    $("body").append( heatmapTable("erstress", er_stress));
+    $("body").append( heatmapTable("gpcr_regulators", gpcr_regulators));
+//    $("body").append( heatmapTable("other_gpcr", other_gpcr));
+    $("body").append( heatmapTable("mapk", mapk));
+    $("body").append( heatmapTable("pp", pp));
+
+    $("body").append( heatmapTable("nr4", nr4));
+    $("body").append( heatmapTable("ets", ets));
+    $("body").append( heatmapTable("creb", creb));
+    $("body").append( heatmapTable("ap1", ap1));
+
+    $("body").append( heatmapTable("mr_glut", mr_glut));
+    $("body").append( heatmapTable("ltype_ca", ltype_ca));
+    $("body").append( heatmapTable("ionotropic_glut", ionotropic_glut));
+    $("body").append( heatmapTable("potassium", potassium));
+    $("body").append( heatmapTable("scaffolding", scaffolding));
+    $("body").append( heatmapTable("rasraf", rasraf));
+
+
+});
+
+</script>
+
+
+    <body>
+    </body>
+
+</html>

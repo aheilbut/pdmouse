@@ -15,8 +15,6 @@ gz.GZConst(1.5).run()
 
 # <codecell>
 
-import pdgz as gz
-import pd_tfmotif_workflow as tf
 import networkx as nx
 import statsmodels.sandbox.stats.multicomp
 import IPython
@@ -35,128 +33,6 @@ import alib.plots
 reload(gz)
 reload(tf)
 reload(tf.pda)
-
-# <codecell>
-
-getFactorTypes = tf.GetFactorTypes()
-
-# <codecell>
-
-loadWideTable = tf.WideLoad()
-
-# <codecell>
-
-w = gz.GZWorkFlow()
-
-# <codecell>
-
-w.addWorkNode( loadWideTable )
-w.addWorkNode( getFactorTypes )
-
-# <codecell>
-
-w.plug( [ (loadWideTable.o.cp_both_wide_info, getFactorTypes.i.cp_both_wide_info) ] )
-
-# <codecell>
-
-loadWideTable.o.resultdict()
-
-# <codecell>
-
-for in_port in getFactorTypes.i.listports():
-    print in_port.port_name
-
-# <codecell>
-
-[p.port_name for p in loadWideTable.o.listports()]
-
-# <codecell>
-
-wr = gz.GZWorkRunner(w)
-
-# <codecell>
-
-n = wr.runFlow()
-
-# <codecell>
-
-w = gz.GZWorkFlow()
-calcTFTargetCounts = tf.CalcTFTargetCounts()
-calcMotifGeneCounts = tf.CalcMotifGeneCounts()
-loadCheaTable = tf.LoadCheaTable() 
-loadGeneMotifs = tf.LoadGeneMotifsFlexible()
-loadMatTFGraph = tf.LoadMatTFGraph()
-wideLoad = tf.WideLoad()
-getFactorTypes = tf.GetFactorTypes() 
-getEnrichedTFs = tf.GetEnrichedTFs() 
-getEnrichedSRMotifs = tf.GetEnrichedSRMotifs()
-
-addEnrichedTFStats = tf.AddEnrichedTFStats() 
-addEnrichedMotifStats = tf.AddEnrichedMotifStats() 
-getContrastPatterns = tf.GetContrastPatterns() 
-fc_t = gz.GZConst(1.5)
-total_genes = gz.GZConst(22000)
-
-species_genome = gz.GZConst("mm9")
-
-w.addWorkNodes( [calcTFTargetCounts, calcMotifGeneCounts, loadCheaTable, loadGeneMotifs,
-                 loadMatTFGraph, wideLoad, getFactorTypes, getEnrichedTFs, getEnrichedSRMotifs, 
-                 addEnrichedMotifStats, addEnrichedTFStats, getContrastPatterns,
-                 fc_t, total_genes, species_genome ] ) 
-
-# <codecell>
-
-upstreamDistance = gz.GZConst(5000)
-downstreamDistance = gz.GZConst(2000)
-
-w.addWorkNodes( [ upstreamDistance, downstreamDistance ] )
-
-# <codecell>
-
-w.plug( [(loadCheaTable.o.chea, calcTFTargetCounts.i.chea) ] )
-
-w.plug( [(wideLoad.o.cp_both_wide_info, getEnrichedTFs.i.cp_both_wide_info),
-         (loadCheaTable.o.chea, getEnrichedTFs.i.chea) ] )
-
-w.plug( [(upstreamDistance.o.value, loadGeneMotifs.i.upstreamDistance),
-         (downstreamDistance.o.value, loadGeneMotifs.i.downstreamDistance)] )
-
-w.plug( [(wideLoad.o.cp_both_wide_info, getFactorTypes.i.cp_both_wide_info)])
-
-w.plug( [(getFactorTypes.o.factortypes, getEnrichedTFs.i.factortypes),
-         (fc_t.o.value, getEnrichedTFs.i.fc_threshold )] )
-
-w.plug( [(wideLoad.o.cp_both_wide_info, getContrastPatterns.i.cp_both_wide_info),
-         (getFactorTypes.o.factortypes, getContrastPatterns.i.factortypes)] )
-
-w.plug( [(wideLoad.o.cp_both_wide_info, getEnrichedSRMotifs.i.cp_both_wide_info),
-         (loadGeneMotifs.o.mm9_gene_motifs, getEnrichedSRMotifs.i.mm9_gene_motifs),
-         (getFactorTypes.o.factortypes, getEnrichedSRMotifs.i.factortypes),
-         (fc_t.o.value, getEnrichedSRMotifs.i.fc_threshold) ] )
-
-w.plug( [(getEnrichedSRMotifs.o.enriched_motifs, addEnrichedMotifStats.i.top_motifs),
-         (calcMotifGeneCounts.o.mm9_motif_gene_counts, addEnrichedMotifStats.i.mm9_motif_gene_counts),
-         (total_genes.o.value, addEnrichedMotifStats.i.total_genes)] )
-
-w.plug( [(calcTFTargetCounts.o.tf_target_counts, addEnrichedTFStats.i.tf_target_counts),
-         (getEnrichedTFs.o.top_tfs, addEnrichedTFStats.i.top_tfs),
-         (total_genes.o.value, addEnrichedTFStats.i.total_genes)] )
-
-w.plug( [(loadGeneMotifs.o.mm9_gene_motifs, calcMotifGeneCounts.i.mm9_gene_motifs)])
-
-w.plug( [(species_genome.o.value, loadGeneMotifs.i.species_genome)] )
-
-# <codecell>
-
-g = gz.GZWorkRunner(w).worknode_graph()
-
-# <codecell>
-
-hs_motifs = c.results[('LoadGeneMotifsFlexible', 1)]["mm9_gene_motifs"]
-
-# <codecell>
-
-c = gz.GZWorkRunner(w).runFlow()
 
 # <codecell>
 
@@ -258,15 +134,6 @@ corroborated = cur_group.merge( mj, how='outer', left_on="tf_name", right_on="tf
 
 # <codecell>
 
-corroborated
-
-# <codecell>
-
-for x in corroborated.index:
-    print type(corroborated.ix[x, "tf_associations"]), type(corroborated.ix[x, "motif_occurrences"])    
-
-# <codecell>
-
 f = open("/data/adrian/Dropbox/tf_motif_intersection_sep4.html", "w")
 
 def listformatter(x):
@@ -345,10 +212,6 @@ corroborated[["tf_name", "motif_divid"]].to_json(orient="records")
 
 # <codecell>
 
-loadGeneMotifs.run.__func__
-
-# <codecell>
-
 f.close()
 
 # <codecell>
@@ -381,10 +244,6 @@ list( set( x.ix["tf_associations"].symbol ).intersection( x.ix["motif_occurrence
 # <codecell>
 
 sort(["a", "b", "z", "c"])
-
-# <codecell>
-
-corroborated["overlap_genes"]
 
 # <codecell>
 
@@ -458,32 +317,11 @@ t = c.results[('LoadCheaTable', 1)]["chea"]
 
 # <codecell>
 
-t
-
-# <codecell>
-
 motifs = c.results[ ('GetEnrichedSRMotifs', 1)]["enriched_motifs"]
 
 # <codecell>
 
-motifs
-
-# <codecell>
-
-
-# <codecell>
-
 t.select(lambda x: t.ix[x, "target"] == "DRD1A")
-
-# <codecell>
-
-
-# <codecell>
-
-
-# <codecell>
-
-m["tf_u"] = m.tf.
 
 # <codecell>
 
@@ -513,25 +351,6 @@ td = t.select(lambda x: t.ix[x, "target"] == "DRD1A")
 # <codecell>
 
 motifs[motifs.keys()[0]]
-
-# <codecell>
-
-tf.LoadGeneMotifs( 
-
-# <codecell>
-
-class T():
-    class P():
-        a = 0
-        b = 0
-    ports = P()
-    
-    def __init__(self, **kwargs):
-        print kwargs
-
-# <codecell>
-
-t = T({"a" : "B"})
 
 # <codecell>
 
@@ -827,8 +646,6 @@ total_genes = 22000
 
 # <codecell>
 
-
-
 p = overlaps.apply( lambda x: (
       scipy.stats.hypergeom.sf(
           x.ix["match_count"]-1, # number of differentially expressed genes in set
@@ -862,9 +679,6 @@ top_tfs.items()[0]
 
 import scipy.stats
 total_genes = 22000
-
-# <codecell>
-
 
 # <codecell>
 
@@ -933,10 +747,6 @@ top_motifs[k]
 # <codecell>
 
 m = motifs[k].drop("motif_occurrences",axis=1)
-
-# <codecell>
-
-m.to_dict(
 
 # <codecell>
 
@@ -1062,10 +872,6 @@ cp73_chronicHigh_down = (cp_both_wide_info.select(
 
 # <codecell>
 
-patterns
-
-# <codecell>
-
 patterns.columns = [[pda.tm.e(val) for (t, val) in pda.tm.d( c ) if t == "cmp"][0] for c in patterns.columns]
 
 # <codecell>
@@ -1094,17 +900,8 @@ imshow( g.get_group(656).as_matrix(), interpolation="nearest", cmap=get_cmap("gr
 
 # <codecell>
 
-
-# <codecell>
-
 targets = cz.target.unique()
 tfs = cz.tf.unique()
-
-# <codecell>
-
-
-# <codecell>
-
 
 # <codecell>
 
@@ -1202,13 +999,6 @@ def countMotifCombos( genegroup, combination_size ):
     result["total_genes_in_group"] = len(z)
     #ret
     return result
-
-
-
-# <codecell>
-
-
-# <codecell>
 
 
 
@@ -1406,14 +1196,7 @@ distances = scipy.cluster.hierarchy.distance.pdist(tfc + 0.001, "jaccard")
 # <codecell>
 
 rowY = fastcluster.linkage( distances )
-
-# <codecell>
-
 rowZ = scipy.cluster.hierarchy.dendrogram(rowY, orientation='right', no_plot=False)
-
-# <codecell>
-
-rowZ['leaves']
 
 # <codecell>
 
@@ -1540,31 +1323,6 @@ def getMotifMatches( genegroup ):
 
 # <codecell>
 
-hs_motifs
-
-# <codecell>
-
-def getHumanMotifMatches( genegroup ):
-    cz= hs_motifs.merge(genegroup, left_on="genename", right_on="symbol") 
-    
-    total_genes_in_group = len( pda.uniqueSym(genegroup.symbol) )
-    
-    print(len(cz.index))
-    
-    result = []
-    for k, z in cz.groupby("motif_name"):
-        result.append( { "motif_name"  : k,
-                         "count" : len(pda.uniqueSym(z.symbol)),
-                         "total_genes_in_group" : total_genes_in_group,
-                         "motif_occurrences": z
-                        }  )
-        
-    result = pd.DataFrame(result)
-    result.index = result.motif_name
-    return result
-
-# <codecell>
-
 mm9_gene_motifs = loadGeneMotifs.o.mm9_gene_motifs.val
 
 # <codecell>
@@ -1577,7 +1335,7 @@ group_d
 
 # <codecell>
 
-getMotifMatches( group_d ).sort_index(by="count", ascending=False).drop("motif_occurrences",axis=1)[0:10]Duckworth spent a number of years toying with the idea of starting her own charter school, but eventually concluded that the model didn’t hold much promise for changing the circumstances of children from disadvantaged backgrounds, those whom the education system was failing most tragically. Instead, she decided to pursue a PhD program at Penn. In her application essay, she shared how profoundly the experience of working in schools had changed her view of school reform and wrote:
+getMotifMatches( group_d ).sort_index(by="count", ascending=False).drop("motif_occurrences",axis=1)[0:10]
 
 # <codecell>
 
@@ -1875,320 +1633,4 @@ for k in t13_tfs.keys():
     t13_tfs[k].drop("tf_associations", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; chea")
     t13_motifs[k].drop("motif_occurrences", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k +"; motifs")
 e.save()
-
-# <codecell>
-
-hd_data = pd.read_table("/data/adrian/Dropbox/Projects/Broad/HD_mouse/HD_file_archive/2013_09/R62 14 week P0.1, FC1.2 BHcorr.txt", 
-                        sep="\t", comment="#",
-                        header=0)
-
-# <codecell>
-
-doyle_data_top_d1_enriched = pd.read_excel("/data/adrian/Dropbox/Projects/Broad/PD_mouse/extra_data/doyle_cell_specific.xlsx", 
-                                           "Top D1 enriched", header=None)
-doyle_data_top_d1_enriched.columns = ["probeset_id", "symbol"]
-
-doyle_data_top_d2_enriched = pd.read_excel("/data/adrian/Dropbox/Projects/Broad/PD_mouse/extra_data/doyle_cell_specific.xlsx", 
-                                           "Top D2 enriched", header=None,  )
-doyle_data_top_d2_enriched.columns = ["probeset_id", "symbol"]
-
-doyle_data_d1_enriched = pd.read_excel("/data/adrian/Dropbox/Projects/Broad/PD_mouse/extra_data/doyle_cell_specific.xlsx", 
-                                           "D1 enriched", header=None)
-doyle_data_d1_enriched.columns = ["probeset_id", "symbol"]
-
-doyle_data_d2_enriched = pd.read_excel("/data/adrian/Dropbox/Projects/Broad/PD_mouse/extra_data/doyle_cell_specific.xlsx", 
-                                           "D2 enriched", header=None)
-doyle_data_d2_enriched.columns = ["probeset_id", "symbol"]
-
-doyle_data_striatal_enriched = pd.read_excel("/data/adrian/Dropbox/Projects/Broad/PD_mouse/extra_data/doyle_cell_specific.xlsx", 
-                                           "Striatal enriched", header=None)
-doyle_data_striatal_enriched.columns = ["probeset_id", "symbol"]
-
-doyle_data_purkinje_enriched = pd.read_excel("/data/adrian/Dropbox/Projects/Broad/PD_mouse/extra_data/doyle_cell_specific.xlsx", 
-                                           "Purkinjie cell enriched", header=None)
-doyle_data_purkinje_enriched.columns = ["probeset_id", "symbol"]
-
-doyle_data_brainstem_motorneuron_enriched = pd.read_excel("/data/adrian/Dropbox/Projects/Broad/PD_mouse/extra_data/doyle_cell_specific.xlsx", 
-                                           "Brain stem motor neuron", header=None)
-doyle_data_brainstem_motorneuron_enriched.columns = ["probeset_id", "symbol"]
-
-
-doyle_motifs= {
-               "top D1" : getMotifMatches( doyle_data_top_d1_enriched ),
-               "top D2" : getMotifMatches( doyle_data_top_d2_enriched ),
-               "D1" : getMotifMatches( doyle_data_d1_enriched ),
-               "D2" : getMotifMatches( doyle_data_d2_enriched ),
-               "Striatal" : getMotifMatches( doyle_data_striatal_enriched ),
-               "purkinje" : getMotifMatches( doyle_data_purkinje_enriched ),
-               "brainstem motorneuron" : getMotifMatches( doyle_data_brainstem_motorneuron_enriched)
-               }
-
-# <codecell>
-
-doyle_tf = {
-               "top D1" : getTFMatches( doyle_data_top_d1_enriched ),
-               "top D2" : getTFMatches( doyle_data_top_d2_enriched ),
-               "D1" : getTFMatches( doyle_data_d1_enriched ),
-               "D2" : getTFMatches( doyle_data_d2_enriched ),
-               "Striatal" : getTFMatches( doyle_data_striatal_enriched ),
-               "purkinje" : getTFMatches( doyle_data_purkinje_enriched ),
-               "brainstem motorneuron" : getTFMatches( doyle_data_brainstem_motorneuron_enriched)
-               }
-
-# <codecell>
-
-doyle_data_top_d1_enriched.symbol.dtype = np.str
-
-# <codecell>
-
-
-# <codecell>
-
-addEnrichedMotifStats.i.top_motifs.val = doyle_motifs
-addEnrichedMotifStats.run()
-
-# <codecell>
-
-addEnrichedTFStats.i.top_tfs.val = doyle_tf
-addEnrichedTFStats.run()
-
-# <codecell>
-
-for k in doyle_motifs.keys():
-    a = doyle_motifs[k].motif_occurrences
-    doyle_motifs[k]["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
-    doyle_motifs[k] = doyle_motifs[k].merge( mm9_motif_gene_counts, left_on="motif_name", right_on="motif_name")
-
-# <codecell>
-
-for k in doyle_tf.keys():
-    a = doyle_tf[k].tf_associations
-    doyle_tf[k]["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
-    doyle_tf[k] = doyle_tf[k].merge( tf_target_counts, left_on="tf_name", right_on="tf")
-
-# <codecell>
-
-
-# <codecell>
-
-doyle_tf["D1"].drop("tf_associations", axis=1).sort_index(by="count", ascending=False)[0:50]
-
-# <codecell>
-
-doyle_motifs["D1"].drop("motif_occurrences", axis=1).sort_index(by="count", ascending=False)[0:50]
-
-# <codecell>
-
-dd_motifs = getMotifMatches( doyle_data_top_d1_enriched )
-
-# <codecell>
-
-dd_motifs.drop("motif_occurrences", axis=1)
-
-# <codecell>
-
-hd_data["symbol"] = hd_data["Gene Symbol"]
-
-# <codecell>
-
-hd_sym = [s.split("///")[0] for s in pda.uniqueSym( hd_data["Gene Symbol"] )]
-
-# <codecell>
-
-hd_motifs = { "hd_set" : getMotifMatches( hd_data ) }
-
-# <codecell>
-
-hd_tfs = { "hd_set" : getTFMatches( hd_data ) }
-
-# <codecell>
-
-addEnrichedTFStats.i.top_tfs.val = hd_tfs
-addEnrichedTFStats.run()
-
-# <codecell>
-
-
-# <codecell>
-
-addEnrichedMotifStats.i.top_motifs.val = hd_motifs
-addEnrichedMotifStats.run()
-
-# <codecell>
-
-hd_tfs
-
-# <codecell>
-
-hd_motifs.drop("motif_occurrences", axis=1).sort_index(by="count", ascending=False)[0:50]
-
-# <codecell>
-
-for k in hd_motifs.keys():
-    a = hd_motifs[k].motif_occurrences
-    hd_motifs[k]["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
-    hd_motifs[k] = hd_motifs[k].merge( mm9_motif_gene_counts, left_on="motif_name", right_on="motif_name")
-
-# <codecell>
-
-for k in hd_tfs.keys():
-    a = hd_tfs[k].tf_associations
-    hd_tfs[k]["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
-    hd_tfs[k] = hd_tfs[k].merge( tf_target_counts, left_on="tf_name", right_on="tf")
-
-# <codecell>
-
-hd_tfs["hd_set"].sort_index(by="pval").drop("tf_associations", axis=1)[0:20]
-
-# <codecell>
-
-hd_motifs["hd_set"].drop("motif_occurrences", axis=1).sort_index(by="pval")[0:10]
-
-# <codecell>
-
-e = pd.ExcelWriter("/data/adrian/Dropbox/hd_r62_14wk_transcriptReg.xls")
-for k in hd_motifs.keys():
-    hd_tfs[k].drop("tf_associations", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; chea")
-    hd_motifs[k].drop("motif_occurrences", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k +"; motifs")
-e.save()
-
-# <codecell>
-
-e = pd.ExcelWriter("/data/adrian/Dropbox/Projects/Broad/PD_mouse/results/2013_09_26/doyle_enriched_transcriptReg.xls")
-for k in doyle_motifs.keys():
-    doyle_tf[k].drop("tf_associations", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; chea")
-    doyle_motifs[k].drop("motif_occurrences", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k +"; motifs")
-e.save()
-
-# <codecell>
-
-hd_human = pd.read_excel("/data/adrian/Dropbox/Projects/Broad/HD_mouse/2013_09_18/Hodges_2006_TableS2.xls",
-                         "Table S3", 
-                         skiprows=1)
-
-# <codecell>
-
-hg133a_symbols = pd.DataFrame.from_csv("/data/adrian/Dropbox/Projects/Broad/HD_mouse/2013_09_18/hgu133a_symbols.tab", sep="\t")
-
-# <codecell>
-
-hg133b_symbols = pd.DataFrame.from_csv("/data/adrian/Dropbox/Projects/Broad/HD_mouse/2013_09_18/hgu133b_symbols.tab", sep="\t")
-
-# <codecell>
-
-hg133a_probesets = set(hg133a_symbols.index)
-hg133b_nonredund = hg133b_symbols.select( lambda x : x not in hg133a_probesets )
-
-# <codecell>
-
-hg133_all_symbols = pd.concat([hg133a_symbols, hg133b_nonredund])
-
-# <codecell>
-
-len(hg133_all_symbols.index)
-
-# <codecell>
-
-hd_human.columns=["probeset_id", "overlap", "direction"]
-
-# <codecell>
-
-hd_human_sym = hd_human.merge( hg133_all_symbols, left_on="probeset_id", right_index=True )
-
-# <codecell>
-
-hd_human_sym.select(lambda x: hd_human_sym.ix[x, "direction"] == "Decreased")
-
-# <codecell>
-
-hd_human_groups = {}
-hd_human_groups["all; Any dir"] = hd_human_sym
-hd_human_groups["all; UP"] = hd_human_sym.select(lambda x: hd_human_sym.ix[x, "direction"] == "Increased")
-hd_human_groups["all; DOWN"] = hd_human_sym.select(lambda x: hd_human_sym.ix[x, "direction"] == "Decreased")
-hd_human_groups["ol caudate; Any dir"] = hd_human_sym.select(lambda x: hd_human_sym.ix[x, "overlap"] == "*" )
-hd_human_groups["ol caudate; UP"] = hd_human_sym.select(lambda x: hd_human_sym.ix[x, "direction"] == "Increased" 
-                                                                          and hd_human_sym.ix[x, "overlap"] == "*" )
-hd_human_groups["ol caudate; DOWN"]  = hd_human_sym.select(lambda x: hd_human_sym.ix[x, "direction"] == "Decreased" 
-                                                                          and hd_human_sym.ix[x, "overlap"] == "*" )
-
-
-# <codecell>
-
-hd_human_groups.keys()
-
-# <codecell>
-
-addEnrichedTFStats.i.tf_target_counts.val
-
-# <codecell>
-
-hd_human_motifs = {}
-for g in hd_human_groups.keys():
-    t = getHumanMotifMatches( hd_human_groups[g] )
-    hd_human_motifs[g] = t
-addEnrichedMotifStats.i.top_motifs.val = hd_human_motifs 
-addEnrichedMotifStats.run()
-
-# <codecell>
-
-hd_human_motifs['ol caudate; UP'].drop("motif_occurrences", axis=1)
-
-# <codecell>
-
-hd_human_motifs['ol caudate; UP'].drop("motif_occurrences", axis=1).sort_index(by="pval")[0:20]
-
-# <codecell>
-
-getHumanMotifMatches(hd_human_groups["all; UP"]).drop("motif_occurrences", axis=1).sort_index(by="count",ascending=False)[0:10]
-
-# <codecell>
-
-hd_human_tfs = {}
-for g in hd_human_groups.keys():
-    t = getTFMatches( hd_human_groups[g] )
-    hd_human_tfs[g] = t
-addEnrichedTFStats.i.top_tfs.val = hd_human_tfs 
-addEnrichedTFStats.run()
-
-# <codecell>
-
-mm9_motif_gene_counts
-
-# <codecell>
-
-for k in hd_human_motifs.keys():
-    a = hd_human_motifs[k].motif_occurrences
-    hd_human_motifs[k]["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
-    hd_human_motifs[k] = hd_human_motifs[k].merge( hg19_motif_gene_counts, left_on="motif_name", right_index=True)
-
-# <codecell>
-
-for k in hd_human_tfs.keys():
-    a = hd_human_tfs[k].tf_associations
-    hd_human_tfs[k]["targets"] = [str( list( a[x].symbol.unique() ) ) for x in a.index]
-    hd_human_tfs[k] = hd_human_tfs[k].merge( tf_target_counts, left_on="tf_name", right_on="tf")
-
-# <codecell>
-
-hg19_motif_gene_counts[0:10]
-
-# <codecell>
-
-e = pd.ExcelWriter("/data/adrian/Dropbox/hd_human_hodges_chea.xls")
-for k in hd_human_tfs.keys():
-    hd_human_tfs[k].drop("tf_associations", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; chea")
-#    hd_motifs[k].drop("motif_occurrences", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k +"; motifs")
-e.save()
-
-# <codecell>
-
-e = pd.ExcelWriter("/data/adrian/Dropbox/hd_human_hodges_sr_motifs.xls")
-for k in hd_human_motifs.keys():
-    hd_human_motifs[k].drop("motif_occurrences", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k + "; motifs")
-#    hd_motifs[k].drop("motif_occurrences", axis=1).sort_index(by="pval").to_excel( e, sheet_name=k +"; motifs")
-e.save()
-
-# <codecell>
-
-hd_tfs = { "hd_set" : getTFMatches( hd_data  }
 
